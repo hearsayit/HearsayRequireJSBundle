@@ -46,7 +46,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('base_url')
                         ->defaultValue('js')
                     ->end()
-                    ->arrayNode('namespaces')
+                    ->arrayNode('modules')
                         ->defaultValue(array())
                         ->useAttributeAsKey('path')
                         ->prototype('array')

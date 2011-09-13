@@ -36,6 +36,7 @@ use Symfony\Component\DependencyInjection\Loader;
  */
 class HearsayRequireJSExtension extends Extension
 {
+
     /**
      * {@inheritDoc}
      */
@@ -44,19 +45,41 @@ class HearsayRequireJSExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
-        
+
         $container->setParameter('hearsay_require_js.base_url', $config['base_url']);
-        
+
+        // Get bundles so we can match up bundle notation
+        $bundles = $container->getParameter('kernel.bundles');
         $count = 0;
-        foreach ($config['namespaces'] as $path => $settings) {
-            $namespace = $settings['namespace'];
+        foreach ($config['modules'] as $path => $settings) {
+
+            // Expand bundle notation (snagged from the Assetic bundle)
+            if ($path[0] == '@' && strpos($path, '/') !== false) {                
+                // Extract the bundle name and the directory within the bundle
+                $bundle = substr($path, 1);
+                $directory = '';
+                if (($pos = strpos($bundle, '/')) !== false) {
+                    $directory = substr($bundle, $pos);
+                    $bundle = substr($bundle, 0, $pos);
+                }
+
+                // Reconstruct the path
+                if (isset($bundles[$bundle])) {
+                    $rc = new \ReflectionClass($bundles[$bundle]);
+                    $path = dirname($rc->getFileName()) . $directory;
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Unrecognized bundle: "%s"', $bundle));
+                }
+            }
             
+            $namespace = $settings['namespace'];
+
             // Register the namespace with the configuration
             $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
             $mapping->addMethodCall('registerNamespace', array($path, $namespace));
-            
+
             // Create the assetic resource
             $resource = new DefinitionDecorator('hearsay_require_js.directory_filename_resource');
             $resource->setArguments(array($path));
@@ -67,4 +90,5 @@ class HearsayRequireJSExtension extends Extension
             $count++;
         }
     }
+
 }
