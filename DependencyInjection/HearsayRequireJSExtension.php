@@ -47,10 +47,11 @@ class HearsayRequireJSExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
         
-        $container->setParameter('hearsay_require_js.base_path', $config['base_path']);
+        $container->setParameter('hearsay_require_js.base_url', $config['base_url']);
         
-        foreach ($config['namespaces'] as $namespace => $settings) {
-            $path = $settings['path'];
+        $count = 0;
+        foreach ($config['namespaces'] as $path => $settings) {
+            $namespace = $settings['namespace'];
             
             // Register the namespace with the configuration
             $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
@@ -61,8 +62,9 @@ class HearsayRequireJSExtension extends Extension
             $resource->setArguments(array($path));
             $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
             $container->addDefinitions(array(
-                'hearsay_require_js.directory_filename_resource.' . $namespace => $resource,
+                'hearsay_require_js.directory_filename_resource.' . $count => $resource,
             ));
+            $count++;
         }
-    }    
+    }
 }

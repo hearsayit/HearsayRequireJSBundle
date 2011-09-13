@@ -45,17 +45,11 @@ class ModuleFormulaLoader implements FormulaLoaderInterface
      * @var NamespaceMappingInterface
      */
     protected $mapping = null;
-
-    /**
-     * @var string
-     */
-    protected $basePath = null;
     
-    public function __construct(AssetFactory $factory, NamespaceMappingInterface $mapping, $basePath)
+    public function __construct(AssetFactory $factory, NamespaceMappingInterface $mapping)
     {
         $this->factory = $factory;
         $this->mapping = $mapping;
-        $this->basePath = $basePath;
     }
     
     /**
@@ -68,7 +62,7 @@ class ModuleFormulaLoader implements FormulaLoaderInterface
         foreach ($tokens as $token) {
             if (is_file($token)) {
                 $name = $this->factory->generateAssetName($token, array());
-                $output = $this->basePath . '/' . $this->mapping->getModulePath($token);
+                $output = $this->mapping->getModulePath($token);
                 if ($output) {
                     $formulae[$name] = array($token, array(), array('output' => $output));
                 }

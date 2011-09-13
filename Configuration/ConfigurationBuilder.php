@@ -24,54 +24,53 @@
 
 namespace Hearsay\RequireJSBundle\Configuration;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 /**
- * Concrete module namespace map.
+ * Helper service to build RequireJS configuration options from the Symfony
+ * configuration.
  * @author Kevin Montag <kevin@hearsay.it>
  */
-class NamespaceMapping implements NamespaceMappingInterface
+class ConfigurationBuilder
 {
-    
-    /**
-     * Internal namespace map.
-     * @var array
-     */
-    private $namespaces = array();
 
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator = null;
     /**
      * @var string
      */
-    protected $basePath = null;
+    protected $baseUrl = null;
+    /**
+     * @var array
+     */
+    protected $additionalConfig = null;
     
     /**
      * Standard constructor.
-     * @param string $basePath The base path to serve resources.
+     * @param TranslatorInterface $translator For getting the current locale.
+     * @param string $baseUrl Base URL where assets are served.
+     * @param array $additionalConfig Additional RequireJS options.
      */
-    public function __construct($basePath)
+    public function __construct(TranslatorInterface $translator, $baseUrl = '', array $additionalConfig = array())
     {
-        $this->basePath = $basePath;
+        $this->translator = $translator;
+        $this->baseUrl = $baseUrl;
+        $this->additionalConfig = $additionalConfig;
     }
-
+    
     /**
-     * Register a directory-to-namespace mapping.
-     * @param string $path
-     * @param string $namespace
+     * Get the RequireJS configuration options.
+     * @return array
      */
-    public function registerNamespace($path, $namespace)
+    public function getConfiguration()
     {
-        $this->namespaces[realpath($path)] = $namespace;
-    }
+        $config = array(
+            'baseUrl' => $this->baseUrl,
+            'locale' => $this->translator->getLocale(),
+        );
+        return array_merge($config, $this->additionalConfig);
+    }    
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getModulePath($filename)
-    {
-        $filename = realpath($filename);
-        foreach ($this->namespaces as $path => $namespace) {
-            if (strpos($filename, $path) === 0) {
-                return preg_replace('#/+#', '/', $this->basePath . $namespace . substr($filename, strlen($path)));
-            }
-        }
-        return false;
-    }
 }

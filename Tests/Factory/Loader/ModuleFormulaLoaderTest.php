@@ -64,12 +64,12 @@ class ModuleFormulaLoaderTest extends \PHPUnit_Framework_TestCase
                 ->method('getContent')
                 ->will($this->returnValue($file1 . "  some other \ntext\n" . $file2));
         
-        $loader = new ModuleFormulaLoader($factory, $mapping, 'base');
+        $loader = new ModuleFormulaLoader($factory, $mapping);
         $formulae = $loader->load($resource);
         
         $this->assertEquals(array(
-            'file' => array($file1, array(), array('output' => 'base/first/module')),
-            'other_file' => array($file2, array(), array('output' => 'base/second/module'))
+            'file' => array($file1, array(), array('output' => 'first/module')),
+            'other_file' => array($file2, array(), array('output' => 'second/module'))
         ), $formulae, 'Unexpected formulae loaded');
     }
 }
