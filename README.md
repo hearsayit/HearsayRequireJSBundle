@@ -11,7 +11,7 @@ Installation
 
         $ git submodule add git://github.com/hearsayit/HearsayRequireJSBundle vendor/bundles/Hearsay/RequireJSBundle
 
-  2. Add the Hearsay namespace:
+  2. Add the Hearsay namespace to your autoloader:
 
         // app/autoload.php
         $loader->registerNamespaces(array(
@@ -52,22 +52,18 @@ a directory structure like:
                             - three/
                                 - four.js
 
-Your configuration would look something like:
+Your configuration might look something like:
 
         # app/config/config.yml
         hearsay_require_js:
-            modules:
-                %kernel_root%/../src/Acme/BlogBundle/Resources/scripts: blog
-                '@AcmeCommentBundle/Resources/scripts': comment
+            namespaces:
+                blog: %kernel_root%/../src/Acme/BlogBundle/Resources/scripts
+                comment: '@AcmeCommentBundle/Resources/scripts'
 
 This specifies base namespaces for each directory, so you would then reference
 modules like:
 
         require(['comment/three/four', 'blog/main'] function(four, main) { ... });
-
-Note that empty namespaces are allowed, and paths can be specified either
-directly (e.g. `%kernel_root%/../src/My/GreatBundle/whatever`) or via bundle 
-notation (e.g. `@MyGreatBundle/whatever`).
 
 Usage
 =====

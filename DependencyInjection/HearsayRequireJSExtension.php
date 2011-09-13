@@ -50,45 +50,69 @@ class HearsayRequireJSExtension extends Extension
 
         $container->setParameter('hearsay_require_js.base_url', $config['base_url']);
 
+        // Add the configured namespaces
+        foreach ($config['namespaces'] as $namespace => $settings) {
+            $this->addNamespaceMapping($settings['path'], $namespace, $container);
+        }
+
+        // Add root directory with an empty namespace
+        $this->addNamespaceMapping($config['base_directory'], '', $container);
+    }
+
+    /**
+     * Configure a mapping from a filesystem path to a RequireJS namespace.
+     * @param string $path
+     * @param string $namespace
+     * @param ContainerBuilder $container 
+     */
+    protected function addNamespaceMapping($path, $namespace, ContainerBuilder $container)
+    {
+        $path = $this->getRealPath($path, $container);
+
+        // Register the namespace with the configuration
+        $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
+        $mapping->addMethodCall('registerNamespace', array($path, $namespace));
+
+        // Create the assetic resource
+        $resource = new DefinitionDecorator('hearsay_require_js.directory_filename_resource');
+        $resource->setArguments(array($path));
+        $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
+        $container->addDefinitions(array(
+            'hearsay_require_js.directory_filename_resource.' . md5($path) => $resource,
+        ));
+    }
+
+    /**
+     * Helper to convert bundle-notation paths to filesystem paths.
+     * @param string $path
+     * @param ContainerBuilder $container
+     * @return string 
+     */
+    private function getRealPath($path, ContainerBuilder $container)
+    {
         // Get bundles so we can match up bundle notation
         $bundles = $container->getParameter('kernel.bundles');
-        $count = 0;
-        foreach ($config['modules'] as $path => $settings) {
 
-            // Expand bundle notation (snagged from the Assetic bundle)
-            if ($path[0] == '@' && strpos($path, '/') !== false) {                
-                // Extract the bundle name and the directory within the bundle
-                $bundle = substr($path, 1);
-                $directory = '';
-                if (($pos = strpos($bundle, '/')) !== false) {
-                    $directory = substr($bundle, $pos);
-                    $bundle = substr($bundle, 0, $pos);
-                }
-
-                // Reconstruct the path
-                if (isset($bundles[$bundle])) {
-                    $rc = new \ReflectionClass($bundles[$bundle]);
-                    $path = dirname($rc->getFileName()) . $directory;
-                } else {
-                    throw new \InvalidArgumentException(sprintf('Unrecognized bundle: "%s"', $bundle));
-                }
+        // Expand bundle notation (snagged from the Assetic bundle)
+        if ($path[0] == '@' && strpos($path, '/') !== false) {
+            // Extract the bundle name and the directory within the bundle
+            $bundle = substr($path, 1);
+            $directory = '';
+            if (($pos = strpos($bundle, '/')) !== false) {
+                $directory = substr($bundle, $pos);
+                $bundle = substr($bundle, 0, $pos);
             }
-            
-            $namespace = $settings['namespace'];
 
-            // Register the namespace with the configuration
-            $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
-            $mapping->addMethodCall('registerNamespace', array($path, $namespace));
-
-            // Create the assetic resource
-            $resource = new DefinitionDecorator('hearsay_require_js.directory_filename_resource');
-            $resource->setArguments(array($path));
-            $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
-            $container->addDefinitions(array(
-                'hearsay_require_js.directory_filename_resource.' . $count => $resource,
-            ));
-            $count++;
+            // Reconstruct the path
+            if (isset($bundles[$bundle])) {
+                $rc = new \ReflectionClass($bundles[$bundle]);
+                $path = dirname($rc->getFileName()) . $directory;
+            } else {
+                throw new \InvalidArgumentException(sprintf('Unrecognized bundle: "%s"', $bundle));
+            }
         }
+
+        return $path;
     }
 
 }

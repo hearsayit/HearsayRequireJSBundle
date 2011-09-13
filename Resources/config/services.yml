@@ -44,7 +44,7 @@ services:
         public: false
         class: Hearsay\RequireJSBundle\Configuration\NamespaceMapping
         arguments:
-            - %hearsay_require_js.base_url%          
+            - %hearsay_require_js.base_url%
         
     # Templating
     hearsay_require_js.configuration_builder:
