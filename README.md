@@ -87,7 +87,7 @@ manually by modifying the default configuration, and suppressing config output
 when initializing RequireJS:
 
         <script type='text/javascript'>
-            var require = {{ hearsay_require_js_config|json_encode|raw }};
+            var require = {{ require_js_config|json_encode|raw }};
             require.ready = function() { console.log('DOM ready') };
         </script>
         {{ require_js_initialize({ 'configure' : false })
