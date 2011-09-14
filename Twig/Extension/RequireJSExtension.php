@@ -79,7 +79,9 @@ class RequireJSExtension extends \Twig_Extension
     public function getGlobals()
     {
         return array(
-            'require_js_config' => $this->configurationBuilder->getConfiguration(),
+            'require_js' => array(
+                'config' => $this->configurationBuilder->getConfiguration(),
+            ),
         );
     }
 
