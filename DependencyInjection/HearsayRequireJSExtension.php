@@ -49,6 +49,8 @@ class HearsayRequireJSExtension extends Extension
         $loader->load('services.yml');
 
         $container->setParameter('hearsay_require_js.base_url', $config['base_url']);
+        $container->setParameter('hearsay_require_js.base_directory', $this->getRealPath($config['base_directory'], $container));
+        $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['r_path'], $container));
 
         // Add the configured namespaces
         foreach ($config['namespaces'] as $namespace => $settings) {
@@ -113,6 +115,13 @@ class HearsayRequireJSExtension extends Extension
         }
 
         return $path;
+    }
+    
+    private function addOptimizedAssets(array $optimized, ContainerBuilder $container)
+    {
+        foreach ($optimized as $name) {
+            
+        }
     }
 
 }

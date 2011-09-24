@@ -33,10 +33,12 @@ use Assetic\Asset\StringAsset;
  */
 class RequireJSOptimizerFilterTest extends \PHPUnit_Framework_TestCase
 {
-    public function testContentOptimized()
+    public function testNamedContentOptimized()
     {
         $filter = new RequireJSOptimizerFilter('/usr/local/bin/node', '/home/kevin/hs/src/Hearsay/RequireJSBundle/Resources/scripts/r.js', '/home/kevin/hs/src/Hearsay/RequireJSBundle/Resources/scripts');
-        $asset = new StringAsset('define(function() { alert("helloworld"); })');
+        $asset = new StringAsset('define({ test: "value" });', array(), null, 'test/asset.js');
+        $asset->load();
+        
         $filter->filterLoad($asset);
         
         print $asset->getContent();

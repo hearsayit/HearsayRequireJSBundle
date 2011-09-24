@@ -36,15 +36,18 @@ class RequireJSOptimizerFilter implements FilterInterface
 {
 
     /**
+     * Absolute path to node.js.
      * @var string
      */
     protected $nodePath = null;
     /**
+     * Absolute path to the r.js optimizer.
      * @var string
      */
     protected $rPath = null;
     /**
-     * Base URL option (this is generally actually a filesystem path).
+     * Base URL option to the optimizer (named for consistency with the r.js 
+     * API; note this is generally actually a filesystem path).
      * @var string
      */
     protected $baseUrl = null;
@@ -104,8 +107,17 @@ class RequireJSOptimizerFilter implements FilterInterface
 
         $output = tempnam(sys_get_temp_dir(), 'assetic_requirejs');
 
-        // Generate a name for the module, for which we'll configure a path
-        $name = md5($input);
+        // Get a name for the module, for which we'll configure a path
+        $name = $asset->getSourcePath();
+        if ($name) {
+            // Remove file extension
+            $extension = strrchr($name, '.');
+            if ($extension !== false) {
+                $name = substr($name, 0, -strlen($extension));
+            }
+        } else {
+            throw new \InvalidArgumentException('Cannot process assets without a source path');
+        }
 
         $pb = new ProcessBuilder();
         $pb
@@ -114,12 +126,12 @@ class RequireJSOptimizerFilter implements FilterInterface
                 ->add('-o') // Optimize
                 // Configure the primary input
                 ->add('paths.' . $name . '=' . $input)
-                ->add('name=' . $name)
+                ->add('name=' . ($this->plugin ? $this->plugin . '!' : '') . $name)
 
                 // Configure the output
                 ->add('out=' . $output)
 
-                // Configure the base URL
+                // Configure the input base URL
                 ->add('baseUrl=' . $this->baseUrl)
         ;
 
@@ -130,6 +142,10 @@ class RequireJSOptimizerFilter implements FilterInterface
 
         $proc = $pb->getProcess();
         $proc->run();
+
+        if (!$proc->isSuccessful()) {
+            throw new \RuntimeException($proc->getErrorOutput());
+        }
 
         $asset->setContent(file_get_contents($output));
     }

@@ -21,10 +21,10 @@
 
 parameters:
     hearsay_require_js.base_url: js
+    hearsay_require_js.base_directory: null # Set in the extension code 
+    hearsay_require_js.r.path: null # Set in the extension code
+
     hearsay_require_js.module_formula_loader.class: Hearsay\RequireJSBundle\Factory\Loader\ModuleFormulaLoader
-    
-    hearsay_require_js.require.path: bundles/hearsayrequirejs/js/require.js
-    hearsay_require_js.require_min.path: bundles/hearsayrequirejs/js/require.min.js
 
 services:
     hearsay_require_js.module_formula_loader:
@@ -69,3 +69,14 @@ services:
             - '@hearsay_require_js.configuration_builder'
         tags:
             - { name: twig.extension }
+            
+    # Assetic
+    hearsay_require_js.optimization_filter:
+        class: Hearsay\RequireJSBundle\Filter\RequireJSOptimizerFilter
+        arguments:
+            - %assetic.node.bin%
+            - %hearsay_require_js.r.path%
+            - %hearsay_require_js.base_directory%
+        tags:
+            - { name: assetic.filter, alias: requirejs }
+            
