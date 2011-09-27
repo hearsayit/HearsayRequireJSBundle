@@ -28,12 +28,15 @@
  #   A module to require immediately when RequireJS is loaded.
  #}
 
-{% if config is defined and config is not empty %}
-<script type='text/javascript'>var require={{ config|json_encode|raw }};</script>
-{% endif %}
+{% block configuration %}
+    {% if config is defined and config is not empty %}
+    <script type='text/javascript'>var require={{ config|json_encode|raw }};</script>
+    {% endif %}
+{% endblock configuration %}
 
-{% javascripts '@HearsayRequireJSBundle/Resources/scripts/require.js' %}
-<script type='text/javascript'{% if main is defined and main is not empty %} data-main='{{ main }}'{% endif %} src='{{ asset_url }}'></script>
-{% endjavascripts %}
+{% block source %}
+    {# Applications may override the requirejs_src block to use a custom URL. #}
+    <script type='text/javascript'{% if main is defined and main is not empty %} data-main='{{ main }}'{% endif %} src='{% block requirejs_src 'http://cdnjs.cloudflare.com/ajax/libs/require.js/0.26.0/require.min.js' %}'></script>
+{% endblock source %}
 
 {% endspaceless %}
