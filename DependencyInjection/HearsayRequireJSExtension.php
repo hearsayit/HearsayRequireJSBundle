@@ -57,7 +57,7 @@ class HearsayRequireJSExtension extends Extension
             $value = $settings['value'];
             $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array($name, $value));
         }
-        
+
         // Add the configured namespaces
         foreach ($config['namespaces'] as $namespace => $settings) {
             $this->addNamespaceMapping($settings['path'], $namespace, $container);
@@ -80,9 +80,11 @@ class HearsayRequireJSExtension extends Extension
         // Register the namespace with the configuration
         $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
         $mapping->addMethodCall('registerNamespace', array($path, $namespace));
-        
+
         // And with the optimizer filter
-        $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $namespace, $path));
+        if ($namespace) {
+            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $namespace, $path));
+        }
 
         // Create the assetic resource
         $resource = new DefinitionDecorator('hearsay_require_js.directory_filename_resource');
@@ -101,11 +103,9 @@ class HearsayRequireJSExtension extends Extension
      */
     private function getRealPath($path, ContainerBuilder $container)
     {
-        // Get bundles so we can match up bundle notation
-        $bundles = $container->getParameter('kernel.bundles');
-
         // Expand bundle notation (snagged from the Assetic bundle)
         if ($path[0] == '@' && strpos($path, '/') !== false) {
+
             // Extract the bundle name and the directory within the bundle
             $bundle = substr($path, 1);
             $directory = '';
@@ -113,6 +113,9 @@ class HearsayRequireJSExtension extends Extension
                 $directory = substr($bundle, $pos);
                 $bundle = substr($bundle, 0, $pos);
             }
+
+            // Get loaded bundles
+            $bundles = $container->getParameter('kernel.bundles');
 
             // Reconstruct the path
             if (isset($bundles[$bundle])) {
@@ -125,5 +128,5 @@ class HearsayRequireJSExtension extends Extension
 
         return $path;
     }
-    
+
 }

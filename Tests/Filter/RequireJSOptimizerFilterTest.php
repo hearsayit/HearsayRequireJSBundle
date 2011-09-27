@@ -42,7 +42,8 @@ class RequireJSOptimizerFilterTest extends \PHPUnit_Framework_TestCase
         $filter->setOption('skipModuleInsertion', true);
 
         $asset = new StringAsset('alert("Hi there!");      alert("Hi there again.");');
-        $this->assertEquals('alert("Hi there!"),alert("Hi there again.")', $asset->dump($filter), 'Content was not properly optimized');
+        $asset->ensureFilter($filter);
+        $this->assertEquals('alert("Hi there!"),alert("Hi there again.")', $asset->dump(), 'Content was not properly optimized');
     }
 
     public function testBaseUrlModulesIncluded()
@@ -87,7 +88,6 @@ JVS;
 
     public function testErrorOnBadInput()
     {
-        // We use the current directory as the base URL
         $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__ . '/../../Resources/scripts');
 
         // Try to load a nonexistent module
@@ -101,7 +101,7 @@ JVS;
         $this->setExpectedException('RuntimeException');
         $asset->dump($filter);
     }
-
+    
     /**
      * Helper to fetch the path to node.js.
      * @return string

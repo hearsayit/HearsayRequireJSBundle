@@ -47,6 +47,7 @@ class Configuration implements ConfigurationInterface
                         ->defaultValue('js')
                     ->end()
                     ->scalarNode('base_directory')
+                        ->cannotBeEmpty()
                         ->defaultValue('@HearsayRequireJSBundle/Resources/scripts')
                     ->end()
                     ->arrayNode('namespaces')

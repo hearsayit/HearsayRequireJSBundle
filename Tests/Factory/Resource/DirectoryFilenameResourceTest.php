@@ -25,12 +25,13 @@
 namespace Hearsay\RequireJSBundle\Tests\Factory\Resource;
 
 use Hearsay\RequireJSBundle\Factory\Resource\DirectoryFilenameResource;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * Unit tests for the filename resource.
  * @author Kevin Montag <kevin@hearsay.it>
  */
-class DirectoryFilenameResourceTest extends \PHPUnit_Framework_TestCase
+class DirectoryFilenameResourceTest extends WebTestCase
 {
     public function testFilenamesRetrieved()
     {
@@ -42,5 +43,33 @@ class DirectoryFilenameResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertContains(__DIR__ . '/DirectoryFilenameResourceTest.php', $filenames, 'Did not find expected filename');
         $this->assertContains(__DIR__ . '/dir/file', $filenames, 'Did not find expected filename');
         $this->assertContains(__DIR__ . '/dir/subdir/file', $filenames, 'Did not find expected filename');
+    }
+    
+    public function testStringConversion()
+    {
+        $resource = new DirectoryFilenameResource(__DIR__);
+        $this->assertEquals(__DIR__, (string)$resource, 'Incorrect string conversion');
+    }
+    
+    public function testFreshCheck()
+    {
+        $time = time() - 1;
+        $dir = $this->createKernel()->getCacheDir(); // Get a directory for temporary files
+        
+        if (filemtime($dir) > $time) {
+            $this->markTestSkipped('Cache dir is too recently modified for testing');
+        }
+        
+        $resource = new DirectoryFilenameResource($dir);
+        $this->assertTrue($resource->isFresh($time), 'Cache dir is not fresh');
+        
+        $file = tempnam($dir, 'requirejs_test');
+        file_put_contents($file, 'temp');
+        
+        $this->assertGreaterThan($time, filemtime($file), 'Sanity check failed; new file has outdated timestamp');
+        $this->assertFalse($resource->isFresh($time), sprintf('System temp dir is still fresh after adding a file (%d < %d', filemtime($dir), $time));
+        
+        // Clean up
+        unlink($file);
     }
 }

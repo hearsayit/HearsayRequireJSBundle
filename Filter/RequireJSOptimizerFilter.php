@@ -52,13 +52,7 @@ class RequireJSOptimizerFilter implements FilterInterface
      */
     protected $baseUrl = null;
     /**
-     * Plugin to apply when processing content.
-     * @var string
-     */
-    protected $plugin = null;
-    /**
-     * Extension to add to temporary files for processing (generally dependent
-     * on the plugin being used).
+     * Extension to add to temporary files for processing.
      * @var string
      */
     protected $extension = 'js';
@@ -86,18 +80,6 @@ class RequireJSOptimizerFilter implements FilterInterface
     }
 
     /**
-     * Set the plugin to apply to content before processing.
-     * @param string $plugin The plugin module name, or null for no plugin.
-     * @param string $extension The file extension to add to temporary files, to
-     * enable them to be loaded by this plugin.
-     */
-    public function setPlugin($plugin, $extension)
-    {
-        $this->plugin = $plugin;
-        $this->extension = $extension;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function filterLoad(AssetInterface $asset)
@@ -111,7 +93,8 @@ class RequireJSOptimizerFilter implements FilterInterface
     public function filterDump(AssetInterface $asset)
     {
         $input = tempnam(sys_get_temp_dir(), 'assetic_requirejs');
-        file_put_contents($input . '.' . $this->extension, $asset->getContent());
+        $inputFilename = $input . ($this->extension ? '.' . $this->extension : '');
+        file_put_contents($inputFilename, $asset->getContent());
 
         $output = tempnam(sys_get_temp_dir(), 'assetic_requirejs');
 
@@ -124,7 +107,7 @@ class RequireJSOptimizerFilter implements FilterInterface
                 ->add('-o') // Optimize
                 // Configure the primary input
                 ->add('paths.' . $name . '=' . $input)
-                ->add('name=' . ($this->plugin ? $this->plugin . '!' : '') . $name)
+                ->add('name=' . $name)
 
                 // Configure the output
                 ->add('out=' . $output)

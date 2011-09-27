@@ -22,15 +22,29 @@
  * SOFTWARE.
  */
 
-namespace Hearsay\RequireJSBundle;
+namespace Hearsay\RequireJSBundle\Tests\Configuration;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder;
 
 /**
- * Bundle providing RequireJS integration.
+ * Unit tests for the helper to generate RequireJS configuration.
  * @author Kevin Montag <kevin@hearsay.it>
- * @codeCoverageIgnore
  */
-class HearsayRequireJSBundle extends Bundle
+class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    public function testConfigurationGenerated()
+    {
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator->expects($this->any())
+                ->method('getLocale')
+                ->will($this->returnValue('fr_FR'));
+        $builder = new ConfigurationBuilder($translator, 'js', array('option' => 'value'));
+        
+        $expected = array(
+            'locale' => 'fr_FR',
+            'baseUrl' => 'js',
+            'option' => 'value',
+        );
+        $this->assertEquals($expected, $builder->getConfiguration(), 'Unexpected configuration generated');
+    }
 }

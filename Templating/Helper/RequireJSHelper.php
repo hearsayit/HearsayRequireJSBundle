@@ -25,9 +25,8 @@
 namespace Hearsay\RequireJSBundle\Templating\Helper;
 
 use Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Templating helper for RequireJS inclusion.
