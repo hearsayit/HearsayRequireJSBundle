@@ -87,7 +87,7 @@ class RequireJSOptimizerFilter implements FilterInterface
 
     /**
      * Set the plugin to apply to content before processing.
-     * @param string $plugin The plugin module name.
+     * @param string $plugin The plugin module name, or null for no plugin.
      * @param string $extension The file extension to add to temporary files, to
      * enable them to be loaded by this plugin.
      */
@@ -102,23 +102,21 @@ class RequireJSOptimizerFilter implements FilterInterface
      */
     public function filterLoad(AssetInterface $asset)
     {
+        // No-op
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function filterDump(AssetInterface $asset)
+    {
         $input = tempnam(sys_get_temp_dir(), 'assetic_requirejs');
         file_put_contents($input . '.' . $this->extension, $asset->getContent());
 
         $output = tempnam(sys_get_temp_dir(), 'assetic_requirejs');
 
         // Get a name for the module, for which we'll configure a path
-        $name = $asset->getSourcePath();
-        if ($name) {
-            // Remove file extension
-            $extension = strrchr($name, '.');
-            if ($extension !== false) {
-                $name = substr($name, 0, -strlen($extension));
-            }
-        } else {
-            throw new \InvalidArgumentException('Cannot process assets without a source path');
-        }
-
+        $name = md5($input);
         $pb = new ProcessBuilder();
         $pb
                 ->add($this->nodePath)
@@ -139,7 +137,7 @@ class RequireJSOptimizerFilter implements FilterInterface
         foreach ($this->options as $option => $value) {
             $pb->add($option . '=' . $value);
         }
-
+        
         $proc = $pb->getProcess();
         $proc->run();
 
@@ -148,14 +146,6 @@ class RequireJSOptimizerFilter implements FilterInterface
         }
 
         $asset->setContent(file_get_contents($output));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function filterDump(AssetInterface $asset)
-    {
-        // No-op
     }
 
 }

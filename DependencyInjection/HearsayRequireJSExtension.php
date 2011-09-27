@@ -50,8 +50,14 @@ class HearsayRequireJSExtension extends Extension
 
         $container->setParameter('hearsay_require_js.base_url', $config['base_url']);
         $container->setParameter('hearsay_require_js.base_directory', $this->getRealPath($config['base_directory'], $container));
-        $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['r_path'], $container));
 
+        // Set optimizer options
+        $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
+        foreach ($config['optimizer']['options'] as $name => $settings) {
+            $value = $settings['value'];
+            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array($name, $value));
+        }
+        
         // Add the configured namespaces
         foreach ($config['namespaces'] as $namespace => $settings) {
             $this->addNamespaceMapping($settings['path'], $namespace, $container);
@@ -74,6 +80,9 @@ class HearsayRequireJSExtension extends Extension
         // Register the namespace with the configuration
         $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
         $mapping->addMethodCall('registerNamespace', array($path, $namespace));
+        
+        // And with the optimizer filter
+        $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $namespace, $path));
 
         // Create the assetic resource
         $resource = new DefinitionDecorator('hearsay_require_js.directory_filename_resource');
@@ -117,11 +126,4 @@ class HearsayRequireJSExtension extends Extension
         return $path;
     }
     
-    private function addOptimizedAssets(array $optimized, ContainerBuilder $container)
-    {
-        foreach ($optimized as $name) {
-            
-        }
-    }
-
 }

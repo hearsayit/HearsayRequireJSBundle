@@ -33,14 +33,87 @@ use Assetic\Asset\StringAsset;
  */
 class RequireJSOptimizerFilterTest extends \PHPUnit_Framework_TestCase
 {
-    public function testNamedContentOptimized()
+
+    public function testContentOptimized()
     {
-        $filter = new RequireJSOptimizerFilter('/usr/local/bin/node', '/home/kevin/hs/src/Hearsay/RequireJSBundle/Resources/scripts/r.js', '/home/kevin/hs/src/Hearsay/RequireJSBundle/Resources/scripts');
-        $asset = new StringAsset('define({ test: "value" });', array(), null, 'test/asset.js');
-        $asset->load();
-        
-        $filter->filterLoad($asset);
-        
-        print $asset->getContent();
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__);
+
+        // So we can get consistent output.
+        $filter->setOption('skipModuleInsertion', true);
+
+        $asset = new StringAsset('alert("Hi there!");      alert("Hi there again.");');
+        $this->assertEquals('alert("Hi there!"),alert("Hi there again.")', $asset->dump($filter), 'Content was not properly optimized');
     }
+
+    public function testBaseUrlModulesIncluded()
+    {
+        // We use the current directory as the base URL
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__);
+
+        // So we can get consistent output
+        $filter->setOption('skipModuleInsertion', true);
+
+        $javascript = <<<'JVS'
+require(['modules/module'], function(module) {
+    console.log('Hello');
+    return console.log(module);
+});
+JVS;
+
+        $asset = new StringAsset($javascript);
+        $this->assertEquals('define("modules/module",{js:"got it"}),require(["modules/module"],function(a){console.log("Hello");return console.log(a)})', $asset->dump($filter), 'Unexpected optimized content');
+    }
+
+    public function testOptionsPassed()
+    {
+        // We use the current directory as the base URL
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__ . '/../../Resources/scripts');
+
+        // So we can get consistent output
+        $filter->setOption('skipModuleInsertion', true);
+
+        // Set an additional path option
+        $filter->setOption('paths.modules', __DIR__ . '/modules');
+
+        $javascript = <<<'JVS'
+require(['modules/module'], function(module) {
+    return console.log(module);
+});
+JVS;
+
+        $asset = new StringAsset($javascript);
+        $this->assertEquals('define("modules/module",{js:"got it"}),require(["modules/module"],function(a){return console.log(a)})', $asset->dump($filter), 'Unexpected optimized content');
+    }
+
+    public function testErrorOnBadInput()
+    {
+        // We use the current directory as the base URL
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__ . '/../../Resources/scripts');
+
+        // Try to load a nonexistent module
+        $javascript = <<<'JVS'
+require(['unknown/module'], function(bad) {
+    return console.log(bad);
+});
+JVS;
+
+        $asset = new StringAsset($javascript);
+        $this->setExpectedException('RuntimeException');
+        $asset->dump($filter);
+    }
+
+    /**
+     * Helper to fetch the path to node.js.
+     * @return string
+     */
+    protected function getNodePath()
+    {   
+        if (isset($_SERVER['NODE_BIN'])) {
+            return $_SERVER['NODE_BIN'];
+        } else {
+            // Use a reasonable default
+            return '/usr/local/bin/node';
+        } 
+    }
+
 }

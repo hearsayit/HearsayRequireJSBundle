@@ -71,7 +71,7 @@ services:
             - { name: twig.extension }
             
     # Assetic
-    hearsay_require_js.optimization_filter:
+    hearsay_require_js.optimizer_filter:
         class: Hearsay\RequireJSBundle\Filter\RequireJSOptimizerFilter
         arguments:
             - %assetic.node.bin%
