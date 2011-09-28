@@ -59,8 +59,12 @@ class HearsayRequireJSExtension extends Extension
         }
 
         // Add the configured namespaces
-        foreach ($config['namespaces'] as $namespace => $settings) {
-            $this->addNamespaceMapping($settings['path'], $namespace, $container);
+        foreach ($config['paths'] as $path => $settings) {
+            if ($settings['external']) {
+                $this->addExternalNamespaceMapping($settings['location'], $path, $container);
+            } else {
+                $this->addNamespaceMapping($settings['location'], $path, $container);
+            }
         }
 
         // Add root directory with an empty namespace
@@ -69,30 +73,45 @@ class HearsayRequireJSExtension extends Extension
 
     /**
      * Configure a mapping from a filesystem path to a RequireJS namespace.
+     * @param string $location
      * @param string $path
-     * @param string $namespace
      * @param ContainerBuilder $container 
      */
-    protected function addNamespaceMapping($path, $namespace, ContainerBuilder $container)
+    protected function addNamespaceMapping($location, $path, ContainerBuilder $container)
     {
-        $path = $this->getRealPath($path, $container);
+        $location = $this->getRealPath($location, $container);
 
         // Register the namespace with the configuration
         $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
-        $mapping->addMethodCall('registerNamespace', array($path, $namespace));
+        $mapping->addMethodCall('registerNamespace', array($location, $path));
 
         // And with the optimizer filter
-        if ($namespace) {
-            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $namespace, $path));
+        if ($path) {
+            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $path, $location));
         }
 
         // Create the assetic resource
         $resource = new DefinitionDecorator('hearsay_require_js.directory_filename_resource');
-        $resource->setArguments(array($path));
+        $resource->setArguments(array($location));
         $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
         $container->addDefinitions(array(
-            'hearsay_require_js.directory_filename_resource.' . md5($path) => $resource,
+            'hearsay_require_js.directory_filename_resource.' . md5($location) => $resource,
         ));
+    }
+
+    /**
+     * Configure a mapping from an external URL to a RequireJS namespace/path.
+     * @param string $location
+     * @param string $path
+     * @param ContainerBuilder $container
+     */
+    protected function addExternalNamespaceMapping($location, $path, ContainerBuilder $container)
+    {
+        $config = $container->getDefinition('hearsay_require_js.configuration_builder');
+        $config->addMethodCall('setPath', array($path, $location));
+
+        $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
+        $filter->addMethodCall('addExternalDependency', array($path));
     }
 
     /**

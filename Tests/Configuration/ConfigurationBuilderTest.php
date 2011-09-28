@@ -38,7 +38,8 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $translator->expects($this->any())
                 ->method('getLocale')
                 ->will($this->returnValue('fr_FR'));
-        $builder = new ConfigurationBuilder($translator, 'js', array('option' => 'value'));
+        $builder = new ConfigurationBuilder($translator, 'js');
+        $builder->setOption('option', 'value');
         
         $expected = array(
             'locale' => 'fr_FR',

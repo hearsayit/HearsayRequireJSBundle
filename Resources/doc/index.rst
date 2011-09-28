@@ -35,8 +35,8 @@ Installation
 Configuration
 =============
 
-You can expose directories of Javascript modules for access via require.  Given
-a directory structure like::
+You can expose directories of Javascript modules for access via ``require``.  
+Given a directory structure like::
 
         - src/
             - Acme/
@@ -57,7 +57,7 @@ Your configuration might look something like::
 
         # app/config/config.yml
         hearsay_require_js:
-            namespaces:
+            paths:
                 blog: %kernel_root%/../src/Acme/BlogBundle/Resources/scripts
                 comment: '@AcmeCommentBundle/Resources/scripts'
 
@@ -65,6 +65,15 @@ This specifies base namespaces for each directory, so you would then reference
 modules like::
 
         require(['comment/three/four', 'blog/module'], function(four, module) { ... });
+
+You can also specify modules to be loaded from external sources::
+
+        # app/config/config.yml
+        hearsay_require_js:
+            paths:
+                jquery:
+                    location: //ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min
+                    external: true
 
 Usage
 =====
@@ -93,9 +102,14 @@ Optimization
 ============
 
 The bundle provides an Assetic filter to create minified Javascript files using
-the RequireJS optimizer.  By default, this also inlines any module definitions
-required by the file being optimized.  You can use it like any other filter::
+the RequireJS optimizer.  This also inlines any module definitions required by 
+the file being optimized.  You can use it like any other filter; for example,
+to optimize only in production::
 
-        {% javascripts filter='requirejs' '@AcmeBlogBundle/Resources/scripts/main.js' %}
+        {% javascripts filter='?requirejs' '@AcmeBlogBundle/Resources/scripts/main.js' %}
             {{ require_js_initialize({ 'main' : asset_url }) }}
         {% endjavascripts %}
+
+Note that your configured path definitions will be incorporated into the
+optimizer filter, including the exclusion of external dependencies from the
+built file.

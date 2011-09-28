@@ -38,7 +38,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $config = array(
             'base_directory' => '/home/user/base',
-            'namespaces' => array(
+            'paths' => array(
                 'namespace' => '/home/user/path',
             ),
         );

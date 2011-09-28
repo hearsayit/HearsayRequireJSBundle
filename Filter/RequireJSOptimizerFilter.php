@@ -57,6 +57,11 @@ class RequireJSOptimizerFilter implements FilterInterface
      */
     protected $extension = 'js';
     /**
+     * Modules to treat as externals which don't need to be loaded.
+     * @var array
+     */
+    protected $externals = array();
+    /**
      * Options to set in the build.
      * @var array
      */
@@ -67,6 +72,16 @@ class RequireJSOptimizerFilter implements FilterInterface
         $this->nodePath = $nodePath;
         $this->rPath = $rPath;
         $this->baseUrl = $baseUrl;
+    }
+
+    /**
+     * Set a RequireJS path which should be treated as an external dependency,
+     * and not compiled.
+     * @param string $path The external path.
+     */
+    public function addExternalDependency($path)
+    {
+        $this->externals[] = $path;
     }
 
     /**
@@ -116,11 +131,20 @@ class RequireJSOptimizerFilter implements FilterInterface
                 ->add('baseUrl=' . $this->baseUrl)
         ;
 
+        // Exclude externals
+        foreach ($this->externals as $external) {
+            // Make a new temporary file
+            $placeholder = tempnam(sys_get_temp_dir(), 'assetic_requirejs');
+            touch($placeholder . '.js');
+            $pb->add('paths.' . $external . '=' . $placeholder);
+            $pb->add('exclude=' . $external);
+        }
+
         // Additional options
         foreach ($this->options as $option => $value) {
             $pb->add($option . '=' . $value);
         }
-        
+
         $proc = $pb->getProcess();
         $proc->run();
 

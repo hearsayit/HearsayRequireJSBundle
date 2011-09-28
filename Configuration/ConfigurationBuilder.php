@@ -45,19 +45,44 @@ class ConfigurationBuilder
     /**
      * @var array
      */
-    protected $additionalConfig = null;
+    protected $paths = null;
+    /**
+     * @var array
+     */
+    protected $additionalConfig = array();
     
     /**
      * Standard constructor.
      * @param TranslatorInterface $translator For getting the current locale.
      * @param string $baseUrl Base URL where assets are served.
-     * @param array $additionalConfig Additional RequireJS options.
      */
-    public function __construct(TranslatorInterface $translator, $baseUrl = '', array $additionalConfig = array())
+    public function __construct(TranslatorInterface $translator, $baseUrl = '')
     {
         $this->translator = $translator;
         $this->baseUrl = $baseUrl;
-        $this->additionalConfig = $additionalConfig;
+    }
+
+    /**
+     * Set a path definition to be included in the configuration.
+     * @param string $path The path name.
+     * @param string $location The actual path location.
+     */
+    public function setPath($path, $location)
+    {
+        if ($this->paths === null) {
+            $this->paths = array();
+        }
+        $this->paths[$path] = $location;
+    }
+
+    /**
+     * Set an additional option to output in the config.
+     * @param string $option The option name.
+     * @param mixed $value The option value.
+     */
+    public function setOption($option, $value)
+    {
+        $this->additionalConfig[$option] = $value;
     }
     
     /**
@@ -70,6 +95,9 @@ class ConfigurationBuilder
             'baseUrl' => $this->baseUrl,
             'locale' => $this->translator->getLocale(),
         );
+        if ($this->paths !== null) {
+            $config['paths'] = $this->paths;
+        }
         return array_merge($config, $this->additionalConfig);
     }    
 

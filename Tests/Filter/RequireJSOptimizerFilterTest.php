@@ -102,6 +102,26 @@ JVS;
         $asset->dump($filter);
     }
     
+    public function testExternalsIgnored()
+    {
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__ . '/../../Resources/scripts');
+        $filter->addExternalDependency('external1');
+        $filter->addExternalDependency('external2');
+        
+        // So we can get consistent output
+        $filter->setOption('skipModuleInsertion', true);
+        
+        // Load a module with the external dependencies
+        $javascript = <<<'JVS'
+require(['external1', 'external2'], function(external1, external2) {
+    return console.log(external1);
+});
+JVS;
+
+        $asset = new StringAsset($javascript);
+        $this->assertEquals('require(["external1","external2"],function(a,b){return console.log(a)})', $asset->dump($filter), 'Unexpected output for external dependencies');
+    }
+    
     /**
      * Helper to fetch the path to node.js.
      * @return string
