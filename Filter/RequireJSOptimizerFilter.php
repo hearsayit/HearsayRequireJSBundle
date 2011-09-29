@@ -62,6 +62,11 @@ class RequireJSOptimizerFilter implements FilterInterface
      */
     protected $externals = array();
     /**
+     * Modules to exclude from the build.
+     * @var array
+     */
+    protected $excludes = array();
+    /**
      * Options to set in the build.
      * @var array
      */
@@ -75,11 +80,20 @@ class RequireJSOptimizerFilter implements FilterInterface
     }
 
     /**
-     * Set a RequireJS path which should be treated as an external dependency,
-     * and not compiled.
+     * Set a RequireJS path which should be excluded from the build.
+     * @param string $path The excluded path.
+     */
+    public function addExclude($path)
+    {
+        $this->excludes[] = $path;
+    }
+
+    /**
+     * Set a RequireJS path which should be treated as an external module that
+     * doesn't need to be included in the build.
      * @param string $path The external path.
      */
-    public function addExternalDependency($path)
+    public function addExternal($path)
     {
         $this->externals[] = $path;
     }
@@ -131,14 +145,23 @@ class RequireJSOptimizerFilter implements FilterInterface
                 ->add('baseUrl=' . $this->baseUrl)
         ;
 
-        // Exclude externals
+        $excludesString = '';
+
+        // Exclude externals and create temporary files
         foreach ($this->externals as $external) {
             // Make a new temporary file
             $placeholder = tempnam(sys_get_temp_dir(), 'assetic_requirejs');
             touch($placeholder . '.js');
             $pb->add('paths.' . $external . '=' . $placeholder);
-            $pb->add('exclude=' . $external);
+            $excludesString .= $external . ',';
         }
+
+        // Exclude standard excludes without temporary files
+        foreach ($this->excludes as $exclude) {
+            $excludesString .= $exclude . ',';
+        }
+        
+        $pb->add('exclude=' . $excludesString);
 
         // Additional options
         foreach ($this->options as $option => $value) {

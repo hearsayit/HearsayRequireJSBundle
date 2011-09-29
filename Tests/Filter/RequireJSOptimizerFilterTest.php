@@ -38,31 +38,34 @@ class RequireJSOptimizerFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__);
 
-        // So we can get consistent output.
-        $filter->setOption('skipModuleInsertion', true);
-
-        $asset = new StringAsset('alert("Hi there!");      alert("Hi there again.");');
+        $asset = new StringAsset('alert("Hi there!");      alert("Hi there again");');
         $asset->ensureFilter($filter);
-        $this->assertEquals('alert("Hi there!"),alert("Hi there again.")', $asset->dump(), 'Content was not properly optimized');
+        $content = $asset->dump();
+        
+        // The named module definition will have an arbitrary MD5 as its name
+        $this->assertRegExp('/^alert\("Hi there!"\),alert\("Hi there again"\),define\(".{32}",function\(\)\{\}\)$/', $content, 'Content was not properly optimized');
     }
 
     public function testBaseUrlModulesIncluded()
     {
         // We use the current directory as the base URL
         $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__);
-
-        // So we can get consistent output
-        $filter->setOption('skipModuleInsertion', true);
+        
 
         $javascript = <<<'JVS'
-require(['modules/module'], function(module) {
+define(['modules/module'], function(module) {
     console.log('Hello');
     return console.log(module);
 });
 JVS;
 
         $asset = new StringAsset($javascript);
-        $this->assertEquals('define("modules/module",{js:"got it"}),require(["modules/module"],function(a){console.log("Hello");return console.log(a)})', $asset->dump($filter), 'Unexpected optimized content');
+        $asset->ensureFilter($filter);
+        $content = $asset->dump();
+
+        // The named module definition will have an arbitrary MD5 as its name
+        $this->assertEquals('define("modules/module",{js:"got it"}),define("', substr($content, 0, 47), 'Unexpected optimized content');
+        $this->assertEquals('",["modules/module"],function(a){console.log("Hello");return console.log(a)})', substr($content, 79), 'Unexpected optimized content');
     }
 
     public function testOptionsPassed()
@@ -98,18 +101,16 @@ require(['unknown/module'], function(bad) {
 JVS;
 
         $asset = new StringAsset($javascript);
+        $asset->ensureFilter($filter);
         $this->setExpectedException('RuntimeException');
-        $asset->dump($filter);
+        $asset->dump();
     }
     
     public function testExternalsIgnored()
     {
         $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__ . '/../../Resources/scripts');
-        $filter->addExternalDependency('external1');
-        $filter->addExternalDependency('external2');
-        
-        // So we can get consistent output
-        $filter->setOption('skipModuleInsertion', true);
+        $filter->addExternal('external1');
+        $filter->addExternal('external2');
         
         // Load a module with the external dependencies
         $javascript = <<<'JVS'
@@ -119,7 +120,12 @@ require(['external1', 'external2'], function(external1, external2) {
 JVS;
 
         $asset = new StringAsset($javascript);
-        $this->assertEquals('require(["external1","external2"],function(a,b){return console.log(a)})', $asset->dump($filter), 'Unexpected output for external dependencies');
+        $asset->ensureFilter($filter);
+        $content = $asset->dump();
+        
+        // The named module definition will have an arbitrary MD5 as its name
+        $this->assertEquals('require(["external1","external2"],function(a,b){return console.log(a)}),define("', substr($content, 0, 80), 'Unexpected output for external dependencies');
+        $this->assertEquals('",function(){})', substr($content, 112), 'Unexpected output for external dependencies');
     }
     
     /**
