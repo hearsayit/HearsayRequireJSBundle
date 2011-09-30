@@ -45,13 +45,13 @@ class RequireJSHelperTest extends \PHPUnit_Framework_TestCase
 
         $engine->expects($this->once())
                 ->method('render')
-                ->with('HearsayRequireJSBundle::initialize.html.twig', array(
+                ->with('template', array(
                     'config' => array('option' => 'value'),
                     'main' => null,
                 ))
                 ->will($this->returnValue('initialized'));
 
-        $helper = new RequireJSHelper($engine, $config);
+        $helper = new RequireJSHelper($engine, $config, 'template');
         $this->assertEquals('initialized', $helper->initialize(), 'Incorrect initialization rendered');
     }
     
@@ -66,13 +66,13 @@ class RequireJSHelperTest extends \PHPUnit_Framework_TestCase
 
         $engine->expects($this->once())
                 ->method('render')
-                ->with('HearsayRequireJSBundle::initialize.html.twig', array(
+                ->with('template', array(
                     'config' => null,
                     'main' => null,
                 ))
                 ->will($this->returnValue('initialized'));
 
-        $helper = new RequireJSHelper($engine, $config);
+        $helper = new RequireJSHelper($engine, $config, 'template');
         $this->assertEquals('initialized', $helper->initialize(array('configure' => false)), 'Incorrect initialization rendered');
     }
     
@@ -88,14 +88,14 @@ class RequireJSHelperTest extends \PHPUnit_Framework_TestCase
 
         $engine->expects($this->once())
                 ->method('render')
-                ->with('HearsayRequireJSBundle::initialize.html.twig', array(
+                ->with('template', array(
                     'config' => array('option' => 'value'),
                     'main' => 'module',
                 ))
                 ->will($this->returnValue('initialized'));
 
-        $helper = new RequireJSHelper($engine, $config);
-        $this->assertEquals('initialized', $helper->initialize(array('main' => 'module')), 'Incorrect initialization rendered');        
+        $helper = new RequireJSHelper($engine, $config, 'template');
+        $this->assertEquals('initialized', $helper->initialize(array('main' => 'module')), 'Incorrect initialization rendered');
     }
 
 }

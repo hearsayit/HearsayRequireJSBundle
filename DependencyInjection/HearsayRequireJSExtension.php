@@ -51,6 +51,8 @@ class HearsayRequireJSExtension extends Extension
         $container->setParameter('hearsay_require_js.base_url', $config['base_url']);
         $container->setParameter('hearsay_require_js.base_directory', $this->getRealPath($config['base_directory'], $container));
 
+        $container->setParameter('hearsay_require_js.initialize_template', $config['initialize_template']);
+        
         // Set optimizer options
         $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
         foreach ($config['optimizer']['excludes'] as $exclude) {

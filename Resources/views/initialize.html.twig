@@ -28,11 +28,11 @@
  #   A module to require immediately when RequireJS is loaded.
  #}
 
+{% if config is defined and config is not empty %}
 {% block configuration %}
-    {% if config is defined and config is not empty %}
     <script type='text/javascript'>var require={{ config|json_encode|raw }}</script>
-    {% endif %}
 {% endblock configuration %}
+{% endif %}
 
 {% block requirejs %}
     {# Applications may override the requirejs_src block to use a custom URL. #}

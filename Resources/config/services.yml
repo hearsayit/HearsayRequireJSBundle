@@ -22,6 +22,7 @@
 parameters:
     hearsay_require_js.base_url: js
     hearsay_require_js.base_directory: null # Set in the extension code 
+    hearsay_require_js.initialize_template: null # Set in the extension code
     hearsay_require_js.r.path: null # Set in the extension code
 
     hearsay_require_js.module_formula_loader.class: Hearsay\RequireJSBundle\Factory\Loader\ModuleFormulaLoader
@@ -59,6 +60,7 @@ services:
         arguments:
             - '@templating'
             - '@hearsay_require_js.configuration_builder'
+            - %hearsay_require_js.initialize_template%
         tags:
             - { name: templating.helper }
             

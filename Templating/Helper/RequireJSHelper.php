@@ -43,16 +43,24 @@ class RequireJSHelper extends Helper
      * @var ConfigurationBuilder
      */
     protected $configurationBuilder = null;
+    /**
+     * @var string
+     */
+    protected $initializeTemplate = null;
 
     /**
      * Standard constructor.
      * @param EngineInterface $engine Templating engine.
-     * @param ConfigurationBuilder $configurationBuilder Helper to get the live configuration.
+     * @param ConfigurationBuilder $configurationBuilder Helper to get the live
+     * configuration.
+     * @param string $initializeTemplate The template name to use for rendering
+     * initialization.
      */
-    public function __construct(EngineInterface $engine, ConfigurationBuilder $configurationBuilder)
+    public function __construct(EngineInterface $engine, ConfigurationBuilder $configurationBuilder, $initializeTemplate)
     {
         $this->engine = $engine;
         $this->configurationBuilder = $configurationBuilder;
+        $this->initializeTemplate = $initializeTemplate;
     }
 
     /**
@@ -78,7 +86,7 @@ class RequireJSHelper extends Helper
             'configure' => true,
         );
         $options = array_merge($defaults, $options);
-        return $this->engine->render('HearsayRequireJSBundle::initialize.html.twig', array(
+        return $this->engine->render($this->initializeTemplate, array(
             'config' => $options['configure'] ? $this->configurationBuilder->getConfiguration() : null,
             'main' => $options['main'],
         ));
