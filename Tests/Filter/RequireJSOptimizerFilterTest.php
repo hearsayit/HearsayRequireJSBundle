@@ -128,6 +128,24 @@ JVS;
         $this->assertEquals('",function(){})', substr($content, 112), 'Unexpected output for external dependencies');
     }
     
+    public function testExclusionsExcluded()
+    {
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), $this->getRPath(), __DIR__);
+        $filter->addExclude('modules/module');
+        
+        $javascript = <<<'JVS'
+require(['modules/module'], function(module) {
+    return console.log(module);
+});
+JVS;
+        $asset = new StringAsset($javascript);
+        $asset->ensureFilter($filter);
+        $content = $asset->dump();
+        
+        $this->assertEquals('require(["modules/module"],function(a){return console.log(a)}),define("', substr($content, 0, 71), 'Did not expect modules/module to be included in build');
+        $this->assertEquals('",function(){})', substr($content, 103), 'Did not expect modules/module to be included in build');
+    }
+    
     /**
      * Helper to fetch the path to node.js.
      * @return string

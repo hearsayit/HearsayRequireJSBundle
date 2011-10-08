@@ -48,4 +48,17 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals($expected, $builder->getConfiguration(), 'Unexpected configuration generated');
     }
+    
+    public function testPathsAdded()
+    {
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator->expects($this->any())
+                ->method('getLocale')
+                ->will($this->returnValue('fr_FR'));
+        $builder = new ConfigurationBuilder($translator, 'js');
+        $builder->setPath('namespace', '/path/to/namespace');
+       
+        $config = $builder->getConfiguration();
+        $this->assertEquals(array('namespace' => '/path/to/namespace'), $config['paths'], 'Did not find expected paths configuration');        
+    }
 }
