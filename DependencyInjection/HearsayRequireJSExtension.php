@@ -52,16 +52,21 @@ class HearsayRequireJSExtension extends Extension
         $container->setParameter('hearsay_require_js.base_directory', $this->getRealPath($config['base_directory'], $container));
 
         $container->setParameter('hearsay_require_js.initialize_template', $config['initialize_template']);
-        
-        // Set optimizer options
-        $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
-        foreach ($config['optimizer']['excludes'] as $exclude) {
-            $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
-            $filter->addMethodCall('addExclude', array($exclude));
-        }
-        foreach ($config['optimizer']['options'] as $name => $settings) {
-            $value = $settings['value'];
-            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array($name, $value));
+
+        if (isset($config['optimizer'])) {
+            // Set optimizer options
+            $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
+            foreach ($config['optimizer']['excludes'] as $exclude) {
+                $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
+                $filter->addMethodCall('addExclude', array($exclude));
+            }
+            foreach ($config['optimizer']['options'] as $name => $settings) {
+                $value = $settings['value'];
+                $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array($name, $value));
+            }
+        } else {
+            // If the optimizer config isn't provided, don't provide the filter
+            $container->removeDefinition('hearsay_require_js.optimizer_filter');
         }
 
         // Add the configured namespaces

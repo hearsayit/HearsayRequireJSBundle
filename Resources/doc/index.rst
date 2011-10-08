@@ -35,9 +35,14 @@ Installation
 Configuration
 =============
 
-You can expose directories of Javascript modules for access via ``require``.  
-Given a directory structure like::
+You can expose directories of Javascript modules for access via ``require``.
+You must expose one root directory (from which files will be ``require``'d by 
+default), and you may expose as many additional namespaces as you like.  Given a
+directory structure like::
 
+        - app/
+            - scripts/
+                - jquery.js
         - src/
             - Acme/
                 - BlogBundle/
@@ -57,14 +62,15 @@ Your configuration might look something like::
 
         # app/config/config.yml
         hearsay_require_js:
+            base_directory: %kernel.root_dir%/scripts
             paths:
-                blog: %kernel_root%/../src/Acme/BlogBundle/Resources/scripts
+                blog: %kernel.root_dir%/../src/Acme/BlogBundle/Resources/scripts
                 comment: '@AcmeCommentBundle/Resources/scripts'
 
 This specifies base namespaces for each directory, so you would then reference
 modules like::
 
-        require(['comment/three/four', 'blog/module'], function(four, module) { ... });
+        require(['jquery', 'comment/three/four', 'blog/module'], function($, four, module) { ... });
 
 You can also specify modules to be loaded from external sources::
 
@@ -103,7 +109,17 @@ Optimization
 
 The bundle provides an Assetic filter to create minified Javascript files using
 the RequireJS optimizer.  This also inlines any module definitions required by 
-the file being optimized.  You can use it like any other filter; for example,
+the file being optimized.  You need to provide a path to the r.js optimizer in
+your configuration to use the filter::
+
+        # app/config/config.yml
+        hearsay_require_js:
+            optimizer:
+                path: /path/to/r.js
+                excludes: [ excluded/module ] # Modules to exclude from the build (optional)
+                options: { skipModuleInsertion: true } # Additional options to pass to the optimizer (optional)
+
+You can then use it like any other filter; for example,
 to optimize only in production::
 
         {% javascripts filter='?requirejs' '@AcmeBlogBundle/Resources/scripts/main.js' %}

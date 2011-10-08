@@ -36,7 +36,7 @@ class RequireJSOptimizerFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testContentOptimized()
     {
-        $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__);
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), $this->getRPath(), __DIR__);
 
         $asset = new StringAsset('alert("Hi there!");      alert("Hi there again");');
         $asset->ensureFilter($filter);
@@ -49,7 +49,7 @@ class RequireJSOptimizerFilterTest extends \PHPUnit_Framework_TestCase
     public function testBaseUrlModulesIncluded()
     {
         // We use the current directory as the base URL
-        $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__);
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), $this->getRPath(), __DIR__);
         
 
         $javascript = <<<'JVS'
@@ -71,7 +71,7 @@ JVS;
     public function testOptionsPassed()
     {
         // We use the current directory as the base URL
-        $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__ . '/../../Resources/scripts');
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), $this->getRPath(), __DIR__);
 
         // So we can get consistent output
         $filter->setOption('skipModuleInsertion', true);
@@ -91,7 +91,7 @@ JVS;
 
     public function testErrorOnBadInput()
     {
-        $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__ . '/../../Resources/scripts');
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), $this->getRPath(), __DIR__);
 
         // Try to load a nonexistent module
         $javascript = <<<'JVS'
@@ -108,7 +108,7 @@ JVS;
     
     public function testExternalsIgnored()
     {
-        $filter = new RequireJSOptimizerFilter($this->getNodePath(), __DIR__ . '/../../Resources/scripts/r.js', __DIR__ . '/../../Resources/scripts');
+        $filter = new RequireJSOptimizerFilter($this->getNodePath(), $this->getRPath(), __DIR__);
         $filter->addExternal('external1');
         $filter->addExternal('external2');
         
@@ -140,6 +140,15 @@ JVS;
             // Use a reasonable default
             return '/usr/local/bin/node';
         } 
+    }
+
+    /**
+     * Get the optimizer path.
+     * @return string
+     */
+    protected function getRPath()
+    {
+        return __DIR__ . '/r.js';
     }
 
 }

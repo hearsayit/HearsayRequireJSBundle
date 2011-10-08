@@ -41,6 +41,9 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             'paths' => array(
                 'namespace' => '/home/user/path',
             ),
+            'optimizer' => array(
+                'path' => '/path/to/r.js',
+            ),
         );
         $container = $this->getContainerBuilder();
         $loader = new HearsayRequireJSExtension();
@@ -79,10 +82,25 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         }
     }
     
+    public function testOptimizerOmittedIfNotConfigured()
+    {
+        $config = array(
+            'base_directory' => '/home/user/base',
+        );
+        $container = $this->getContainerBuilder();
+        $loader = new HearsayRequireJSExtension();
+        
+        $loader->load(array($config), $container);
+        
+        $this->assertFalse($container->hasDefinition('hearsay_require_js.optimizer_filter'), 'Expected optimizer filter not to be defined');
+    }
+    
     public function testOptimizerOptionsSet()
     {
         $config = array(
+            'base_directory' => '/home/user/base',
             'optimizer' => array(
+                'path' => '/path/to/r.js',
                 'options' => array(
                     'option' => 'value',
                 ),
