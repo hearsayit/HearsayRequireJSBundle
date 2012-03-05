@@ -51,6 +51,8 @@ class HearsayRequireJSExtension extends Extension
         $container->setParameter('hearsay_require_js.base_url', $config['base_url']);
         $container->setParameter('hearsay_require_js.base_directory', $this->getRealPath($config['base_directory'], $container));
 
+        $container->setParameter('hearsay_require_js.require_js_src', $config['require_js_src']);
+        
         $container->setParameter('hearsay_require_js.initialize_template', $config['initialize_template']);
 
         if (isset($config['optimizer'])) {

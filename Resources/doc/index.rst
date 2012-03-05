@@ -104,6 +104,13 @@ when initializing RequireJS::
         </script>
         {{ require_js_initialize({ 'configure' : false })
 
+To make global changes to the configuration/initialization output, you can
+specify an initialization template in your configuration::
+
+        # app/config/config.yml
+        hearsay_require_js:
+            initialize_template: '::initialize_require_js.html.twig'
+
 Optimization
 ============
 

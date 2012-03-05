@@ -21,7 +21,8 @@
 
 parameters:
     hearsay_require_js.base_url: js
-    hearsay_require_js.base_directory: null # Set in the extension code 
+    hearsay_require_js.base_directory: null # Set in the extension code
+    hearsay_require_js.require_js_src: null # Set in the extension code
     hearsay_require_js.initialize_template: null # Set in the extension code
     hearsay_require_js.r.path: null # Set in the extension code
 
@@ -70,6 +71,7 @@ services:
         arguments:
             - '@service_container'
             - '@hearsay_require_js.configuration_builder'
+            - %hearsay_require_js.require_js_src%
         tags:
             - { name: twig.extension }
             

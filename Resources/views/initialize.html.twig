@@ -34,9 +34,9 @@
 {% endblock configuration %}
 {% endif %}
 
-{% block requirejs %}
-    {# Applications may override the requirejs_src block to use a custom URL. #}
-    <script type='text/javascript'{% if main is defined and main is not empty %} data-main='{{ main }}'{% endif %} src='{% block requirejs_src '//cdnjs.cloudflare.com/ajax/libs/require.js/1.0.5/require.min.js' %}'></script>
-{% endblock requirejs %}
+{% block require_js %}
+    {# Applications may override the require_js_src block to use a custom URL. #}
+    <script type='text/javascript'{% if main is defined and main is not empty %} data-main='{{ main }}'{% endif %} src='{% block src require_js.src %}'></script>
+{% endblock require_js %}
 
 {% endspaceless %}

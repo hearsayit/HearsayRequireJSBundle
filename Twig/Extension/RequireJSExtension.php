@@ -42,16 +42,24 @@ class RequireJSExtension extends \Twig_Extension
      * @var ConfigurationBuilder
      */
     protected $configurationBuilder = null;
+    /**
+     * @var string
+     */
+    protected $requireJsSrc = null;
 
     /**
      * Standard constructor.
      * @param ContainerInterface $container Container to get the templating
      * helper.
+     * @param ConfigurationBuilder $configurationBuilder For generating the
+     * initial Javascript config array.
+     * @param string $requireJsSrc Default URL to use for loading RequireJS.
      */
-    public function __construct(ContainerInterface $container, ConfigurationBuilder $configurationBuilder)
+    public function __construct(ContainerInterface $container, ConfigurationBuilder $configurationBuilder, $requireJsSrc)
     {
         $this->container = $container;
         $this->configurationBuilder = $configurationBuilder;
+        $this->requireJsSrc = $requireJsSrc;
     }
 
     /**
@@ -81,6 +89,7 @@ class RequireJSExtension extends \Twig_Extension
         return array(
             'require_js' => array(
                 'config' => $this->configurationBuilder->getConfiguration(),
+                'src' => $this->requireJsSrc,
             ),
         );
     }
