@@ -1,27 +1,28 @@
 ##
 # Copyright (c) 2011 Hearsay News Products, Inc.
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights 
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-# copies of the Software, and to permit persons to whom the Software is 
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in 
+# The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
 parameters:
     hearsay_require_js.base_url: js
-    hearsay_require_js.base_directory: null # Set in the extension code 
+    hearsay_require_js.requirejs_src: null # Set in the extension code
+    hearsay_require_js.base_directory: null # Set in the extension code
     hearsay_require_js.initialize_template: null # Set in the extension code
     hearsay_require_js.r.path: null # Set in the extension code
 
@@ -35,18 +36,18 @@ services:
             - '@hearsay_require_js.namespace_mapping'
         tags:
             - { name: assetic.formula_loader, alias: require_js }
-            
+
     # Parent definition for module directory resources
     hearsay_require_js.directory_filename_resource:
         abstract: true
         class: Hearsay\RequireJSBundle\Factory\Resource\DirectoryFilenameResource
-            
+
     hearsay_require_js.namespace_mapping:
         public: false
         class: Hearsay\RequireJSBundle\Configuration\NamespaceMapping
         arguments:
             - %hearsay_require_js.base_url%
-        
+
     # Templating
     hearsay_require_js.configuration_builder:
         public: false
@@ -55,7 +56,7 @@ services:
             - '@translator'
             - '@service_container'
             - %hearsay_require_js.base_url%
-    
+
     hearsay_require_js.helper:
         class: Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper
         arguments:
@@ -64,7 +65,7 @@ services:
             - %hearsay_require_js.initialize_template%
         tags:
             - { name: templating.helper }
-            
+
     hearsay_require_js.twig_extension:
         class: Hearsay\RequireJSBundle\Twig\Extension\RequireJSExtension
         arguments:
@@ -72,7 +73,7 @@ services:
             - '@hearsay_require_js.configuration_builder'
         tags:
             - { name: twig.extension }
-            
+
     # Assetic
     hearsay_require_js.optimizer_filter:
         class: Hearsay\RequireJSBundle\Filter\RequireJSOptimizerFilter
@@ -82,4 +83,4 @@ services:
             - %hearsay_require_js.base_directory%
         tags:
             - { name: assetic.filter, alias: requirejs }
-            
+
