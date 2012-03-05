@@ -35,7 +35,7 @@
 {% endif %}
 
 {% block require_js %}
-    {# Applications may override the require_js_src block to use a custom URL. #}
+    {# Applications may override the src block to use a custom URL. #}
     <script type='text/javascript'{% if main is defined and main is not empty %} data-main='{{ main }}'{% endif %} src='{% block src require_js.src %}'></script>
 {% endblock require_js %}
 
