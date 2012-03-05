@@ -24,6 +24,7 @@
 
 namespace Hearsay\RequireJSBundle\Configuration;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -38,6 +39,10 @@ class ConfigurationBuilder
      * @var TranslatorInterface
      */
     protected $translator = null;
+    /**
+     * @var ContainerInterface
+     */
+    protected $container = null;
     /**
      * @var string
      */
@@ -54,11 +59,15 @@ class ConfigurationBuilder
     /**
      * Standard constructor.
      * @param TranslatorInterface $translator For getting the current locale.
-     * @param string $baseUrl Base URL where assets are served.
+     * @param ContainerInterface $container For getting the request object,
+     * which gives us the site root.
+     * @param string $baseUrl Base URL where assets are served, relative to the
+     * site root.
      */
-    public function __construct(TranslatorInterface $translator, $baseUrl = '')
+    public function __construct(TranslatorInterface $translator, ContainerInterface $container, $baseUrl = '')
     {
         $this->translator = $translator;
+        $this->container = $container;
         $this->baseUrl = $baseUrl;
     }
 
@@ -91,8 +100,10 @@ class ConfigurationBuilder
      */
     public function getConfiguration()
     {
+        /** @var $request Syfmony\Component\HttpFoundation\Request */
+        $request = $this->container->get('request');
         $config = array(
-            'baseUrl' => $this->baseUrl,
+            'baseUrl' => $request->getBaseUrl() . '/' . \ltrim($this->baseUrl, '/'),
             'locale' => $this->translator->getLocale(),
         );
         if ($this->paths !== null) {

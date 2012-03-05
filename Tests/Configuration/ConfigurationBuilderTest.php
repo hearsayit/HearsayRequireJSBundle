@@ -38,15 +38,37 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $translator->expects($this->any())
                 ->method('getLocale')
                 ->will($this->returnValue('fr_FR'));
-        $builder = new ConfigurationBuilder($translator, 'js');
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request->expects($this->any())
+                ->method('getBaseUrl')
+                ->will($this->returnValue('/base'));
+        $container = new \Symfony\Component\DependencyInjection\Container();
+        $container->set('request', $request);
+        
+        $builder = new ConfigurationBuilder($translator, $container, 'js');
         $builder->setOption('option', 'value');
         
         $expected = array(
             'locale' => 'fr_FR',
-            'baseUrl' => 'js',
+            'baseUrl' => '/base/js',
             'option' => 'value',
         );
         $this->assertEquals($expected, $builder->getConfiguration(), 'Unexpected configuration generated');
+    }
+    
+    public function testBaseUrlSlashesTrimmed()
+    {
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request->expects($this->any())
+                ->method('getBaseUrl')
+                ->will($this->returnValue('/base'));
+        $container = new \Symfony\Component\DependencyInjection\Container();
+        $container->set('request', $request);
+        $builder = new ConfigurationBuilder($translator, $container, '/js');
+
+        $configuration = $builder->getConfiguration();
+        $this->assertEquals('/base/js', $configuration['baseUrl'], 'Expected slashes to be trimmed when generating base URL');        
     }
     
     public function testPathsAdded()
@@ -55,7 +77,13 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $translator->expects($this->any())
                 ->method('getLocale')
                 ->will($this->returnValue('fr_FR'));
-        $builder = new ConfigurationBuilder($translator, 'js');
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request->expects($this->any())
+                ->method('getBaseUrl')
+                ->will($this->returnValue('/base'));
+        $container = new \Symfony\Component\DependencyInjection\Container();
+        $container->set('request', $request);
+        $builder = new ConfigurationBuilder($translator, $container, 'js');
         $builder->setPath('namespace', '/path/to/namespace');
        
         $config = $builder->getConfiguration();
