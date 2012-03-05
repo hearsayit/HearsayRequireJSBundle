@@ -155,8 +155,7 @@ JVS;
         if (isset($_SERVER['NODE_BIN'])) {
             return $_SERVER['NODE_BIN'];
         } else {
-            // Use a reasonable default
-            return '/usr/local/bin/node';
+            $this->markTestSkipped('No path for node.js specified; please specify the path in the NODE_BIN variable.');
         } 
     }
 
