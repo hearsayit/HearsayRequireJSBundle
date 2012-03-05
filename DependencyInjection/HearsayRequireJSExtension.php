@@ -76,12 +76,12 @@ class HearsayRequireJSExtension extends Extension
             if ($settings['external']) {
                 $this->addExternalNamespaceMapping($settings['location'], $path, $container);
             } else {
-                $this->addNamespaceMapping($settings['location'], $path, $container);
+                $this->addNamespaceMapping($settings['location'], $path, $container, !$config['hide_unoptimized_assets']);
             }
         }
 
         // Add root directory with an empty namespace
-        $this->addNamespaceMapping($config['base_directory'], '', $container);
+        $this->addNamespaceMapping($config['base_directory'], '', $container, !$config['hide_unoptimized_assets']);
     }
 
     /**
@@ -89,8 +89,9 @@ class HearsayRequireJSExtension extends Extension
      * @param string $location
      * @param string $path
      * @param ContainerBuilder $container 
+     * @param boolean $generateAssets
      */
-    protected function addNamespaceMapping($location, $path, ContainerBuilder $container)
+    protected function addNamespaceMapping($location, $path, ContainerBuilder $container, $generateAssets = true)
     {
         $location = $this->getRealPath($location, $container);
 
@@ -99,17 +100,19 @@ class HearsayRequireJSExtension extends Extension
         $mapping->addMethodCall('registerNamespace', array($location, $path));
 
         // And with the optimizer filter
-        if ($path) {
+        if ($path && $container->hasDefinition('hearsay_require_js.optimizer_filter')) {
             $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $path, $location));
         }
 
-        // Create the assetic resource
-        $resource = new DefinitionDecorator('hearsay_require_js.directory_filename_resource');
-        $resource->setArguments(array($location));
-        $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
-        $container->addDefinitions(array(
-            'hearsay_require_js.directory_filename_resource.' . md5($location) => $resource,
-        ));
+        if ($generateAssets) {
+            // Create the assetic resource
+            $resource = new DefinitionDecorator('hearsay_require_js.directory_filename_resource');
+            $resource->setArguments(array($location));
+            $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
+            $container->addDefinitions(array(
+                'hearsay_require_js.directory_filename_resource.' . md5($location) => $resource,
+            ));
+        }
     }
 
     /**

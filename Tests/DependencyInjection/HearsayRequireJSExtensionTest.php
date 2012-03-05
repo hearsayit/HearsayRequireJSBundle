@@ -82,6 +82,39 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         }
     }
     
+    public function testAssetsCanBeHidden()
+    {
+        $config = array(
+            'base_directory' => '/home/user/base',
+            'paths' => array(
+                'namespace' => '/home/user/path',
+            ),
+            'hide_unoptimized_assets' => true,
+        );
+        $container = $this->getContainerBuilder();
+        $loader = new HearsayRequireJSExtension();
+        
+        $loader->load(array($config), $container);
+        
+        // Make sure we don't have any assetic resources
+        foreach(array('/home/user/base', '/home/user/path') as $path) {
+            $this->assertFalse($container->hasDefinition('hearsay_require_js.directory_filename_resource.' . md5($path)));
+        }
+        
+        // Sanity check; make sure we do have assetic resources by default.
+        unset($config['hide_unoptimized_assets']);
+        $container = $this->getContainerBuilder();
+        $loader = new HearsayRequireJSExtension();
+        
+        $loader->load(array($config), $container);
+        
+        // Make sure we don't have any assetic resources
+        foreach(array('/home/user/base', '/home/user/path') as $path) {
+            $this->assertTrue($container->hasDefinition('hearsay_require_js.directory_filename_resource.' . md5($path)));
+        }
+        
+    }
+    
     public function testOptimizerOmittedIfNotConfigured()
     {
         $config = array(
