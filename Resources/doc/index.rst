@@ -87,7 +87,7 @@ Usage
 Just output the RequireJS initialization and load files normally::
 
         {{ require_js_initialize() }}
-        <script type='text/javascript'>require('blog/main')</script>
+        <script type='text/javascript'>require(['blog/main'])</script>
 
 Alternately, you can specify a file to be required immediately via the
 data-main attribute::
