@@ -20,6 +20,7 @@
 # SOFTWARE.
 
 parameters:
+    hearsay_require_js.use_controller_for_assets: %assetic.use_controller%
     hearsay_require_js.base_url: js
     hearsay_require_js.base_directory: null # Set in the extension code
     hearsay_require_js.require_js_src: null # Set in the extension code
@@ -55,6 +56,7 @@ services:
         arguments:
             - '@translator'
             - '@service_container'
+            - %hearsay_require_js.use_controller_for_assets%
             - %hearsay_require_js.base_url%
     
     hearsay_require_js.helper:

@@ -44,6 +44,10 @@ class ConfigurationBuilder
      */
     protected $container = null;
     /**
+     * @var boolean
+     */
+    protected $useControllerForAssets = false;
+    /**
      * @var string
      */
     protected $baseUrl = null;
@@ -61,13 +65,17 @@ class ConfigurationBuilder
      * @param TranslatorInterface $translator For getting the current locale.
      * @param ContainerInterface $container For getting the request object,
      * which gives us the site root.
+     * @param boolean $useControllerForAssets True if we should serve assets
+     * by pointing to the site root (e.g. /app.php/{asset URL}), false if the
+     * assets should be served directly from the filesystem.
      * @param string $baseUrl Base URL where assets are served, relative to the
      * site root.
      */
-    public function __construct(TranslatorInterface $translator, ContainerInterface $container, $baseUrl = '')
+    public function __construct(TranslatorInterface $translator, ContainerInterface $container, $useControllerForAssets, $baseUrl = '')
     {
         $this->translator = $translator;
         $this->container = $container;
+        $this->useControllerForAssets = $useControllerForAssets;
         $this->baseUrl = $baseUrl;
     }
 
@@ -100,10 +108,12 @@ class ConfigurationBuilder
      */
     public function getConfiguration()
     {
-        /** @var $request Syfmony\Component\HttpFoundation\Request */
-        $request = $this->container->get('request');
+        $rootUrl = '';
+        if ($this->useControllerForAssets && $this->container->isScopeActive('request')) {
+            $rootUrl = $this->container->get('request')->getBaseUrl();
+        }
         $config = array(
-            'baseUrl' => $request->getBaseUrl() . '/' . \ltrim($this->baseUrl, '/'),
+            'baseUrl' => $rootUrl . '/' . \ltrim($this->baseUrl, '/'),
             'locale' => $this->translator->getLocale(),
         );
         if ($this->paths !== null) {

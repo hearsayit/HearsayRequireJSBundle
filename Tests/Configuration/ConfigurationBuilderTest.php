@@ -43,9 +43,12 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 ->method('getBaseUrl')
                 ->will($this->returnValue('/base'));
         $container = new \Symfony\Component\DependencyInjection\Container();
+        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
+        $container->addScope($requestScope);
+        $container->enterScope('request');
         $container->set('request', $request);
         
-        $builder = new ConfigurationBuilder($translator, $container, 'js');
+        $builder = new ConfigurationBuilder($translator, $container, true, 'js');
         $builder->setOption('option', 'value');
         
         $expected = array(
@@ -64,11 +67,34 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 ->method('getBaseUrl')
                 ->will($this->returnValue('/base'));
         $container = new \Symfony\Component\DependencyInjection\Container();
+        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
+        $container->addScope($requestScope);
+        $container->enterScope('request');
         $container->set('request', $request);
-        $builder = new ConfigurationBuilder($translator, $container, '/js');
+        
+        $builder = new ConfigurationBuilder($translator, $container, true, '/js');
 
         $configuration = $builder->getConfiguration();
         $this->assertEquals('/base/js', $configuration['baseUrl'], 'Expected slashes to be trimmed when generating base URL');        
+    }
+    
+    public function testRootUrlIgnoredIfAppropriate()
+    {
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request->expects($this->never())
+                ->method('getBaseUrl');
+        $container = new \Symfony\Component\DependencyInjection\Container();
+        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
+        $container->addScope($requestScope);
+        $container->enterScope('request');
+        $container->set('request', $request);
+        
+        // Use-controller parameter is false
+        $builder = new ConfigurationBuilder($translator, $container, false, '/js');
+
+        $configuration = $builder->getConfiguration();
+        $this->assertEquals('/js', $configuration['baseUrl'], 'Did not expect to pull the base URL from the request object');
     }
     
     public function testPathsAdded()
@@ -77,13 +103,8 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $translator->expects($this->any())
                 ->method('getLocale')
                 ->will($this->returnValue('fr_FR'));
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-        $request->expects($this->any())
-                ->method('getBaseUrl')
-                ->will($this->returnValue('/base'));
         $container = new \Symfony\Component\DependencyInjection\Container();
-        $container->set('request', $request);
-        $builder = new ConfigurationBuilder($translator, $container, 'js');
+        $builder = new ConfigurationBuilder($translator, $container, false, 'js');
         $builder->setPath('namespace', '/path/to/namespace');
        
         $config = $builder->getConfiguration();
