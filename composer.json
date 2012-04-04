@@ -1,0 +1,22 @@
+{
+    "name": "hearsay/require-js-bundle",
+    "type": "symfony-bundle",
+    "description": "Hearsay RequireJS Bundle",
+    "keywords": ["requirejs", "require", "javascript"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kevin Montag",
+            "email": "kmontag@cs.stanford.edu"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "symfony/framework-bundle": "2.*",
+        "symfony/assetic-bundle": "2.0.*", 
+    },
+    "autoload": {
+        "psr-0": {"Hearsay\\RequireJSBundle": ""},
+    },
+    "target-dir": "Hearsay/RequireJSBundle"
+}
