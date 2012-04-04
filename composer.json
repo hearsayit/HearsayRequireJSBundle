@@ -16,7 +16,7 @@
         "symfony/assetic-bundle": "2.0.*"
     },
     "autoload": {
-        "psr-0": {"Hearsay\\RequireJSBundle": ""},
+        "psr-0": {"Hearsay\\RequireJSBundle": ""}
     },
     "target-dir": "Hearsay/RequireJSBundle"
 }
