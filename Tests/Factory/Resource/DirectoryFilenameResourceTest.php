@@ -25,13 +25,12 @@
 namespace Hearsay\RequireJSBundle\Tests\Factory\Resource;
 
 use Hearsay\RequireJSBundle\Factory\Resource\DirectoryFilenameResource;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * Unit tests for the filename resource.
  * @author Kevin Montag <kevin@hearsay.it>
  */
-class DirectoryFilenameResourceTest extends WebTestCase
+class DirectoryFilenameResourceTest extends \PHPUnit_Framework_TestCase
 {
     public function testFilenamesRetrieved()
     {
@@ -53,9 +52,11 @@ class DirectoryFilenameResourceTest extends WebTestCase
     
     public function testFreshCheck()
     {
+        $dir = sys_get_temp_dir() . '/' . uniqid('hearsay_requirejs_fresh', true);
+        $this->assertTrue(mkdir($dir), 'There was a problem creating the temporary directory');
+        sleep(2);
+
         $time = time() - 1;
-        $dir = $this->createKernel()->getCacheDir(); // Get a directory for temporary files
-        
         if (filemtime($dir) > $time) {
             $this->markTestSkipped('Cache dir is too recently modified for testing');
         }
