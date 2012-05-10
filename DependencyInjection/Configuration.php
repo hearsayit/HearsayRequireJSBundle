@@ -86,7 +86,6 @@ class Configuration implements ConfigurationInterface
                                 ->prototype('scalar')->end()
                             ->end()
                             ->arrayNode('options')
-                                ->addDefaultsIfNotSet()
                                 ->defaultValue(array())
                                 ->useAttributeAsKey('name')
                                 ->prototype('array')
