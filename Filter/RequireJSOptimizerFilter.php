@@ -26,7 +26,6 @@ namespace Hearsay\RequireJSBundle\Filter;
 
 use Assetic\Asset\AssetInterface;
 use Assetic\Filter\FilterInterface;
-use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * Assetic filter for RequireJS optimization.
@@ -120,6 +119,16 @@ class RequireJSOptimizerFilter implements FilterInterface
      */
     public function filterDump(AssetInterface $asset)
     {
+        // Figure out which ProcessBuilder class is available to us
+        // (https://github.com/kriswallsmith/assetic/commit/0c7158ac6c480eb1dcc9f1c4b5795680d49e2577)
+        $pb_class = 'Assetic\\Util\\ProcessBuilder';
+        if (!class_exists($pb_class)) {
+            $pb_class = 'Symfony\\Component\\Process\\ProcessBuilder';
+        }
+        if (!class_exists($pb_class)) {
+            throw new \RuntimeException('Cannot find an acceptable ProcessBuilder class');
+        }
+        
         $input = tempnam(sys_get_temp_dir(), 'assetic_requirejs');
         $inputFilename = $input . ($this->extension ? '.' . $this->extension : '');
         file_put_contents($inputFilename, $asset->getContent());
@@ -128,7 +137,7 @@ class RequireJSOptimizerFilter implements FilterInterface
 
         // Get a name for the module, for which we'll configure a path
         $name = md5($input);
-        $pb = new ProcessBuilder();
+        $pb = new $pb_class();
         $pb
                 ->add($this->nodePath)
                 ->add($this->rPath)
