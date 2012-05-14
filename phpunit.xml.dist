@@ -6,6 +6,12 @@
             <directory suffix="Test.php">./Tests</directory>
         </testsuite>
     </testsuites>
+    
+    <php>
+    	<!--
+    	<server name="NODE_BIN" value="/usr/bin/node"/>
+    	-->
+    </php>
 
     <filter>
         <whitelist>
