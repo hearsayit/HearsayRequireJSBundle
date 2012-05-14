@@ -6,6 +6,8 @@ your Symfony2 projects.
 
 Installation
 ============
+If you're using composer, just require `hearsay/require-js-bundle` in your project.
+To install the bundle manually:
 
   1. Install the bundle::
 
@@ -142,9 +144,11 @@ production environment), you can suppress them::
         
         # app/config/config.yml
         hearsay_require_js:
-            hide_unoptimized_assets: true
+            optimizer:
+                path: /path/to/r.js
+                hide_unoptimized_assets: true
 
-If you're doing this, be sure that all of your needed modules are bundled into
+If you're doing this, be sure that all the modules you need are bundled into
 your optimized assets (i.e. you're not accessing any modules by dynamic name, or
 if you are, then you're explicitly including those modules via optimizer
 options) - otherwise, you may see certain assets available in development, but 

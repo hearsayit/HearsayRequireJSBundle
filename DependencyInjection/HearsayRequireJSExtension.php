@@ -55,7 +55,11 @@ class HearsayRequireJSExtension extends Extension
         
         $container->setParameter('hearsay_require_js.initialize_template', $config['initialize_template']);
 
+        $hide_unoptimized_assets = false;
         if (isset($config['optimizer'])) {
+            // Check whether the optimizer should suppress unoptimized files
+            $hide_unoptimized_assets = $config['optimizer']['hide_unoptimized_assets'];
+
             // Set optimizer options
             $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
             foreach ($config['optimizer']['excludes'] as $exclude) {
@@ -76,12 +80,12 @@ class HearsayRequireJSExtension extends Extension
             if ($settings['external']) {
                 $this->addExternalNamespaceMapping($settings['location'], $path, $container);
             } else {
-                $this->addNamespaceMapping($settings['location'], $path, $container, !$config['hide_unoptimized_assets']);
+                $this->addNamespaceMapping($settings['location'], $path, $container, !$hide_unoptimized_assets);
             }
         }
 
         // Add root directory with an empty namespace
-        $this->addNamespaceMapping($config['base_directory'], '', $container, !$config['hide_unoptimized_assets']);
+        $this->addNamespaceMapping($config['base_directory'], '', $container, !$hide_unoptimized_assets);
     }
 
     /**
