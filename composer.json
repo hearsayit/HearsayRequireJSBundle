@@ -19,7 +19,7 @@
         "symfony/templating": ">=2.0",
         "symfony/translation": ">=2.0",
         "symfony/yaml": ">=2.0",
-        "kriswallsmith/assetic": ">=2.0"
+        "kriswallsmith/assetic": ">=1.0"
     },
     "require-dev": {
         "symfony/http-foundation": ">=2.0"
