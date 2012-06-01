@@ -3,22 +3,22 @@
 /**
  * Copyright (c) 2011 Hearsay News Products, Inc.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights 
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is 
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in 
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
 
@@ -47,20 +47,20 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $container = $this->getContainerBuilder();
         $loader = new HearsayRequireJSExtension();
-        
+
         $loader->load(array($config), $container);
-        
+
         // Check the namespace mapping
         $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
         $methods = $mapping->getMethodCalls();
         $this->assertEquals(2, count($methods), 'Incorrect number of method calls on namespace mapping');
         $this->assertContains(array(
-            'registerNamespace', array('/home/user/path', 'namespace'),
+            'registerNamespace', array('/home/user/path', 'namespace', is_dir('/home/user/base')),
         ), $methods, 'Did not find expected method call');
         $this->assertContains(array(
-            'registerNamespace', array('/home/user/base', ''),
+            'registerNamespace', array('/home/user/base', '', is_dir('/home/user/base')),
         ), $methods, 'Did not find expected method call');
-        
+
         // Check the optimization filter
         $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
         $methods = $filter->getMethodCalls();
@@ -68,7 +68,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertContains(array(
             'setOption', array('paths.namespace', '/home/user/path'),
         ), $methods, 'Did not find expected method call');
-        
+
         // And the Assetic resources
         foreach(array('/home/user/base', '/home/user/path') as $path) {
             /* @var $resource \Symfony\Component\DependencyInjection\DefinitionDecorator */
@@ -96,15 +96,15 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
         $container = $this->getContainerBuilder();
         $loader = new HearsayRequireJSExtension();
-        
+
         $loader->load(array($config), $container);
-        
+
         // Make sure we have the relevant assetic resources
         foreach(array('/home/user/base', '/home/user/path') as $path) {
             $this->assertTrue($container->hasDefinition('hearsay_require_js.directory_filename_resource.' . md5($path)));
         }
     }
-    
+
     public function testAssetsCanBeHidden()
     {
         $config = array(
@@ -119,15 +119,15 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $container = $this->getContainerBuilder();
         $loader = new HearsayRequireJSExtension();
-        
+
         $loader->load(array($config), $container);
-        
+
         // Make sure we don't have any assetic resources
         foreach(array('/home/user/base', '/home/user/path') as $path) {
             $this->assertFalse($container->hasDefinition('hearsay_require_js.directory_filename_resource.' . md5($path)));
         }
     }
-    
+
     public function testOptimizerOmittedIfNotConfigured()
     {
         $config = array(
@@ -135,12 +135,12 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $container = $this->getContainerBuilder();
         $loader = new HearsayRequireJSExtension();
-        
+
         $loader->load(array($config), $container);
-        
+
         $this->assertFalse($container->hasDefinition('hearsay_require_js.optimizer_filter'), 'Expected optimizer filter not to be defined');
     }
-    
+
     public function testOptimizerOptionsSet()
     {
         $config = array(
@@ -154,9 +154,9 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $container = $this->getContainerBuilder();
         $loader = new HearsayRequireJSExtension();
-        
+
         $loader->load(array($config), $container);
-        
+
         $optimizer = $container->getDefinition('hearsay_require_js.optimizer_filter');
         $methods = $optimizer->getMethodCalls();
         $this->assertEquals(1, count($methods), 'Incorrect number of method calls on optimizer');
@@ -164,7 +164,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             'setOption', array('option', 'value'),
         ), $methods, 'Did not find expected method call');
     }
-    
+
     public function testExceptionOnUnrecognizedBundle()
     {
         $config = array(
@@ -172,11 +172,11 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $container = $this->getContainerBuilder();
         $loader = new HearsayRequireJSExtension();
-        
+
         $this->setExpectedException('InvalidArgumentException', 'Unrecognized bundle: "UnknownBundle"');
         $loader->load(array($config), $container);
     }
-    
+
     /**
      * Helper to get a new container builder with necessary initialization
      * performed.
@@ -187,9 +187,9 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $bundles = array(
             'HearsayRequireJSBundle' => 'Hearsay\RequireJSBundle\HearsayRequireJSBundle',
-        );        
+        );
         $container->setParameter('kernel.bundles', $bundles);
         return $container;
     }
-    
+
 }

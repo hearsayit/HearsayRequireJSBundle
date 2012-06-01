@@ -56,6 +56,11 @@ class DirectoryFilenameResource implements ResourceInterface
     {
         $finder = Finder::create();
         $files = '';
+
+        if (is_file($this->path)) {
+            return strtr($this->path, '\\', '/');
+        }
+
         foreach($finder->files()->in($this->path) as $file) {
             $files .= strtr($file, '\\', '/') . "\n";
         }

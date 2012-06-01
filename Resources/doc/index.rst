@@ -59,6 +59,8 @@ directory structure like::
                         - scripts/
                             - three/
                                 - four.js
+                            - libs/
+                                - text.js
 
 Your configuration might look something like::
 
@@ -68,6 +70,15 @@ Your configuration might look something like::
             paths:
                 blog: %kernel.root_dir%/../src/Acme/BlogBundle/Resources/scripts
                 comment: '@AcmeCommentBundle/Resources/scripts'
+
+You can also expose files directly using the following syntax. In this
+example the file that otherwise would be exposed as `/js/libs/text.js`
+(according to the configuration above) will now be exposed as `/js/text.js`.
+
+        # app/config/config.yml
+        hearsay_require_js:
+            paths:
+                text: '@AcmeCommentBundle/Resources/scripts/libs/text.js'
 
 This specifies base namespaces for each directory, so you would then reference
 modules like::

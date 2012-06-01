@@ -55,10 +55,11 @@ class NamespaceMapping implements NamespaceMappingInterface
      * Register a directory-to-namespace mapping.
      * @param string $path
      * @param string $namespace
+     * @param Boolean $isDir true if the path is a directory
      */
-    public function registerNamespace($path, $namespace)
+    public function registerNamespace($path, $namespace, $isDir = true)
     {
-        $this->namespaces[realpath($path)] = $namespace;
+        $this->namespaces[realpath($path)] = array('namespace' => $namespace, 'is_dir' => $isDir);
     }
 
     /**
@@ -67,9 +68,13 @@ class NamespaceMapping implements NamespaceMappingInterface
     public function getModulePath($filename)
     {
         $filename = realpath($filename);
-        foreach ($this->namespaces as $path => $namespace) {
+        foreach ($this->namespaces as $path => $settings) {
             if (strpos($filename, $path) === 0) {
-                return preg_replace('#[/\\\\]+#', '/', $this->basePath . '/' . $namespace . '/' . substr($filename, strlen($path)));
+                if ($settings['is_dir']) {
+                    return preg_replace('#[/\\\\]+#', '/', $this->basePath . '/' . $settings['namespace'] . '/' . substr($filename, strlen($path)));
+                }
+
+                return preg_replace('#[/\\\\]+#', '/', $this->basePath . '/' . $settings['namespace'] . '.' . pathinfo($filename, PATHINFO_EXTENSION));
             }
         }
         return false;
