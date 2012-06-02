@@ -110,11 +110,11 @@ class HearsayRequireJSExtension extends Extension
 
         if ($generateAssets) {
             // Create the assetic resource
-            $resource = new DefinitionDecorator('hearsay_require_js.directory_filename_resource');
+            $resource = new DefinitionDecorator('hearsay_require_js.filenames_resource');
             $resource->setArguments(array($location));
             $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
             $container->addDefinitions(array(
-                'hearsay_require_js.directory_filename_resource.' . md5($location) => $resource,
+                'hearsay_require_js.filenames_resource.' . md5($location) => $resource,
             ));
         }
     }

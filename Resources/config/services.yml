@@ -39,9 +39,9 @@ services:
             - { name: assetic.formula_loader, alias: require_js }
             
     # Parent definition for module directory resources
-    hearsay_require_js.directory_filename_resource:
+    hearsay_require_js.filenames_resource:
         abstract: true
-        class: Hearsay\RequireJSBundle\Factory\Resource\DirectoryFilenameResource
+        class: Hearsay\RequireJSBundle\Factory\Resource\FilenamesResource
             
     hearsay_require_js.namespace_mapping:
         public: false

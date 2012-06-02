@@ -28,7 +28,6 @@ use Assetic\Factory\AssetFactory;
 use Assetic\Factory\Loader\FormulaLoaderInterface;
 use Assetic\Factory\Resource\ResourceInterface;
 use Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface;
-use Hearsay\RequireJSBundle\Factory\Resource\DirectoryFilenameResource;
 
 /**
  * Formula loader for Javascript modules.

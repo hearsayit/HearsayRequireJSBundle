@@ -36,10 +36,25 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testNamespacesMapped()
     {
+        // Set up directory structure
+        $base_dir = sys_get_temp_dir() . '/' . uniqid('hearsay_requirejs_base', true);
+        $this->assertTrue(mkdir($base_dir), 'There was a problem creating the temporary directory');
+
+        $namespace_dir = sys_get_temp_dir() . '/' . uniqid('hearsay_requirejs_namespace_dir', true);
+        $this->assertTrue(mkdir($namespace_dir), 'There was a problem creating the temporary directory');
+
+        $namespace_file = sys_get_temp_dir() . '/' . uniqid('hearsay_requirejs_namespace_file', true) . '.js';
+        $handle = fopen($namespace_file, 'w');
+        if (!$handle) {
+            throw new \RuntimeException('Cannot create temp file');
+        }
+        fclose($handle);
+
         $config = array(
-            'base_directory' => '/home/user/base',
+            'base_directory' => $base_dir,
             'paths' => array(
-                'namespace' => '/home/user/path',
+                'namespace' => $namespace_dir,
+                'namespace_file' => $namespace_file,
             ),
             'optimizer' => array(
                 'path' => '/path/to/r.js',
@@ -53,29 +68,36 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         // Check the namespace mapping
         $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
         $methods = $mapping->getMethodCalls();
-        $this->assertEquals(2, count($methods), 'Incorrect number of method calls on namespace mapping');
+        
+        $this->assertEquals(3, count($methods), 'Incorrect number of method calls on namespace mapping');
         $this->assertContains(array(
-            'registerNamespace', array('/home/user/path', 'namespace', is_dir('/home/user/base')),
+            'registerNamespace', array($namespace_dir, 'namespace', true),
         ), $methods, 'Did not find expected method call');
         $this->assertContains(array(
-            'registerNamespace', array('/home/user/base', '', is_dir('/home/user/base')),
+            'registerNamespace', array($base_dir, '', true),
+        ), $methods, 'Did not find expected method call');
+        $this->assertContains(array(
+            'registerNamespace', array($namespace_file, 'namespace_file', false),
         ), $methods, 'Did not find expected method call');
 
         // Check the optimization filter
         $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
         $methods = $filter->getMethodCalls();
-        $this->assertEquals(1, count($methods), 'Incorrect number of method calls on optimizer filter');
+        $this->assertEquals(2, count($methods), 'Incorrect number of method calls on optimizer filter');
         $this->assertContains(array(
-            'setOption', array('paths.namespace', '/home/user/path'),
+            'setOption', array('paths.namespace', $namespace_dir),
+        ), $methods, 'Did not find expected method call');
+        $this->assertContains(array(
+            'setOption', array('paths.namespace_file', $namespace_file),
         ), $methods, 'Did not find expected method call');
 
         // And the Assetic resources
-        foreach(array('/home/user/base', '/home/user/path') as $path) {
+        foreach(array($base_dir, $namespace_dir, $namespace_file) as $path) {
             /* @var $resource \Symfony\Component\DependencyInjection\DefinitionDecorator */
-            $resource = $container->getDefinition('hearsay_require_js.directory_filename_resource.' . md5($path));
+            $resource = $container->getDefinition('hearsay_require_js.filenames_resource.' . md5($path));
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $resource);
             $this->assertEquals(array($path), $resource->getArguments(), 'Incorrect constructor arguments for assetic resource');
-            $this->assertEquals('hearsay_require_js.directory_filename_resource', $resource->getParent(), 'Incorrect parent for assetic resource');
+            $this->assertEquals('hearsay_require_js.filenames_resource', $resource->getParent(), 'Incorrect parent for assetic resource');
 
             $tag = $resource->getTag('assetic.formula_resource');
             $this->assertEquals(array(array('loader' => 'require_js')), $tag, 'Unexpected formula resource tag');
@@ -101,7 +123,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
         // Make sure we have the relevant assetic resources
         foreach(array('/home/user/base', '/home/user/path') as $path) {
-            $this->assertTrue($container->hasDefinition('hearsay_require_js.directory_filename_resource.' . md5($path)));
+            $this->assertTrue($container->hasDefinition('hearsay_require_js.filenames_resource.' . md5($path)));
         }
     }
 

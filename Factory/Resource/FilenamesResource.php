@@ -28,14 +28,14 @@ use Assetic\Factory\Resource\ResourceInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
- * Assetic resource containing the filenames in a directory.
+ * Assetic resource containing the filenames descendant from some root.
  * @author Kevin Montag <kevin@hearsay.it>
  */
-class DirectoryFilenameResource implements ResourceInterface
+class FilenamesResource implements ResourceInterface
 {
 
     /**
-     * Base directory on the file system.
+     * Base directory on the file system, or a single filename.
      * @var string
      */
     protected $path = null;
@@ -54,18 +54,18 @@ class DirectoryFilenameResource implements ResourceInterface
      */
     public function getContent()
     {
-        $finder = Finder::create();
-        $files = '';
-
         if (is_file($this->path)) {
             return strtr($this->path, '\\', '/');
+        } else {
+            $finder = Finder::create();
+            $files = '';
+    
+            foreach($finder->files()->in($this->path) as $file) {
+                $files .= strtr($file, '\\', '/') . "\n";
+            }
+    
+            return $files;
         }
-
-        foreach($finder->files()->in($this->path) as $file) {
-            $files .= strtr($file, '\\', '/') . "\n";
-        }
-
-        return $files;
     }
 
     /**

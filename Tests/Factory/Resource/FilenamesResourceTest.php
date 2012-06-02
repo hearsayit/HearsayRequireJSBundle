@@ -24,29 +24,36 @@
 
 namespace Hearsay\RequireJSBundle\Tests\Factory\Resource;
 
-use Hearsay\RequireJSBundle\Factory\Resource\DirectoryFilenameResource;
+use Hearsay\RequireJSBundle\Factory\Resource\FilenamesResource;
 
 /**
  * Unit tests for the filename resource.
  * @author Kevin Montag <kevin@hearsay.it>
  */
-class DirectoryFilenameResourceTest extends \PHPUnit_Framework_TestCase
+class FilenamesResourceTest extends \PHPUnit_Framework_TestCase
 {
     public function testFilenamesRetrieved()
     {
-        $resource = new DirectoryFilenameResource(__DIR__);
+        $resource = new FilenamesResource(__DIR__);
         $content = $resource->getContent();
 
         $filenames = preg_split("/\s+/", trim($content));
         $this->assertEquals(3, count($filenames), 'Incorrect number of files pulled');
-        $this->assertContains(strtr(__DIR__, '\\', '/') . '/DirectoryFilenameResourceTest.php', $filenames, 'Did not find expected filename');
+        $this->assertContains(strtr(__DIR__, '\\', '/') . '/FilenamesResourceTest.php', $filenames, 'Did not find expected filename');
         $this->assertContains(strtr(__DIR__, '\\', '/') . '/dir/file', $filenames, 'Did not find expected filename');
         $this->assertContains(strtr(__DIR__, '\\', '/') . '/dir/subdir/file', $filenames, 'Did not find expected filename');
+    }
+    
+    public function testSingleFilenameRetrieved()
+    {
+        $resource = new FilenamesResource(__FILE__);
+        $content = $resource->getContent();
+        $this->assertEquals(strtr(__FILE__, '\\', '/'), $content, 'Did not find expected filename');
     }
 
     public function testStringConversion()
     {
-        $resource = new DirectoryFilenameResource(__DIR__);
+        $resource = new FilenamesResource(__DIR__);
         $this->assertEquals(strtr(__DIR__, '\\', '/'), (string)$resource, 'Incorrect string conversion');
     }
 
@@ -61,7 +68,7 @@ class DirectoryFilenameResourceTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Cache dir is too recently modified for testing');
         }
 
-        $resource = new DirectoryFilenameResource($dir);
+        $resource = new FilenamesResource($dir);
         $this->assertTrue($resource->isFresh($time), 'Cache dir is not fresh');
 
         $file = tempnam($dir, 'requirejs_test');
