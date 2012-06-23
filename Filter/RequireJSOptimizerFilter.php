@@ -173,6 +173,10 @@ class RequireJSOptimizerFilter implements FilterInterface
 
         // Additional options
         foreach ($this->options as $option => $value) {
+            if ($option == 'insertRequire')
+            {
+              $value = $name;
+            }
             $pb->add($option . '=' . $value);
         }
 
