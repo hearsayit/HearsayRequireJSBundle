@@ -128,7 +128,7 @@ class RequireJSOptimizerFilter implements FilterInterface
         if (!class_exists($pb_class)) {
             throw new \RuntimeException('Cannot find an acceptable ProcessBuilder class');
         }
-        
+
         $input = tempnam(sys_get_temp_dir(), 'assetic_requirejs');
         $inputFilename = $input . ($this->extension ? '.' . $this->extension : '');
         file_put_contents($inputFilename, $asset->getContent());
@@ -180,7 +180,17 @@ class RequireJSOptimizerFilter implements FilterInterface
         $proc->run();
 
         if (!$proc->isSuccessful()) {
-            throw new \RuntimeException($proc->getErrorOutput());
+            $message = "Optimization failed";
+            
+            $output = $proc->getErrorOutput();
+            if (strlen($output) === 0) {
+                $output = $proc->getOutput();
+            }
+            if (strlen($output)) {
+                $message .= ": ".$output;
+            }
+
+            throw new \RuntimeException($message);
         }
 
         $asset->setContent(file_get_contents($output));
