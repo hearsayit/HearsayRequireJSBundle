@@ -68,7 +68,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         // Check the namespace mapping
         $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
         $methods = $mapping->getMethodCalls();
-        
+
         $this->assertEquals(3, count($methods), 'Incorrect number of method calls on namespace mapping');
         $this->assertContains(array(
             'registerNamespace', array($namespace_dir, 'namespace', true),
@@ -184,6 +184,28 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($methods), 'Incorrect number of method calls on optimizer');
         $this->assertContains(array(
             'setOption', array('option', 'value'),
+        ), $methods, 'Did not find expected method call');
+    }
+
+    public function testOptimizerBuildProfileSet()
+    {
+        $config = array(
+            'base_directory' => '/home/user/base',
+            'optimizer' => array(
+                'path' => '/path/to/r.js',
+                'build_profile' => 'path/to/app.build.js'
+            ),
+        );
+        $container = $this->getContainerBuilder();
+        $loader = new HearsayRequireJSExtension();
+
+        $loader->load(array($config), $container);
+
+        $optimizer = $container->getDefinition('hearsay_require_js.optimizer_filter');
+        $methods = $optimizer->getMethodCalls();
+        $this->assertEquals(1, count($methods), 'Incorrect number of method calls on optimizer');
+        $this->assertContains(array(
+            'setBuildProfile', array('path/to/app.build.js'),
         ), $methods, 'Did not find expected method call');
     }
 
