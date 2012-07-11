@@ -23,7 +23,7 @@ To install the bundle manually:
         ));
 
   3. Add the bundle to your kernel::
-        
+
         // app/AppKernel.php
         public function registerBundles()
         {
@@ -38,7 +38,7 @@ Configuration
 =============
 
 You can expose directories of Javascript modules for access via ``require``.
-You must expose one root directory (from which files will be ``require``'d by 
+You must expose one root directory (from which files will be ``require``'d by
 default), and you may expose as many additional namespaces as you like.  Given a
 directory structure like::
 
@@ -128,7 +128,7 @@ Optimization
 ============
 
 The bundle provides an Assetic filter to create minified Javascript files using
-the RequireJS optimizer.  This also inlines any module definitions required by 
+the RequireJS optimizer.  This also inlines any module definitions required by
 the file being optimized.  You need to provide a path to the r.js optimizer in
 your configuration to use the filter::
 
@@ -150,9 +150,20 @@ Note that your configured path definitions will be incorporated into the
 optimizer filter, including the exclusion of external dependencies from the
 built file.
 
+If you wish to provide configuration using a `build profile <http://github.com/jrburke/r.js/blob/master/build/example.build.js>`_::
+
+        # app/config/config.yml
+        hearsay_require_js:
+            optimizer:
+                path: /path/to/r.js
+                build_profile: /path/to/app.build.js # Build profile location (filename is arbitrary)
+                options: { skipModuleInsertion: true } # Additional options to pass to the optimizer (optional)
+
+Note that any command line options will take precedence over matching corresponding build profile configuration.
+
 If you wish to prevent unoptimized assets from being served (in e.g. a
 production environment), you can suppress them::
-        
+
         # app/config/config.yml
         hearsay_require_js:
             optimizer:
@@ -162,5 +173,5 @@ production environment), you can suppress them::
 If you're doing this, be sure that all the modules you need are bundled into
 your optimized assets (i.e. you're not accessing any modules by dynamic name, or
 if you are, then you're explicitly including those modules via optimizer
-options) - otherwise, you may see certain assets available in development, but 
+options) - otherwise, you may see certain assets available in development, but
 not production.

@@ -50,6 +50,11 @@ class RequireJSOptimizerFilter implements FilterInterface
      */
     protected $baseUrl = null;
     /**
+     * Path to an optional build profile containing optimizer configuration
+     * @var string
+     */
+    protected $buildProfile = null;
+    /**
      * Extension to add to temporary files for processing.
      * @var string
      */
@@ -75,6 +80,14 @@ class RequireJSOptimizerFilter implements FilterInterface
         $this->nodePath = $nodePath;
         $this->rPath = $rPath;
         $this->baseUrl = $baseUrl;
+    }
+
+    /**
+     * @param string $path
+     */
+    public function setBuildProfile($path)
+    {
+        $this->buildProfile = $path;
     }
 
     /**
@@ -139,18 +152,30 @@ class RequireJSOptimizerFilter implements FilterInterface
         $name = md5($input);
         $pb = new $pb_class();
         $pb
-                ->add($this->nodePath)
-                ->add($this->rPath)
-                ->add('-o') // Optimize
-                // Configure the primary input
-                ->add('paths.' . $name . '=' . $input)
-                ->add('name=' . $name)
+            ->add($this->nodePath)
+            ->add($this->rPath)
+            ->add('-o') // Optimize
+        ;
 
-                // Configure the output
-                ->add('out=' . $output)
+        // Build profile path, if set, needs to be provided after the optimize flag
+        if ($this->buildProfile) {
+            $buildProfile = $this->buildProfile;
+            if (! file_exists($buildProfile)) {
+                throw new \RuntimeException("Build profile does not exist at ".$buildProfile);
+            }
+            $pb->add($buildProfile);
+        }
 
-                // Configure the input base URL
-                ->add('baseUrl=' . $this->baseUrl)
+        $pb
+            // Configure the primary input
+            ->add('paths.' . $name . '=' . $input)
+            ->add('name=' . $name)
+
+            // Configure the output
+            ->add('out=' . $output)
+
+            // Configure the input base URL
+            ->add('baseUrl=' . $this->baseUrl)
         ;
 
         $excludesString = '';
@@ -181,7 +206,7 @@ class RequireJSOptimizerFilter implements FilterInterface
 
         if (!$proc->isSuccessful()) {
             $message = "Optimization failed";
-            
+
             $output = $proc->getErrorOutput();
             if (strlen($output) === 0) {
                 $output = $proc->getOutput();

@@ -62,13 +62,18 @@ class HearsayRequireJSExtension extends Extension
 
             // Set optimizer options
             $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
+            $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
+
+            if (isset($config['optimizer']['build_profile'])) {
+                $buildProfile = $this->getRealPath($config['optimizer']['build_profile'], $container);
+                $filter->addMethodCall('setBuildProfile', array($buildProfile));
+            }
             foreach ($config['optimizer']['excludes'] as $exclude) {
-                $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
                 $filter->addMethodCall('addExclude', array($exclude));
             }
             foreach ($config['optimizer']['options'] as $name => $settings) {
                 $value = $settings['value'];
-                $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array($name, $value));
+                $filter->addMethodCall('setOption', array($name, $value));
             }
         } else {
             // If the optimizer config isn't provided, don't provide the filter
