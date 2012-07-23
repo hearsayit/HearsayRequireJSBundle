@@ -43,12 +43,24 @@ class FilenamesResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertContains(strtr(__DIR__, '\\', '/') . '/dir/file', $filenames, 'Did not find expected filename');
         $this->assertContains(strtr(__DIR__, '\\', '/') . '/dir/subdir/file', $filenames, 'Did not find expected filename');
     }
-    
+
     public function testSingleFilenameRetrieved()
     {
         $resource = new FilenamesResource(__FILE__);
         $content = $resource->getContent();
         $this->assertEquals(strtr(__FILE__, '\\', '/'), $content, 'Did not find expected filename');
+    }
+
+    public function testFilenamesRetrievedUsingWhitelist()
+    {
+        $resource = new FilenamesResource(__DIR__, '#\.php$#');
+        $content = $resource->getContent();
+
+        $filenames = preg_split("/\s+/", trim($content));
+        $this->assertEquals(1, count($filenames), 'Incorrect number of files pulled');
+        $this->assertContains(__FILE__, $filenames, 'Did not find expected filename');
+        $this->assertNotContains(__DIR__ . '/dir/file', $filenames, 'Did not find expected filename');
+        $this->assertNotContains(__DIR__ . '/dir/subdir/file', $filenames, 'Did not find expected filename');
     }
 
     public function testStringConversion()

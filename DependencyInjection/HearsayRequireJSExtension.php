@@ -85,22 +85,24 @@ class HearsayRequireJSExtension extends Extension
             if ($settings['external']) {
                 $this->addExternalNamespaceMapping($settings['location'], $path, $container);
             } else {
-                $this->addNamespaceMapping($settings['location'], $path, $container, !$hide_unoptimized_assets);
+                $this->addNamespaceMapping($settings['location'], $path, $settings['whitelist'], $container, !$hide_unoptimized_assets);
             }
         }
 
         // Add root directory with an empty namespace
-        $this->addNamespaceMapping($config['base_directory'], '', $container, !$hide_unoptimized_assets);
+        $this->addNamespaceMapping($config['base_directory'], '', $config['whitelist'], $container, !$hide_unoptimized_assets);
     }
 
     /**
      * Configure a mapping from a filesystem path to a RequireJS namespace.
      * @param string $location
      * @param string $path
+     * @param string $whitelist
      * @param ContainerBuilder $container
      * @param boolean $generateAssets
+     * @return void
      */
-    protected function addNamespaceMapping($location, $path, ContainerBuilder $container, $generateAssets = true)
+    protected function addNamespaceMapping($location, $path, $whitelist, ContainerBuilder $container, $generateAssets = true)
     {
         $location = $this->getRealPath($location, $container);
 
@@ -116,7 +118,7 @@ class HearsayRequireJSExtension extends Extension
         if ($generateAssets) {
             // Create the assetic resource
             $resource = new DefinitionDecorator('hearsay_require_js.filenames_resource');
-            $resource->setArguments(array($location));
+            $resource->setArguments(array($location, $whitelist));
             $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
             $container->addDefinitions(array(
                 'hearsay_require_js.filenames_resource.' . md5($location) => $resource,

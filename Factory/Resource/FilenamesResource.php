@@ -41,12 +41,20 @@ class FilenamesResource implements ResourceInterface
     protected $path = null;
 
     /**
+     * Whitelist of files to be included
+     * @var string
+     */
+    protected $whitelist;
+
+    /**
      * Standard constructor.
      * @param string $path Filesystem directory path.
+     * @param string $whitelist Whitelist of files to consider
      */
-    public function __construct($path)
+    public function __construct($path, $whitelist = null)
     {
         $this->path = $path;
+        $this->whitelist = $whitelist;
     }
 
     /**
@@ -58,12 +66,15 @@ class FilenamesResource implements ResourceInterface
             return strtr($this->path, '\\', '/');
         } else {
             $finder = Finder::create();
+            if ($this->whitelist) {
+                $finder->name($this->whitelist);
+            }
             $files = '';
-    
+
             foreach($finder->files()->in($this->path) as $file) {
                 $files .= strtr($file, '\\', '/') . "\n";
             }
-    
+
             return $files;
         }
     }

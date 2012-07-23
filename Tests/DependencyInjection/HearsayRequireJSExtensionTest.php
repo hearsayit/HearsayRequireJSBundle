@@ -74,9 +74,6 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             'registerNamespace', array($namespace_dir, 'namespace', true),
         ), $methods, 'Did not find expected method call');
         $this->assertContains(array(
-            'registerNamespace', array($base_dir, '', true),
-        ), $methods, 'Did not find expected method call');
-        $this->assertContains(array(
             'registerNamespace', array($namespace_file, 'namespace_file', false),
         ), $methods, 'Did not find expected method call');
 
@@ -96,7 +93,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             /* @var $resource \Symfony\Component\DependencyInjection\DefinitionDecorator */
             $resource = $container->getDefinition('hearsay_require_js.filenames_resource.' . md5($path));
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $resource);
-            $this->assertEquals(array($path), $resource->getArguments(), 'Incorrect constructor arguments for assetic resource');
+            $this->assertEquals(array($path, ''), $resource->getArguments(), 'Incorrect constructor arguments for assetic resource');
             $this->assertEquals('hearsay_require_js.filenames_resource', $resource->getParent(), 'Incorrect parent for assetic resource');
 
             $tag = $resource->getTag('assetic.formula_resource');
@@ -139,6 +136,9 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
                 'hide_unoptimized_assets' => true,
             ),
         );
+
+        // Sanity check; make sure we do have assetic resources by default.
+        unset($config['hide_unoptimized_assets']);
         $container = $this->getContainerBuilder();
         $loader = new HearsayRequireJSExtension();
 
