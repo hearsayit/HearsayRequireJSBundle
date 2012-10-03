@@ -64,4 +64,11 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($mapping->getModulePath(__DIR__ . '/dir/file.js'), 'Non-existent module expected not to be converted');
     }
 
+    public function testFilesRenamedToJs()
+    {
+        $mapping = new NamespaceMapping('js');
+        $mapping->registerNamespace(__DIR__ . '/dir', 'modules');
+
+        $this->assertEquals('js/modules/file2.js', $mapping->getModulePath(__DIR__ . '/dir/file2.coffee'), 'Incorrect file-to-module conversion');
+    }
 }
