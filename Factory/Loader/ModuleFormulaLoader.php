@@ -57,7 +57,7 @@ class ModuleFormulaLoader implements FormulaLoaderInterface
     public function load(ResourceInterface $resource)
     {
         $formulae = array();
-        $tokens = preg_split("/\s+/", $resource->getContent());
+        $tokens = preg_split("/\n+/", $resource->getContent());
         foreach ($tokens as $token) {
             if (is_file($token)) {
                 $name = $this->factory->generateAssetName($token, array());
