@@ -86,8 +86,16 @@ class RequireJSHelper extends Helper
             'configure' => true,
         );
         $options = array_merge($defaults, $options);
+        
+        $config = $this->configurationBuilder->getConfiguration();
+        
+        if (isset($config['baseUrl']) && substr($options['main'], 0, strlen($config['baseUrl'])) == $config['baseUrl']) {
+            // strip the base url from main.
+            $options['main'] = substr($options['main'], strlen($config['baseUrl']) + 1);
+        }
+        
         return $this->engine->render($this->initializeTemplate, array(
-            'config' => $options['configure'] ? $this->configurationBuilder->getConfiguration() : null,
+            'config' => $options['configure'] ? $config : null,
             'main' => $options['main'],
         ));
     }
