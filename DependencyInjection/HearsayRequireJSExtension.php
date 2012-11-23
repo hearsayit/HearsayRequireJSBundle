@@ -110,6 +110,7 @@ class HearsayRequireJSExtension extends Extension
 
         // And with the optimizer filter
         if ($path && $container->hasDefinition('hearsay_require_js.optimizer_filter')) {
+            $tLoc = $location;
             if (substr($location, -3) == '.js') {
                 $tLoc = substr($location, 0, strlen($location) - 3);
             }
