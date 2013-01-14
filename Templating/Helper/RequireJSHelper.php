@@ -93,6 +93,12 @@ class RequireJSHelper extends Helper
             // strip the base url from main.
             $options['main'] = substr($options['main'], strlen($config['baseUrl']) + 1);
         }
+
+        if ($pos = strpos($options['main'], '?')) {
+            // we are cache busting
+            $config['urlArgs'] = substr($options['main'], $pos + 1);
+            $options['main'] = substr($options['main'], 0, $pos);
+        }
         
         return $this->engine->render($this->initializeTemplate, array(
             'config' => $options['configure'] ? $config : null,
