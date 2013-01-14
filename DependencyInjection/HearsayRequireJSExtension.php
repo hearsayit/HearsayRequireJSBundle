@@ -110,7 +110,11 @@ class HearsayRequireJSExtension extends Extension
 
         // And with the optimizer filter
         if ($path && $container->hasDefinition('hearsay_require_js.optimizer_filter')) {
-            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $path, $location));
+            $tLoc = $location;
+            if (substr($location, -3) == '.js') {
+                $tLoc = substr($location, 0, strlen($location) - 3);
+            }
+            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $path, $tLoc));
         }
 
         if ($generateAssets) {
@@ -170,6 +174,12 @@ class HearsayRequireJSExtension extends Extension
             }
         }
 
+        if (!is_file($path) && !is_dir($path)) {
+            if (is_file($path . '.js')) {
+                $path .= '.js';
+            }
+        }
+        
         return $path;
     }
 

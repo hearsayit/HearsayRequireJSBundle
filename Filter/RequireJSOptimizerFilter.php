@@ -150,6 +150,7 @@ class RequireJSOptimizerFilter implements FilterInterface
 
         // Get a name for the module, for which we'll configure a path
         $name = md5($input);
+        /* @var $pb \Symfony\Component\Process\ProcessBuilder */
         $pb = new $pb_class();
         $pb
             ->add($this->nodePath)
