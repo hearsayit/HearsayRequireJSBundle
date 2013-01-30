@@ -1,3 +1,5 @@
+__Currently seeking a new maintainer__ - please ping @kmontag if interested. Thank you!
+
 Introduction
 ============
 
