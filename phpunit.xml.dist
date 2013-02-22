@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit bootstrap="vendor/autoload.php" colors="true">
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         syntaxCheck="false"
+         bootstrap="Tests/bootstrap.php"
+>
     <testsuites>
-        <testsuite name="HearsayRequireJSBundle">
+        <testsuite name="HearsayRequireJSBundle for the Symfony Framework">
             <directory suffix="Test.php">./Tests</directory>
         </testsuite>
     </testsuites>
-    
-    <php>
-    	<!--
-    	<server name="NODE_BIN" value="/usr/bin/node"/>
-    	-->
-    </php>
 
     <filter>
         <whitelist>
