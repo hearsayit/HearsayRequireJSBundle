@@ -135,8 +135,10 @@ class HearsayRequireJSExtension extends Extension
         $config = $container->getDefinition('hearsay_require_js.configuration_builder');
         $config->addMethodCall('setPath', array($path, $location));
 
-        $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
-        $filter->addMethodCall('addExternal', array($path));
+        if ($container->hasDefinition('hearsay_require_js.optimizer_filter')) {
+            $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
+            $filter->addMethodCall('addExternal', array($path));
+        }
     }
 
     /**
