@@ -62,7 +62,7 @@ class ModuleFormulaLoaderTest extends \PHPUnit_Framework_TestCase
         $resource = $this->getMock('Assetic\Factory\Resource\ResourceInterface');
         $resource->expects($this->any())
                 ->method('getContent')
-                ->will($this->returnValue($file1 . "  some other \ntext\n" . $file2));
+                ->will($this->returnValue($file1 . "\nsome other\ntext\n" . $file2));
         
         $loader = new ModuleFormulaLoader($factory, $mapping);
         $formulae = $loader->load($resource);
