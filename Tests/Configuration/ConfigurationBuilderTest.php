@@ -32,8 +32,34 @@ use Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder;
  */
 class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @param $container
+     * @param $filename
+     */
+    protected function setMockAssetTwigExtension($container, $filename)
+    {
+
+        $mockAssetsHelper = $this
+            ->getMockBuilder('Symfony\Component\Templating\Helper\AssetsHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockAssetsHelper
+            ->expects($this->any())
+            ->method('getUrl')
+            ->will($this->returnValue($filename));
+
+        $container->set('templating.helper.assets', $mockAssetsHelper);
+    }
+
     public function testConfigurationGenerated()
     {
+        $container = new \Symfony\Component\DependencyInjection\Container();
+        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
+
+        // Assets twig funtion only available in request scope, so mock it out
+        $this->setMockAssetTwigExtension($container, 'base');
+
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
                 ->method('getLocale')
@@ -42,8 +68,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $request->expects($this->any())
                 ->method('getBaseUrl')
                 ->will($this->returnValue('/base'));
-        $container = new \Symfony\Component\DependencyInjection\Container();
-        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
+
         $container->addScope($requestScope);
         $container->enterScope('request');
         $container->set('request', $request);
@@ -75,17 +100,22 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new ConfigurationBuilder($translator, $container, true, '/js');
 
         $configuration = $builder->getConfiguration();
-        $this->assertEquals('/base/js', $configuration['baseUrl'], 'Expected slashes to be trimmed when generating base URL');        
+        $this->assertEquals('/base/js', $configuration['baseUrl'], 'Expected slashes to be trimmed when generating base URL');
     }
     
     public function testRootUrlIgnoredIfAppropriate()
     {
+        $container = new \Symfony\Component\DependencyInjection\Container();
+        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
+
+        // Assets twig funtion only available in request scope, so mock it out
+        $this->setMockAssetTwigExtension($container, '/js');
+
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request->expects($this->never())
                 ->method('getBaseUrl');
-        $container = new \Symfony\Component\DependencyInjection\Container();
-        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
+
         $container->addScope($requestScope);
         $container->enterScope('request');
         $container->set('request', $request);
@@ -99,11 +129,17 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     
     public function testPathsAdded()
     {
+        $container = new \Symfony\Component\DependencyInjection\Container();
+        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
+
+        // Assets twig funtion only available in request scope, so mock it out
+        $this->setMockAssetTwigExtension($container, 'base');
+
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
                 ->method('getLocale')
                 ->will($this->returnValue('fr_FR'));
-        $container = new \Symfony\Component\DependencyInjection\Container();
+
         $builder = new ConfigurationBuilder($translator, $container, false, 'js');
         $builder->setPath('namespace', '/path/to/namespace');
        
