@@ -175,3 +175,12 @@ your optimized assets (i.e. you're not accessing any modules by dynamic name, or
 if you are, then you're explicitly including those modules via optimizer
 options) - otherwise, you may see certain assets available in development, but
 not production.
+
+If you have issues while running the optimiser on a slow machine,
+you can still override the timeout of the node process::
+
+        # app/config/config.yml
+        hearsay_require_js:
+            optimizer:
+                timeout: 120
+
