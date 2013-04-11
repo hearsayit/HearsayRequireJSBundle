@@ -100,6 +100,18 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                             ->end()
+                            ->scalarNode('timeout')
+                                ->info('The timeout, in seconds, of the node process')
+                                ->validate()
+                                    ->ifTrue(
+                                        function ($v) {
+                                            return !(is_int($v) || ctype_digit($v));
+                                        }
+                                    )
+                                    ->thenInvalid('Invalid number of seconds "%s"')
+                                ->end()
+                                ->defaultValue(60)
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
