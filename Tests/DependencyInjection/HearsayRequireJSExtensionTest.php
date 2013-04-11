@@ -83,7 +83,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         // Check the optimization filter
         $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
         $methods = $filter->getMethodCalls();
-        $this->assertEquals(2, count($methods), 'Incorrect number of method calls on optimizer filter');
+        $this->assertEquals(3, count($methods), 'Incorrect number of method calls on optimizer filter');
         $this->assertContains(array(
             'setOption', array('paths.namespace', $namespace_dir),
         ), $methods, 'Did not find expected method call');
@@ -181,7 +181,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
         $optimizer = $container->getDefinition('hearsay_require_js.optimizer_filter');
         $methods = $optimizer->getMethodCalls();
-        $this->assertEquals(1, count($methods), 'Incorrect number of method calls on optimizer');
+        $this->assertEquals(2, count($methods), 'Incorrect number of method calls on optimizer');
         $this->assertContains(array(
             'setOption', array('option', 'value'),
         ), $methods, 'Did not find expected method call');
@@ -203,7 +203,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
         $optimizer = $container->getDefinition('hearsay_require_js.optimizer_filter');
         $methods = $optimizer->getMethodCalls();
-        $this->assertEquals(1, count($methods), 'Incorrect number of method calls on optimizer');
+        $this->assertEquals(2, count($methods), 'Incorrect number of method calls on optimizer');
         $this->assertContains(array(
             'setBuildProfile', array('path/to/app.build.js'),
         ), $methods, 'Did not find expected method call');

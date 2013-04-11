@@ -68,6 +68,9 @@ class HearsayRequireJSExtension extends Extension
                 $buildProfile = $this->getRealPath($config['optimizer']['build_profile'], $container);
                 $filter->addMethodCall('setBuildProfile', array($buildProfile));
             }
+            if (isset($config['optimizer']['timeout'])) {
+                $filter->addMethodCall('setTimeout', array(intval($config['optimizer']['timeout'])));
+            }
             foreach ($config['optimizer']['excludes'] as $exclude) {
                 $filter->addMethodCall('addExclude', array($exclude));
             }
