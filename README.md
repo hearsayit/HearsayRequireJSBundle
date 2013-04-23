@@ -1,7 +1,5 @@
 [![Build Status](https://travis-ci.org/hearsayit/HearsayRequireJSBundle.png?branch=master)](https://travis-ci.org/hearsayit/HearsayRequireJSBundle)
 
-__Currently seeking a new maintainer__ - please ping @kmontag if interested. Thank you!
-
 Introduction
 ============
 
