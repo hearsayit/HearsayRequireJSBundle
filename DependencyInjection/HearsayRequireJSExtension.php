@@ -88,7 +88,7 @@ class HearsayRequireJSExtension extends Extension
             if ($settings['external']) {
                 $this->addExternalNamespaceMapping($settings['location'], $path, $container);
             } else {
-                $this->addNamespaceMapping($settings['location'], $path, $container, !$hide_unoptimized_assets);
+                $this->addNamespaceMapping(array_shift($settings['location']), $path, $container, !$hide_unoptimized_assets);
             }
         }
 
