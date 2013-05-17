@@ -23,7 +23,8 @@
         "kriswallsmith/assetic": ">=1.0"
     },
     "require-dev": {
-        "symfony/http-foundation": ">=2.0"
+        "symfony/http-foundation": ">=2.0",
+        "satooshi/php-coveralls": "v0.6.1"
     },
     "suggest": {
         "symfony/assetic-bundle": "The Hearsay RequireJS bundle provides integration with the Symfony2 Assetic bundle."

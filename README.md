@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/hearsayit/HearsayRequireJSBundle.png?branch=master)](https://travis-ci.org/hearsayit/HearsayRequireJSBundle)
+[![Coverage Status](https://coveralls.io/repos/hearsayit/HearsayRequireJSBundle/badge.png)](https://coveralls.io/r/hearsayit/HearsayRequireJSBundle)
 
 Introduction
 ============
