@@ -54,16 +54,18 @@ class FilenamesResource implements ResourceInterface
      */
     public function getContent()
     {
-        if (is_file($this->path)) {
+        $file = is_file($this->path) ? $this->path : $this->path . '.js';
+
+        if (is_file($file)) {
             return strtr($this->path, '\\', '/');
         } else {
             $finder = Finder::create();
             $files = '';
-    
+
             foreach($finder->files()->in($this->path) as $file) {
                 $files .= strtr($file, '\\', '/') . "\n";
             }
-    
+
             return $files;
         }
     }

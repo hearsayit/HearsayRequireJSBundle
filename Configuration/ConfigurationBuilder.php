@@ -3,27 +3,28 @@
 /**
  * Copyright (c) 2011 Hearsay News Products, Inc.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights 
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is 
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in 
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
 
 namespace Hearsay\RequireJSBundle\Configuration;
 
+use Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -34,7 +35,6 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class ConfigurationBuilder
 {
-
     /**
      * @var TranslatorInterface
      */
@@ -58,8 +58,16 @@ class ConfigurationBuilder
     /**
      * @var array
      */
+    protected $shim = array();
+    /**
+     * @var array
+     */
     protected $additionalConfig = array();
-    
+    /**
+     * @var NamespaceMappingInterface
+     */
+    protected $mapping;
+
     /**
      * Standard constructor.
      * @param TranslatorInterface $translator For getting the current locale.
@@ -71,12 +79,14 @@ class ConfigurationBuilder
      * @param string $baseUrl Base URL where assets are served, relative to the
      * site root.
      */
-    public function __construct(TranslatorInterface $translator, ContainerInterface $container, $useControllerForAssets, $baseUrl = '')
+    public function __construct(TranslatorInterface $translator, ContainerInterface $container, NamespaceMappingInterface $mapping, $useControllerForAssets, $baseUrl = '', $shim = array())
     {
         $this->translator = $translator;
         $this->container = $container;
+        $this->mapping = $mapping;
         $this->useControllerForAssets = $useControllerForAssets;
         $this->baseUrl = $baseUrl;
+        $this->shim = $shim;
     }
 
     /**
@@ -89,6 +99,12 @@ class ConfigurationBuilder
         if ($this->paths === null) {
             $this->paths = array();
         }
+
+        $modulePath = $this->mapping->getModulePath($location);
+        if (null !== $modulePath) {
+            $location = '/'.str_replace('.js', '', $modulePath);
+        }
+
         $this->paths[$path] = $location;
     }
 
@@ -101,7 +117,7 @@ class ConfigurationBuilder
     {
         $this->additionalConfig[$option] = $value;
     }
-    
+
     /**
      * Get the RequireJS configuration options.
      * @return array
@@ -123,10 +139,15 @@ class ConfigurationBuilder
             'baseUrl' => $baseUrl,
             'locale' => $this->translator->getLocale(),
         );
+
         if ($this->paths !== null) {
             $config['paths'] = $this->paths;
         }
+
+        if (!empty($this->shim)) {
+            $config['shim'] = $this->shim;
+        }
+
         return array_merge($config, $this->additionalConfig);
     }
-
 }
