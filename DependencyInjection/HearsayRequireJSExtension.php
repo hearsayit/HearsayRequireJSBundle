@@ -54,6 +54,7 @@ class HearsayRequireJSExtension extends Extension
         $container->setParameter('hearsay_require_js.require_js_src', $config['require_js_src']);
 
         $container->setParameter('hearsay_require_js.initialize_template', $config['initialize_template']);
+        $container->setParameter('hearsay_require_js.shim', $config['shim']);
 
         $hide_unoptimized_assets = false;
         if (isset($config['optimizer'])) {
@@ -77,6 +78,11 @@ class HearsayRequireJSExtension extends Extension
             foreach ($config['optimizer']['options'] as $name => $settings) {
                 $value = $settings['value'];
                 $filter->addMethodCall('setOption', array($name, $value));
+            }
+            foreach ($config['shim'] as $name => $shim) {
+                $shim['name'] = $name;
+
+                $filter->addMethodCall('addShim', array($shim));
             }
         } else {
             // If the optimizer config isn't provided, don't provide the filter
@@ -111,9 +117,12 @@ class HearsayRequireJSExtension extends Extension
         $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
         $mapping->addMethodCall('registerNamespace', array($location, $path, is_dir($location)));
 
+        $config = $container->getDefinition('hearsay_require_js.configuration_builder');
+        $config->addMethodCall('setPath', array($path, $location));
+
         // And with the optimizer filter
         if ($path && $container->hasDefinition('hearsay_require_js.optimizer_filter')) {
-            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $path, $location));
+            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $path, str_replace('.js', '', $location)));
         }
 
         if ($generateAssets) {
@@ -173,6 +182,10 @@ class HearsayRequireJSExtension extends Extension
             } else {
                 throw new \InvalidArgumentException(sprintf('Unrecognized bundle: "%s"', $bundle));
             }
+        }
+
+        if (file_exists($path.'.js')) {
+            $path = $path.'.js';
         }
 
         return $path;
