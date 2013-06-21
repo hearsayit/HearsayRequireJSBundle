@@ -226,9 +226,7 @@ class RequireJSOptimizerFilter implements FilterInterface
 
         // Additional options
         foreach ($this->options as $option => $value) {
-            /** XXX CUSTOM PREG_REPLACE CALL, DO PR OR FORK FOR THIS */
             $pb->add($option . '=' . preg_replace('#\.js$#', '', $value));
-            // $pb->add($option . '=' . $value);
         }
 
         $proc = $pb->getProcess();
