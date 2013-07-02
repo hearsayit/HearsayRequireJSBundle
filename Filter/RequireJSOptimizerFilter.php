@@ -65,6 +65,11 @@ class RequireJSOptimizerFilter implements FilterInterface
      */
     protected $externals = array();
     /**
+     * Shims to load if no buildProfile is provided
+     * @var array
+     */
+    protected $shim = array();
+    /**
      * Modules to exclude from the build.
      * @var array
      */
@@ -92,6 +97,15 @@ class RequireJSOptimizerFilter implements FilterInterface
     public function setBuildProfile($path)
     {
         $this->buildProfile = $path;
+    }
+
+    /**
+     * Add a shim
+     * @param array $shim Shim information.
+     */
+    public function addShim($shim)
+    {
+        $this->shim[] = $shim;
     }
 
     /**
@@ -185,14 +199,32 @@ class RequireJSOptimizerFilter implements FilterInterface
             ->add('-o') // Optimize
         ;
 
-        // Build profile path, if set, needs to be provided after the optimize flag
-        if ($this->buildProfile) {
-            $buildProfile = $this->buildProfile;
-            if (! file_exists($buildProfile)) {
-                throw new \RuntimeException("Build profile does not exist at ".$buildProfile);
+        if (!$this->buildProfile) {
+            $this->buildProfile = tempnam(sys_get_temp_dir(), 'profile').'.js';
+            $data = "({ shim: {";
+            foreach ($this->shim as $shim) {
+                $data .= '"' . $shim['name'] . '": {';
+
+                $data .= 'deps: ["' . implode($shim['deps'], '","') . '"]';
+
+                if (isset($shim['exports'])) {
+                    $data .= ',exports: "' . $shim['exports'] . '"';
+                }
+
+                $data .= '},';
             }
-            $pb->add($buildProfile);
+
+            $data .= '}})';
+
+            file_put_contents($this->buildProfile, $data);
         }
+
+        // Build profile path, if set, needs to be provided after the optimize flag
+        $buildProfile = $this->buildProfile;
+        if (! file_exists($buildProfile)) {
+            throw new \RuntimeException("Build profile does not exist at ".$buildProfile);
+        }
+        $pb->add($buildProfile);
 
         $pb
             // Configure the primary input

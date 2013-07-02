@@ -59,7 +59,11 @@ class NamespaceMapping implements NamespaceMappingInterface
      */
     public function registerNamespace($path, $namespace, $isDir = true)
     {
-        $this->namespaces[realpath($path)] = array('namespace' => $namespace, 'is_dir' => $isDir);
+        if (file_exists($path.'.js')) {
+            $path = $path.'.js';
+        }
+
+        $this->namespaces[str_replace('.js', '', realpath($path))] = array('namespace' => $namespace, 'is_dir' => $isDir);
     }
 
     /**
@@ -67,6 +71,10 @@ class NamespaceMapping implements NamespaceMappingInterface
      */
     public function getModulePath($filename)
     {
+        if (file_exists($filename.'.js')) {
+            $filename = $filename.'.js';
+        }
+
         $filename = realpath($filename);
         foreach ($this->namespaces as $path => $settings) {
             if (strpos($filename, $path) === 0) {
