@@ -83,9 +83,6 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         // Check the optimization filter
         $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
         $methods = $filter->getMethodCalls();
-
-        var_dump($methods);
-
         $this->assertEquals(3, count($methods), 'Incorrect number of method calls on optimizer filter');
         $this->assertContains(array(
             'setOption', array('paths.namespace', $namespace_dir),
