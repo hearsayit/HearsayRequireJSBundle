@@ -43,7 +43,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         $namespace_dir = sys_get_temp_dir() . '/' . uniqid('hearsay_requirejs_namespace_dir', true);
         $this->assertTrue(mkdir($namespace_dir), 'There was a problem creating the temporary directory');
 
-        $namespace_file = sys_get_temp_dir() . '/' . uniqid('hearsay_requirejs_namespace_file', true) . '.js';
+        $namespace_file = sys_get_temp_dir() . '/' . uniqid('hearsay_requirejs_namespace_file', true);
         $handle = fopen($namespace_file, 'w');
         if (!$handle) {
             throw new \RuntimeException('Cannot create temp file');
@@ -83,6 +83,9 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         // Check the optimization filter
         $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
         $methods = $filter->getMethodCalls();
+
+        var_dump($methods);
+
         $this->assertEquals(3, count($methods), 'Incorrect number of method calls on optimizer filter');
         $this->assertContains(array(
             'setOption', array('paths.namespace', $namespace_dir),
