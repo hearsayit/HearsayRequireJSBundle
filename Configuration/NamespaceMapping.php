@@ -76,6 +76,11 @@ class NamespaceMapping implements NamespaceMappingInterface
         }
 
         $filename = realpath($filename);
+
+        if (!$filename) {
+            return false;
+        }
+
         foreach ($this->namespaces as $path => $settings) {
             if (strpos($filename, $path) === 0) {
                 if ($settings['is_dir']) {
@@ -85,6 +90,7 @@ class NamespaceMapping implements NamespaceMappingInterface
                 return preg_replace('#[/\\\\]+#', '/', $this->basePath . '/' . $settings['namespace'] . '.' . pathinfo($filename, PATHINFO_EXTENSION));
             }
         }
+
         return false;
     }
 }
