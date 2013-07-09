@@ -27,6 +27,8 @@ namespace Hearsay\RequireJSBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Hearsay\RequireJSBundle\Exception\InvalidTypeException;
+
 /**
  * Bundle configuration definitions.
  * @author Kevin Montag <kevin@hearsay.it>
@@ -64,15 +66,21 @@ class Configuration implements ConfigurationInterface
                             ->beforeNormalization()
                                 ->ifString()
                                 ->then(function($v){
-                                    return array('location' => array($v));
+                                    return array('location' => $v);
                                 })
                             ->end()
                             ->children()
-                                ->arrayNode('location')
+                                ->variableNode('location')
                                     ->isRequired()
-                                    ->requiresAtLeastOneElement()
-                                    ->useAttributeAsKey('name')
-                                    ->prototype('scalar')
+                                    ->cannotBeEmpty()
+                                    ->validate()
+                                        ->always(function ($v) {
+                                            if (!is_string($v) && !is_array($v)) {
+                                                throw new InvalidTypeException();
+                                            }
+
+                                            return $v;
+                                        })
                                     ->end()
                                 ->end()
                                 ->booleanNode('external')
