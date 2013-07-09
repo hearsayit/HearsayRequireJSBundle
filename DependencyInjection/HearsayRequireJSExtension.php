@@ -91,10 +91,14 @@ class HearsayRequireJSExtension extends Extension
 
         // Add the configured namespaces
         foreach ($config['paths'] as $path => $settings) {
+            $location = $settings['location'];
+
             if ($settings['external']) {
-                $this->addExternalNamespaceMapping($settings['location'], $path, $container);
+                $this->addExternalNamespaceMapping($location, $path, $container);
             } else {
-                $this->addNamespaceMapping(array_shift($settings['location']), $path, $container, !$hide_unoptimized_assets);
+                !is_string($location) && $location = array_shift($location);
+
+                $this->addNamespaceMapping($location, $path, $container, !$hide_unoptimized_assets);
             }
         }
 
