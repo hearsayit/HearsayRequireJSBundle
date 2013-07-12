@@ -108,7 +108,7 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
      * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::getModulePath
      * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::registerNamespace
      */
-    public function testNonexistentModulePathReturnsFalse()
+    public function testNonExistentModulePathReturnsFalse()
     {
         $this->mapping->registerNamespace('dir', 'root');
 
