@@ -24,9 +24,9 @@
 
 namespace Hearsay\RequireJSBundle\Configuration;
 
-use Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+
+use Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface;
 
 /**
  * Helper service to build RequireJS configuration options from the Symfony
@@ -36,82 +36,110 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ConfigurationBuilder
 {
     /**
-     * @var TranslatorInterface
-     */
-    protected $translator = null;
-    /**
-     * @var ContainerInterface
-     */
-    protected $container = null;
-    /**
-     * @var boolean
-     */
-    protected $useControllerForAssets = false;
-    /**
-     * @var string
-     */
-    protected $baseUrl = null;
-    /**
-     * @var array
-     */
-    protected $paths = null;
-    /**
-     * @var array
-     */
-    protected $shim = array();
-    /**
+     * An array of additional configuration options
+     *
      * @var array
      */
     protected $additionalConfig = array();
+
+    /**
+     * The base URL where assets are served, relative to the website root
+     * directory
+     *
+     * @var string
+     */
+    protected $baseUrl;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
     /**
      * @var NamespaceMappingInterface
      */
     protected $mapping;
 
     /**
-     * Standard constructor.
-     * @param TranslatorInterface $translator For getting the current locale.
-     * @param ContainerInterface $container For getting the request object,
-     * which gives us the site root.
-     * @param boolean $useControllerForAssets True if we should serve assets
-     * by pointing to the site root (e.g. /app.php/{asset URL}), false if the
-     * assets should be served directly from the filesystem.
-     * @param string $baseUrl Base URL where assets are served, relative to the
-     * site root.
+     * An array of paths
+     *
+     * @var array
      */
-    public function __construct(TranslatorInterface $translator, ContainerInterface $container, NamespaceMappingInterface $mapping, $useControllerForAssets, $baseUrl = '', $shim = array())
-    {
-        $this->translator = $translator;
+    protected $paths = array();
+
+    /**
+     * An array of shims
+     *
+     * @var array
+     */
+    protected $shim  = array();
+
+    /**
+     * The constructor method
+     *
+     * @param ContainerInterface        $container
+     * @param NamespaceMappingInterface $mapping
+     * @param string                    $baseUrl    The base URL where assets
+     *                                              are served, relative to the
+     *                                              website root directory
+     * @param array                     $shim
+     */
+    public function __construct(
+        ContainerInterface $container,
+        NamespaceMappingInterface $mapping,
+        $baseUrl = '',
+        $shim = array()
+    ) {
         $this->container = $container;
-        $this->mapping = $mapping;
-        $this->useControllerForAssets = $useControllerForAssets;
-        $this->baseUrl = $baseUrl;
-        $this->shim = $shim;
+        $this->mapping   = $mapping;
+        $this->baseUrl   = \ltrim($baseUrl, '/');
+        $this->shim      = $shim;
     }
 
     /**
-     * Set a path definition to be included in the configuration.
-     * @param string $path The path name.
-     * @param string $location The actual path location.
+     * Get the RequireJS configuration options
+     *
+     * @return array
      */
-    public function setPath($path, $location)
+    public function getConfiguration()
     {
-        if ($this->paths === null) {
-            $this->paths = array();
+        if ($this->container->getParameter('assetic.use_controller')
+            && $this->container->isScopeActive('request')) {
+            $baseUrl = $this->container->get('request')->getBaseUrl();
+            $baseUrl = $baseUrl . '/' . $this->baseUrl;
+        } else {
+            $baseUrl = $this
+                ->container
+                ->get('templating.helper.assets')
+                ->getUrl($this->baseUrl);
+
+            // Remove ?version from the end of the base URL
+            if (($pos = strpos($baseUrl, '?')) !== false) {
+                $baseUrl = substr($baseUrl, 0, $pos);
+            }
         }
 
-        $modulePath = $this->mapping->getModulePath($location);
-        if (null !== $modulePath) {
-            $location = '/'.str_replace('.js', '', $modulePath);
+        $config = array(
+            'baseUrl' => $baseUrl,
+            'locale'  => $this->container->get('translator')->getLocale(),
+        );
+
+        if (count($this->paths) > 0) {
+            $config['paths'] = $this->paths;
         }
 
-        $this->paths[$path] = $location;
+        if (count($this->shim)  > 0) {
+            $config['shim']  = $this->shim;
+        }
+
+        return array_merge($config, $this->additionalConfig);
     }
 
     /**
-     * Set an additional option to output in the config.
-     * @param string $option The option name.
-     * @param mixed $value The option value.
+     * Set an additional option to output in the config
+     *
+     * @param string $option The option name
+     * @param mixed  $value  The option value
      */
     public function setOption($option, $value)
     {
@@ -119,35 +147,27 @@ class ConfigurationBuilder
     }
 
     /**
-     * Get the RequireJS configuration options.
-     * @return array
+     * Set a path definition to be included in the configuration
+     *
+     * @param string       $path      The path name
+     * @param string|array $locations The actual path locations
      */
-    public function getConfiguration()
+    public function setPath($path, $locations)
     {
-        if ($this->useControllerForAssets && $this->container->isScopeActive('request')) {
-            $baseUrl = $this->container->get('request')->getBaseUrl();
-            $baseUrl = $baseUrl . '/' . \ltrim($this->baseUrl, '/');
-        } else {
-            $baseUrl = $this->container->get('templating.helper.assets')->getUrl(\ltrim($this->baseUrl, '/'));
-            // remove ?version from end of URL
-            if (($p = strpos($baseUrl, '?')) !== false) {
-                $baseUrl = substr($baseUrl, 0, $p);
+        !is_array($locations) && $locations = (array) $locations;
+
+        foreach ($locations as &$location) {
+            $modulePath = $this->mapping->getModulePath($location);
+
+            if ($modulePath !== null) {
+                $location = '/' . str_replace('.js', '', $modulePath);
             }
         }
 
-        $config = array(
-            'baseUrl' => $baseUrl,
-            'locale' => $this->translator->getLocale(),
-        );
+        unset($location);
 
-        if ($this->paths !== null) {
-            $config['paths'] = $this->paths;
-        }
+        count($locations) == 1 && $locations = array_shift($locations);
 
-        if (!empty($this->shim)) {
-            $config['shim'] = $this->shim;
-        }
-
-        return array_merge($config, $this->additionalConfig);
+        $this->paths[$path] = $locations;
     }
 }
