@@ -24,6 +24,9 @@
 
 namespace Hearsay\RequireJSBundle\Tests\Configuration;
 
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Scope;
+
 use Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder;
 
 /**
@@ -33,124 +36,190 @@ use Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder;
 class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @param $container
-     * @param $filename
+     * @var Container
      */
-    protected function setMockAssetTwigExtension($container, $filename)
+    private $container;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUp()
     {
-        $mockAssetsHelper = $this
+        parent::setUp();
+
+        $this->container = new Container();
+
+        $translator = $this
+            ->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator
+            ->expects($this->any())
+            ->method('getLocale')
+            ->will($this->returnValue('fr_FR'));
+
+        $this->container->set('translator', $translator);
+    }
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::setOption
+     */
+    public function testConfigurationGenerated()
+    {
+        $requestScope = new Scope('request');
+
+        $this->container->addScope($requestScope);
+        $this->container->enterScope('request');
+
+        // Assets Twig function only available in request scope, so mock it out
+        $this->setAssetsHelperMock('base');
+
+        $request = $this
+            ->getMock('Symfony\Component\HttpFoundation\Request');
+        $request
+            ->expects($this->any())
+            ->method('getBaseUrl')
+            ->will($this->returnValue('/base'));
+
+        $this->container->set('request', $request);
+
+        $mapping = $this
+            ->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
+
+        $this->container->setParameter('assetic.use_controller', true);
+
+        $builder = new ConfigurationBuilder($this->container, $mapping, 'js');
+        $builder->setOption('option', 'value');
+
+        $expected = array(
+            'locale'  => 'fr_FR',
+            'baseUrl' => '/base/js',
+            'option'  => 'value',
+        );
+
+        $this->assertEquals(
+            $expected,
+            $builder->getConfiguration(),
+            'Unexpected configuration generated'
+        );
+    }
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
+     */
+    public function testBaseUrlSlashesTrimmed()
+    {
+        $requestScope = new Scope('request');
+
+        $this->container->addScope($requestScope);
+        $this->container->enterScope('request');
+
+        $request = $this
+            ->getMock('Symfony\Component\HttpFoundation\Request');
+        $request
+            ->expects($this->any())
+            ->method('getBaseUrl')
+            ->will($this->returnValue('/base'));
+
+        $this->container->set('request', $request);
+
+        $mapping = $this
+            ->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
+
+        $this->container->setParameter('assetic.use_controller', true);
+
+        $builder = new ConfigurationBuilder($this->container, $mapping, '/js');
+        $config  = $builder->getConfiguration();
+
+        $this->assertEquals(
+            '/base/js',
+            $config['baseUrl'],
+            'Expected slashes to be trimmed when generating base URL'
+        );
+    }
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
+     */
+    public function testRootUrlIgnoredIfAppropriate()
+    {
+        $requestScope = new Scope('request');
+
+        $this->container->addScope($requestScope);
+        $this->container->enterScope('request');
+
+        // Assets Twig function only available in request scope, so mock it out
+        $this->setAssetsHelperMock('/js');
+
+        $request = $this
+            ->getMock('Symfony\Component\HttpFoundation\Request');
+        $request
+            ->expects($this->never())
+            ->method('getBaseUrl');
+
+        $this->container->set('request', $request);
+
+        $mapping = $this
+            ->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
+
+        $this->container->setParameter('assetic.use_controller', false);
+
+        $builder = new ConfigurationBuilder($this->container, $mapping, '/js');
+        $config  = $builder->getConfiguration();
+
+        $this->assertEquals(
+            '/js',
+            $config['baseUrl'],
+            'Did not expect to pull the base URL from the request object'
+        );
+    }
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
+     */
+    public function testPathsAdded()
+    {
+        // Assets Twig function only available in request scope, so mock it out
+        $this->setAssetsHelperMock('base');
+
+        $mapping = $this
+            ->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
+
+        $this->container->setParameter('assetic.use_controller', false);
+
+        $builder = new ConfigurationBuilder($this->container, $mapping, 'js');
+        $builder->setPath('namespace', '/path/to/namespace');
+        $config  = $builder->getConfiguration();
+
+        $expected = array(
+            'namespace' => '/path/to/namespace',
+        );
+
+        $this->assertEquals(
+            $expected,
+            $config['paths'],
+            'Did not find expected paths configuration'
+        );
+    }
+
+    /**
+     * @param string $filename
+     */
+    private function setAssetsHelperMock($filename)
+    {
+        $assetsHelper = $this
             ->getMockBuilder('Symfony\Component\Templating\Helper\AssetsHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockAssetsHelper
+        $assetsHelper
             ->expects($this->any())
             ->method('getUrl')
             ->will($this->returnValue($filename));
 
-        $container->set('templating.helper.assets', $mockAssetsHelper);
-    }
-
-    public function testConfigurationGenerated()
-    {
-        $container = new \Symfony\Component\DependencyInjection\Container();
-        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
-
-        // Assets twig funtion only available in request scope, so mock it out
-        $this->setMockAssetTwigExtension($container, 'base');
-
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->any())
-                ->method('getLocale')
-                ->will($this->returnValue('fr_FR'));
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-        $request->expects($this->any())
-                ->method('getBaseUrl')
-                ->will($this->returnValue('/base'));
-
-        $container->addScope($requestScope);
-        $container->enterScope('request');
-        $container->set('request', $request);
-
-        $mapping = $this->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
-
-        $builder = new ConfigurationBuilder($translator, $container, $mapping, true, 'js');
-        $builder->setOption('option', 'value');
-
-        $expected = array(
-            'locale' => 'fr_FR',
-            'baseUrl' => '/base/js',
-            'option' => 'value',
-        );
-        $this->assertEquals($expected, $builder->getConfiguration(), 'Unexpected configuration generated');
-    }
-
-    public function testBaseUrlSlashesTrimmed()
-    {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-        $request->expects($this->any())
-                ->method('getBaseUrl')
-                ->will($this->returnValue('/base'));
-        $container = new \Symfony\Component\DependencyInjection\Container();
-        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
-        $container->addScope($requestScope);
-        $container->enterScope('request');
-        $container->set('request', $request);
-
-        $mapping = $this->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
-
-        $builder = new ConfigurationBuilder($translator, $container, $mapping, true, '/js');
-
-        $configuration = $builder->getConfiguration();
-        $this->assertEquals('/base/js', $configuration['baseUrl'], 'Expected slashes to be trimmed when generating base URL');
-    }
-
-    public function testRootUrlIgnoredIfAppropriate()
-    {
-        $container = new \Symfony\Component\DependencyInjection\Container();
-        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
-
-        // Assets twig funtion only available in request scope, so mock it out
-        $this->setMockAssetTwigExtension($container, '/js');
-
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-        $request->expects($this->never())
-                ->method('getBaseUrl');
-
-        $container->addScope($requestScope);
-        $container->enterScope('request');
-        $container->set('request', $request);
-
-        $mapping = $this->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
-
-        // Use-controller parameter is false
-        $builder = new ConfigurationBuilder($translator, $container, $mapping, false, '/js');
-
-        $configuration = $builder->getConfiguration();
-        $this->assertEquals('/js', $configuration['baseUrl'], 'Did not expect to pull the base URL from the request object');
-    }
-
-    public function testPathsAdded()
-    {
-        $container = new \Symfony\Component\DependencyInjection\Container();
-        $requestScope = new \Symfony\Component\DependencyInjection\Scope('request');
-
-        // Assets twig funtion only available in request scope, so mock it out
-        $this->setMockAssetTwigExtension($container, 'base');
-
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->any())
-                ->method('getLocale')
-                ->will($this->returnValue('fr_FR'));
-
-        $mapping = $this->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
-
-        $builder = new ConfigurationBuilder($translator, $container, $mapping, false, 'js');
-        $builder->setPath('namespace', '/path/to/namespace');
-
-        $config = $builder->getConfiguration();
-        $this->assertEquals(array('namespace' => '/path/to/namespace'), $config['paths'], 'Did not find expected paths configuration');
+        $this->container->set('templating.helper.assets', $assetsHelper);
     }
 }
