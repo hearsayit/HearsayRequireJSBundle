@@ -103,24 +103,8 @@ class ConfigurationBuilder
      */
     public function getConfiguration()
     {
-        if ($this->container->getParameter('assetic.use_controller')
-            && $this->container->isScopeActive('request')) {
-            $baseUrl = $this->container->get('request')->getBaseUrl();
-            $baseUrl = $baseUrl . '/' . $this->baseUrl;
-        } else {
-            $baseUrl = $this
-                ->container
-                ->get('templating.helper.assets')
-                ->getUrl($this->baseUrl);
-
-            // Remove ?version from the end of the base URL
-            if (($pos = strpos($baseUrl, '?')) !== false) {
-                $baseUrl = substr($baseUrl, 0, $pos);
-            }
-        }
-
         $config = array(
-            'baseUrl' => $baseUrl,
+            'baseUrl' => $this->getScriptUrl(),
             'locale'  => $this->container->get('translator')->getLocale(),
         );
 
@@ -160,7 +144,7 @@ class ConfigurationBuilder
             $modulePath = $this->mapping->getModulePath($location);
 
             if ($modulePath !== null) {
-                $location = '/' . str_replace('.js', '', $modulePath);
+                $location = $this->getBaseUrl() . '/' . str_replace('.js', '', $modulePath);
             }
         }
 
@@ -169,5 +153,42 @@ class ConfigurationBuilder
         count($locations) == 1 && $locations = array_shift($locations);
 
         $this->paths[$path] = $locations;
+    }
+
+    /**
+     * Get URL to Script
+     *
+     * @return string
+     */
+    protected function getScriptUrl()
+    {
+        return $this->getBaseUrl() . '/' . $this->baseUrl;
+    }
+
+    /**
+     * Get Base URL
+     *
+     * @return string
+     */
+    protected function getBaseUrl()
+    {
+        if ($this->container->getParameter('assetic.use_controller')
+            && $this->container->isScopeActive('request')
+        ) {
+            $baseUrl = $this->container->get('request')->getBaseUrl();
+            return $baseUrl;
+        } else {
+            $baseUrl = $this
+                ->container
+                ->get('templating.helper.assets')
+                ->getUrl('');
+
+            // Remove ?version from the end of the base URL
+            if (($pos = strpos($baseUrl, '?')) !== false) {
+                $baseUrl = substr($baseUrl, 0, $pos);
+                return $baseUrl;
+            }
+            return $baseUrl;
+        }
     }
 }
