@@ -83,11 +83,19 @@ class NamespaceMapping implements NamespaceMappingInterface
 
         foreach ($this->namespaces as $path => $settings) {
             if (strpos($filename, $path) === 0) {
+                $namespacePath = $this->basePath . '/' . $settings['namespace'];
+
                 if ($settings['is_dir']) {
-                    return preg_replace('#[/\\\\]+#', '/', $this->basePath . '/' . $settings['namespace'] . '/' . substr($filename, strlen($path)));
+
+                    $destPath = substr($filename, strlen($path))
+                        ? $namespacePath . '/' . substr($filename, strlen($path))
+                        : $namespacePath;
+                } else {
+                    $destPath = $namespacePath . '.' . pathinfo($filename, PATHINFO_EXTENSION);
                 }
 
-                return preg_replace('#[/\\\\]+#', '/', $this->basePath . '/' . $settings['namespace'] . '.' . pathinfo($filename, PATHINFO_EXTENSION));
+
+                return preg_replace('#[/\\\\]+#', '/', $destPath);
             }
         }
 
