@@ -173,22 +173,19 @@ class ConfigurationBuilder
     protected function getBaseUrl()
     {
         if ($this->container->getParameter('assetic.use_controller')
-            && $this->container->isScopeActive('request')
-        ) {
-            $baseUrl = $this->container->get('request')->getBaseUrl();
-            return $baseUrl;
-        } else {
-            $baseUrl = $this
-                ->container
-                ->get('templating.helper.assets')
-                ->getUrl('');
+            && $this->container->isScopeActive('request')) {
+            return $this->container->get('request')->getBaseUrl();
+        }
 
-            // Remove ?version from the end of the base URL
-            if (($pos = strpos($baseUrl, '?')) !== false) {
-                $baseUrl = substr($baseUrl, 0, $pos);
-                return $baseUrl;
-            }
+        $baseUrl = $this->container->isScopeActive('templating.helper.assets')
+            ? $this->container->get('templating.helper.assets')->getUrl('')
+            : '';
+
+        // Remove version from the end of the base URL
+        if (($pos = strpos($baseUrl, '?')) !== false) {
+            $baseUrl = substr($baseUrl, 0, $pos);
             return $baseUrl;
         }
+        return $baseUrl;
     }
 }
