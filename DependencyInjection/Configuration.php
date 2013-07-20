@@ -27,6 +27,7 @@ namespace Hearsay\RequireJSBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Hearsay\RequireJSBundle\Exception\InvalidPathException;
 use Hearsay\RequireJSBundle\Exception\InvalidTypeException;
 
 /**
@@ -41,7 +42,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('hearsay_require_js');
+        $rootNode    = $treeBuilder->root('hearsay_require_js');
 
         $rootNode
                 ->children()
@@ -65,18 +66,21 @@ class Configuration implements ConfigurationInterface
                         ->prototype('array')
                             ->beforeNormalization()
                                 ->ifString()
-                                ->then(function($v){
+                                ->then(function ($v) {
                                     return array('location' => $v);
                                 })
                             ->end()
                             ->children()
                                 ->variableNode('location')
                                     ->isRequired()
-                                    ->cannotBeEmpty()
                                     ->validate()
                                         ->always(function ($v) {
                                             if (!is_string($v) && !is_array($v)) {
                                                 throw new InvalidTypeException();
+                                            }
+
+                                            if (preg_match('~\.js$~', $v)) {
+                                                throw new InvalidPathException();
                                             }
 
                                             return $v;
@@ -94,12 +98,15 @@ class Configuration implements ConfigurationInterface
                         ->useAttributeAsKey('name')
                         ->prototype('array')
                             ->children()
-                                ->scalarNode('name')->end()
+                                ->scalarNode('name')
+                                ->end()
                                 ->arrayNode('deps')
                                     ->defaultValue(array())
-                                    ->prototype('scalar')->end()
+                                    ->prototype('scalar')
+                                    ->end()
                                 ->end()
-                                ->scalarNode('exports')->end()
+                                ->scalarNode('exports')
+                                ->end()
                             ->end()
                         ->end()
                     ->end()
@@ -117,13 +124,21 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->arrayNode('excludes')
                                 ->defaultValue(array())
-                                ->prototype('scalar')->end()
+                                ->prototype('scalar')
+                                ->end()
                             ->end()
                             ->arrayNode('options')
                                 ->defaultValue(array())
                                 ->useAttributeAsKey('name')
                                 ->prototype('array')
-                                    ->beforeNormalization()->ifTrue(function($v) { return !is_array($v); })->then(function($v) { return array('value' => $v); })->end()
+                                    ->beforeNormalization()
+                                        ->ifTrue(function ($v) {
+                                            return !is_array($v);
+                                        })
+                                        ->then(function ($v) {
+                                            return array('value' => $v);
+                                        })
+                                    ->end()
                                     ->children()
                                         ->scalarNode('value')
                                             ->isRequired()
@@ -134,19 +149,16 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('timeout')
                                 ->info('The timeout, in seconds, of the node process')
                                 ->validate()
-                                    ->ifTrue(
-                                        function ($v) {
-                                            return !(is_int($v) || ctype_digit($v));
-                                        }
-                                    )
+                                    ->ifTrue(function ($v) {
+                                        return !(is_int($v) || ctype_digit($v));
+                                    })
                                     ->thenInvalid('Invalid number of seconds "%s"')
                                 ->end()
                                 ->defaultValue(60)
                             ->end()
                         ->end()
                     ->end()
-                ->end()
-        ;
+                ->end();
 
         return $treeBuilder;
     }

@@ -24,11 +24,11 @@
 
 namespace Hearsay\RequireJSBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * Bundle setup.
@@ -36,7 +36,6 @@ use Symfony\Component\DependencyInjection\Loader;
  */
 class HearsayRequireJSExtension extends Extension
 {
-
     /**
      * {@inheritDoc}
      */
@@ -124,9 +123,9 @@ class HearsayRequireJSExtension extends Extension
         $config = $container->getDefinition('hearsay_require_js.configuration_builder');
         $config->addMethodCall('setPath', array($path, $location));
 
-        // And with the optimizer filter
         if ($path && $container->hasDefinition('hearsay_require_js.optimizer_filter')) {
-            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $path, str_replace('.js', '', $location)));
+            $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
+            $filter->addMethodCall('setOption', array('paths.' . $path, $location));
         }
 
         if ($generateAssets) {
@@ -194,5 +193,4 @@ class HearsayRequireJSExtension extends Extension
 
         return $path;
     }
-
 }
