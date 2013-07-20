@@ -97,7 +97,7 @@ class ConfigurationBuilder
     }
 
     /**
-     * Get the RequireJS configuration options
+     * Gets the RequireJS configuration options
      *
      * @return array
      */
@@ -120,7 +120,7 @@ class ConfigurationBuilder
     }
 
     /**
-     * Set an additional option to output in the config
+     * Sets an additional option to output in the config
      *
      * @param string $option The option name
      * @param mixed  $value  The option value
@@ -131,7 +131,7 @@ class ConfigurationBuilder
     }
 
     /**
-     * Set a path definition to be included in the configuration
+     * Sets a path definition to be included in the configuration
      *
      * @param string       $path      The path name
      * @param string|array $locations The actual path locations
@@ -144,7 +144,9 @@ class ConfigurationBuilder
             $modulePath = $this->mapping->getModulePath($location);
 
             if ($modulePath !== null) {
-                $location = $this->getBaseUrl() . '/' . str_replace('.js', '', $modulePath);
+                $location = $this->getBaseUrl()
+                    . '/'
+                    . str_replace('.js', '', $modulePath);
             }
         }
 
@@ -156,17 +158,7 @@ class ConfigurationBuilder
     }
 
     /**
-     * Get URL to Script
-     *
-     * @return string
-     */
-    protected function getScriptUrl()
-    {
-        return $this->getBaseUrl() . '/' . $this->baseUrl;
-    }
-
-    /**
-     * Get Base URL
+     * Gets the base URL
      *
      * @return string
      */
@@ -181,11 +173,23 @@ class ConfigurationBuilder
             ? $this->container->get('templating.helper.assets')->getUrl('')
             : '';
 
-        // Remove version from the end of the base URL
+        // Remove ?version from the end of the base URL
         if (($pos = strpos($baseUrl, '?')) !== false) {
             $baseUrl = substr($baseUrl, 0, $pos);
+
             return $baseUrl;
         }
+
         return $baseUrl;
+    }
+
+    /**
+     * Gets the URL to script
+     *
+     * @return string
+     */
+    protected function getScriptUrl()
+    {
+        return $this->getBaseUrl() . '/' . $this->baseUrl;
     }
 }
