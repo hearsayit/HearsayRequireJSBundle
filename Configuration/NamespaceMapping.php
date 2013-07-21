@@ -72,7 +72,12 @@ class NamespaceMapping implements NamespaceMappingInterface
         }
 
         if (!$path = realpath($path)) {
-            throw new PathNotFoundException();
+            throw new PathNotFoundException(
+                sprintf(
+                    'The path `%s` was not found.',
+                    $path
+                )
+            );
         }
 
         $namespaceName = preg_replace('~\.js$~', '', realpath($path));
@@ -99,6 +104,8 @@ class NamespaceMapping implements NamespaceMappingInterface
         foreach ($this->namespaces as $path => $settings) {
             if (strpos($filename, $path) === 0) {
                 $actualPath = substr($filename, strlen($path));
+                $actualPath = preg_replace('~\.js$~', '', $actualPath);
+
                 $modulePath = $this->basePath . '/' . $settings['namespace'];
 
                 if ($settings['is_dir'] && $actualPath) {
