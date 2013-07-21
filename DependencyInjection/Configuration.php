@@ -79,7 +79,10 @@ class Configuration implements ConfigurationInterface
                                                 throw new InvalidTypeException();
                                             }
 
-                                            if (preg_match('~\.js$~', $v)) {
+                                            $vs = !is_array($v) ? (array) $v : $v;
+                                            $er = preg_grep('~\.js$~', $vs);
+
+                                            if (count($er) > 0) {
                                                 throw new InvalidPathException();
                                             }
 
