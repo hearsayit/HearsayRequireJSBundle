@@ -138,21 +138,27 @@ class ConfigurationBuilder
      */
     public function setPath($path, $locations)
     {
-        !is_array($locations) && $locations = (array) $locations;
+        if (!is_array($locations)) {
+            $locations = (array) $locations;
+        }
 
         foreach ($locations as &$location) {
+            if (preg_match('~^(\/\/|http|https)~', $location)) {
+                continue;
+            }
+
             $modulePath = $this->mapping->getModulePath($location);
 
             if ($modulePath !== null) {
-                $location = $this->getBaseUrl()
-                    . '/'
-                    . str_replace('.js', '', $modulePath);
+                $location = $this->getBaseUrl() . '/' . $modulePath;
             }
         }
 
         unset($location);
 
-        count($locations) == 1 && $locations = array_shift($locations);
+        if (count($locations) == 1) {
+            $locations = array_shift($locations);
+        }
 
         $this->paths[$path] = $locations;
     }

@@ -31,7 +31,7 @@ namespace Hearsay\RequireJSBundle\Exception;
  * @author Igor Timoshenko <igor.timoshenko@i.ua>
  * @codeCoverageIgnore
  */
-class InvalidPathException extends \InvalidArgumentException implements ExceptionInterface
+class InvalidPathException extends InvalidArgumentException implements ExceptionInterface
 {
     /**
      * {@inheritDoc}

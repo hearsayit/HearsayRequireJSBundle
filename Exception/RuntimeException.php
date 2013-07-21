@@ -25,12 +25,12 @@
 namespace Hearsay\RequireJSBundle\Exception;
 
 /**
- * This class represents the exception that is thrown if a type does not match
- * with the expected type
+ * This class represents the exception that is thrown if an error which can only
+ * be found on runtime occurs
  *
  * @author Igor Timoshenko <igor.timoshenko@i.ua>
  * @codeCoverageIgnore
  */
-class InvalidTypeException extends InvalidArgumentException implements ExceptionInterface
+class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

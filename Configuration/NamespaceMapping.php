@@ -24,27 +24,32 @@
 
 namespace Hearsay\RequireJSBundle\Configuration;
 
+use Hearsay\RequireJSBundle\Exception\PathNotFoundException;
+
 /**
  * Concrete module namespace map.
  * @author Kevin Montag <kevin@hearsay.it>
  */
 class NamespaceMapping implements NamespaceMappingInterface
 {
-
     /**
-     * Internal namespace map.
-     * @var array
-     */
-    private $namespaces = array();
-
-    /**
+     * The base path to serve resources
+     *
      * @var string
      */
-    protected $basePath = null;
+    protected $basePath;
 
     /**
-     * Standard constructor.
-     * @param string $basePath The base path to serve resources.
+     * An internal namespace map
+     *
+     * @var array
+     */
+    protected $namespaces = array();
+
+    /**
+     * The constructor method
+     *
+     * @param string $basePath The base path to serve resources
      */
     public function __construct($basePath)
     {
@@ -52,18 +57,30 @@ class NamespaceMapping implements NamespaceMappingInterface
     }
 
     /**
-     * Register a directory-to-namespace mapping.
-     * @param string $path
-     * @param string $namespace
-     * @param Boolean $isDir true if the path is a directory
+     * Registers a directory-to-namespace mapping
+     *
+     * @param string                 $path      The path
+     * @param string                 $namespace The namespace
+     * @param boolean                $isDir     Determines if the path is a
+     *                                          directory
+     * @throws PathNotFoundException            If the path was not found
      */
     public function registerNamespace($path, $namespace, $isDir = true)
     {
-        if (file_exists($path.'.js')) {
-            $path = $path.'.js';
+        if (file_exists($path . '.js')) {
+            $path = $path . '.js';
         }
 
-        $this->namespaces[str_replace('.js', '', realpath($path))] = array('namespace' => $namespace, 'is_dir' => $isDir);
+        if (!$path = realpath($path)) {
+            throw new PathNotFoundException();
+        }
+
+        $namespaceName = preg_replace('~\.js$~', '', realpath($path));
+
+        $this->namespaces[$namespaceName] = array(
+            'is_dir'    => $isDir,
+            'namespace' => $namespace,
+        );
     }
 
     /**
@@ -71,23 +88,24 @@ class NamespaceMapping implements NamespaceMappingInterface
      */
     public function getModulePath($filename)
     {
-        if (file_exists($filename.'.js')) {
-            $filename = $filename.'.js';
+        if (file_exists($filename . '.js')) {
+            $filename = $filename . '.js';
         }
 
-        $filename = realpath($filename);
-
-        if (!$filename) {
+        if (!$filename = realpath($filename)) {
             return false;
         }
 
         foreach ($this->namespaces as $path => $settings) {
             if (strpos($filename, $path) === 0) {
-                if ($settings['is_dir']) {
-                    return preg_replace('#[/\\\\]+#', '/', $this->basePath . '/' . $settings['namespace'] . '/' . substr($filename, strlen($path)));
+                $actualPath = substr($filename, strlen($path));
+                $modulePath = $this->basePath . '/' . $settings['namespace'];
+
+                if ($settings['is_dir'] && $actualPath) {
+                    $modulePath .= '/' . $actualPath;
                 }
 
-                return preg_replace('#[/\\\\]+#', '/', $this->basePath . '/' . $settings['namespace'] . '.' . pathinfo($filename, PATHINFO_EXTENSION));
+                return preg_replace('~[/\\\\]+~', '/', $modulePath);
             }
         }
 
