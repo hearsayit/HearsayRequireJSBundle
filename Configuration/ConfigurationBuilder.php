@@ -182,8 +182,6 @@ class ConfigurationBuilder
         // Remove ?version from the end of the base URL
         if (($pos = strpos($baseUrl, '?')) !== false) {
             $baseUrl = substr($baseUrl, 0, $pos);
-
-            return $baseUrl;
         }
 
         return $baseUrl;
