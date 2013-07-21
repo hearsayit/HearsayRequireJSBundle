@@ -157,6 +157,10 @@ class ConfigurationBuilder
         !is_array($locations) && $locations = (array) $locations;
 
         foreach ($locations as &$location) {
+            if (preg_match('~^(\/\/|http|https)~', $location)) {
+                continue;
+            }
+
             $modulePath = $this->mapping->getModulePath($location);
 
             if ($modulePath !== null) {
