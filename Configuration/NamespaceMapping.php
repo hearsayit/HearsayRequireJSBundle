@@ -68,7 +68,7 @@ class NamespaceMapping implements NamespaceMappingInterface
     public function registerNamespace($path, $namespace, $isDir = true)
     {
         if (file_exists($path . '.js')) {
-            $path = $path . '.js';
+            $path .= '.js';
         }
 
         if (!$path = realpath($path)) {
@@ -89,7 +89,7 @@ class NamespaceMapping implements NamespaceMappingInterface
     public function getModulePath($filename)
     {
         if (file_exists($filename . '.js')) {
-            $filename = $filename . '.js';
+            $filename .= '.js';
         }
 
         if (!$filename = realpath($filename)) {
