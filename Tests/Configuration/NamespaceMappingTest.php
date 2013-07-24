@@ -56,7 +56,7 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
         $this->mapping->registerNamespace(__DIR__ . '/dir', 'modules');
 
         $this->assertEquals(
-            'js/modules/file',
+            'js/modules/file.js',
             $this->mapping->getModulePath(__DIR__ . '/dir/file.js'),
             'Incorrect file-to-module conversion'
         );
@@ -72,7 +72,7 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
         $mapping->registerNamespace(__DIR__ . '/dir', '/modules/');
 
         $this->assertEquals(
-            'js/modules/file',
+            'js/modules/file.js',
             $mapping->getModulePath(__DIR__ . '/dir/file.js'),
             'Incorrect file-to-module conversion'
         );
@@ -87,7 +87,7 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
         $this->mapping->registerNamespace(__DIR__ . '/dir/../dir', 'modules');
 
         $this->assertEquals(
-            'js/modules/file',
+            'js/modules/file.js',
             $this->mapping->getModulePath(__DIR__ . '/../Configuration/dir/file.js'),
             'Incorrect file-to-module conversion'
         );

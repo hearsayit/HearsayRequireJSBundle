@@ -102,8 +102,6 @@ class NamespaceMapping implements NamespaceMappingInterface
         foreach ($this->namespaces as $path => $settings) {
             if (strpos($filename, $path) === 0) {
                 $actualPath = substr($filename, strlen($path));
-                $actualPath = preg_replace('~\.js$~', '', $actualPath);
-
                 $modulePath = $this->basePath . '/' . $settings['namespace'];
 
                 if ($settings['is_dir'] && $actualPath) {
