@@ -54,7 +54,7 @@ class FilenamesResource implements ResourceInterface
      */
     public function getContent()
     {
-        $file = is_file($this->path) ? $this->path : $this->path . '.js';
+        $file = $this->getFilePath();
 
         if (is_file($file)) {
             return strtr($this->path, '\\', '/');
@@ -75,7 +75,9 @@ class FilenamesResource implements ResourceInterface
      */
     public function isFresh($timestamp)
     {
-        return filemtime($this->path) <= $timestamp;
+        $path = $this->getFilePath();
+
+        return filemtime($path) <= $timestamp;
     }
 
     /**
@@ -84,5 +86,15 @@ class FilenamesResource implements ResourceInterface
     public function __toString()
     {
         return strtr($this->path, '\\', '/');
+    }
+
+    /**
+     * Gets a resolved file path
+     *
+     * @return string
+     */
+    private function getFilePath()
+    {
+        return is_file($this->path) ? $this->path : $this->path . '.js';
     }
 }
