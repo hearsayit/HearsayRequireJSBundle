@@ -95,6 +95,6 @@ class FilenamesResource implements ResourceInterface
      */
     private function getFilePath()
     {
-        return is_file($this->path) ? $this->path : $this->path . '.js';
+        return is_readable($this->path) ? $this->path : $this->path . '.js';
     }
 }
