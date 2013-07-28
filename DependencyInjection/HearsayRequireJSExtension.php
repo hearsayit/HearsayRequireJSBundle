@@ -64,10 +64,6 @@ class HearsayRequireJSExtension extends Extension
             $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
             $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
 
-            if (isset($config['optimizer']['build_profile'])) {
-                $buildProfile = $this->getRealPath($config['optimizer']['build_profile'], $container);
-                $filter->addMethodCall('setBuildProfile', array($buildProfile));
-            }
             if (isset($config['optimizer']['timeout'])) {
                 $filter->addMethodCall('setTimeout', array(intval($config['optimizer']['timeout'])));
             }
@@ -76,13 +72,10 @@ class HearsayRequireJSExtension extends Extension
             }
             foreach ($config['optimizer']['options'] as $name => $settings) {
                 $value = $settings['value'];
-                $filter->addMethodCall('setOption', array($name, $value));
+                $filter->addMethodCall('addOption', array($name, $value));
             }
-            foreach ($config['shim'] as $name => $shim) {
-                $shim['name'] = $name;
 
-                $filter->addMethodCall('addShim', array($shim));
-            }
+            $filter->addMethodCall('setShim', array($config['shim']));
         } else {
             // If the optimizer config isn't provided, don't provide the filter
             $container->removeDefinition('hearsay_require_js.optimizer_filter');
@@ -125,7 +118,7 @@ class HearsayRequireJSExtension extends Extension
 
         if ($path && $container->hasDefinition('hearsay_require_js.optimizer_filter')) {
             $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
-            $filter->addMethodCall('setOption', array('paths.' . $path, $location));
+            $filter->addMethodCall('addPath', array($path, $location));
         }
 
         if ($generateAssets) {

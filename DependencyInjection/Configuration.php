@@ -82,7 +82,7 @@ class Configuration implements ConfigurationInterface
                                             $vs = !is_array($v) ? (array) $v : $v;
                                             $er = preg_grep('~\.js$~', $vs);
 
-                                            if (count($er) > 0) {
+                                            if ($er) {
                                                 throw new InvalidPathException();
                                             }
 
@@ -118,9 +118,6 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('path')
                                 ->cannotBeEmpty()
                                 ->isRequired()
-                            ->end()
-                            ->scalarNode('build_profile')
-                                ->defaultNull()
                             ->end()
                             ->booleanNode('hide_unoptimized_assets')
                                 ->defaultFalse()

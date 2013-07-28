@@ -178,17 +178,17 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         $methods = $filter->getMethodCalls();
 
         $this->assertEquals(
-            3,
+            5,
             count($methods),
             'Incorrect number of method calls on optimizer filter'
         );
         $this->assertContains(
-            array('setOption', array('paths.namespace', $namespace_dir)),
+            array('addPath', array('namespace', $namespace_dir)),
             $methods,
             'Did not find expected method call'
         );
         $this->assertContains(
-            array('setOption', array('paths.namespace_file', $namespace_file)),
+            array('addPath', array('namespace_file', $namespace_file)),
             $methods,
             'Did not find expected method call'
         );
@@ -324,41 +324,12 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         $methods = $filter->getMethodCalls();
 
         $this->assertEquals(
-            2,
+            4,
             count($methods),
             'Incorrect number of method calls on optimizer'
         );
         $this->assertContains(
-            array('setOption', array('option', 'value')),
-            $methods,
-            'Did not find expected method call'
-        );
-    }
-
-    public function testOptimizerBuildProfileSet()
-    {
-        $config = array(
-            'base_directory' => '/home/user/base',
-            'optimizer'      => array(
-                'path'          => '/path/to/r.js',
-                'build_profile' => 'path/to/app.build.js'
-            ),
-        );
-
-        $container = $this->getContainerBuilder();
-
-        $this->extension->load(array($config), $container);
-
-        $filter  = $container->getDefinition('hearsay_require_js.optimizer_filter');
-        $methods = $filter->getMethodCalls();
-
-        $this->assertEquals(
-            2,
-            count($methods),
-            'Incorrect number of method calls on optimizer'
-        );
-        $this->assertContains(
-            array('setBuildProfile', array('path/to/app.build.js')),
+            array('addOption', array('option', 'value')),
             $methods,
             'Did not find expected method call'
         );
