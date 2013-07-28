@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-namespace Hearsay\RequireJSBundle\Tests\Factory\Loader;
+namespace Hearsay\RequireJSBundle\Tests\Assetic\Factory\Loader;
 
-use Hearsay\RequireJSBundle\Factory\Loader\ModuleFormulaLoader;
+use Hearsay\RequireJSBundle\Assetic\Factory\Loader\ModuleFormulaLoader;
 
 /**
  * Unit tests for the module formula loader.

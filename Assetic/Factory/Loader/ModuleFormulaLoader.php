@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace Hearsay\RequireJSBundle\Factory\Loader;
+namespace Hearsay\RequireJSBundle\Assetic\Factory\Loader;
 
 use Assetic\Factory\AssetFactory;
 use Assetic\Factory\Loader\FormulaLoaderInterface;

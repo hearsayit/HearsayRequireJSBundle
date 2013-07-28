@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace Hearsay\RequireJSBundle\Factory\Resource;
+namespace Hearsay\RequireJSBundle\Assetic\Factory\Resource;
 
 use Assetic\Factory\Resource\ResourceInterface;
 use Symfony\Component\Finder\Finder;
