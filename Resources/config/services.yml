@@ -20,9 +20,9 @@
 # SOFTWARE.
 
 parameters:
-  hearsay_require_js.module_formula_loader.class: Hearsay\RequireJSBundle\Factory\Loader\ModuleFormulaLoader
+  hearsay_require_js.module_formula_loader.class: Hearsay\RequireJSBundle\Assetic\Factory\Loader\ModuleFormulaLoader
 
-  hearsay_require_js.filenames_resource.class: Hearsay\RequireJSBundle\Factory\Resource\FilenamesResource
+  hearsay_require_js.filenames_resource.class: Hearsay\RequireJSBundle\Assetic\Factory\Resource\FilenamesResource
 
   hearsay_require_js.namespace_mapping.class: Hearsay\RequireJSBundle\Configuration\NamespaceMapping
 
