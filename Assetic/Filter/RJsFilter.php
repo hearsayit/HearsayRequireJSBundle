@@ -189,7 +189,7 @@ class RJsFilter extends BaseNodeFilter
      * Adds the option
      *
      * @param string $name  The option name
-     * @param string $value The option value
+     * @param mixed  $value The option value
      */
     public function addOption($name, $value)
     {
