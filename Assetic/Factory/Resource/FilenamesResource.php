@@ -24,8 +24,9 @@
 
 namespace Hearsay\RequireJSBundle\Assetic\Factory\Resource;
 
-use Assetic\Factory\Resource\ResourceInterface;
 use Symfony\Component\Finder\Finder;
+
+use Assetic\Factory\Resource\ResourceInterface;
 
 /**
  * Assetic resource containing the filenames descendant from some root.
@@ -33,12 +34,11 @@ use Symfony\Component\Finder\Finder;
  */
 class FilenamesResource implements ResourceInterface
 {
-
     /**
      * Base directory on the file system, or a single filename.
      * @var string
      */
-    protected $path = null;
+    protected $path;
 
     /**
      * Standard constructor.
@@ -54,20 +54,17 @@ class FilenamesResource implements ResourceInterface
      */
     public function getContent()
     {
-        $file = is_file($this->path) ? $this->path : $this->path . '.js';
-
-        if (is_file($file)) {
+        if (is_file($this->path)) {
             return strtr($this->path, '\\', '/');
-        } else {
-            $finder = Finder::create();
-            $files = '';
-
-            foreach($finder->files()->in($this->path) as $file) {
-                $files .= strtr($file, '\\', '/') . "\n";
-            }
-
-            return $files;
         }
+
+        $files = '';
+
+        foreach (Finder::create()->files()->in($this->path) as $file) {
+            $files .= strtr($file, '\\', '/') . "\n";
+        }
+
+        return $files;
     }
 
     /**
