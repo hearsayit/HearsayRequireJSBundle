@@ -61,8 +61,8 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::addOption
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
-     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::setOption
      */
     public function testConfigurationGenerated()
     {
@@ -89,7 +89,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->container->setParameter('assetic.use_controller', true);
 
         $builder = new ConfigurationBuilder($this->container, $mapping, 'js');
-        $builder->setOption('option', 'value');
+        $builder->addOption('option', 'value');
 
         $expected = array(
             'locale'  => 'fr_FR',

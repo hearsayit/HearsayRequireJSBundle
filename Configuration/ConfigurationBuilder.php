@@ -36,13 +36,6 @@ use Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface;
 class ConfigurationBuilder
 {
     /**
-     * An array of additional configuration options
-     *
-     * @var array
-     */
-    protected $additionalConfig = array();
-
-    /**
      * The base URL where assets are served, relative to the website root
      * directory
      *
@@ -61,6 +54,13 @@ class ConfigurationBuilder
     protected $mapping;
 
     /**
+     * An array of options
+     *
+     * @var array
+     */
+    protected $options = array();
+
+    /**
      * An array of paths
      *
      * @var array
@@ -68,7 +68,7 @@ class ConfigurationBuilder
     protected $paths = array();
 
     /**
-     * An array of shims
+     * The shim config
      *
      * @var array
      */
@@ -82,7 +82,7 @@ class ConfigurationBuilder
      * @param string                    $baseUrl    The base URL where assets
      *                                              are served, relative to the
      *                                              website root directory
-     * @param array                     $shim
+     * @param array                     $shim       The shim config
      */
     public function __construct(
         ContainerInterface $container,
@@ -97,6 +97,17 @@ class ConfigurationBuilder
     }
 
     /**
+     * Adds the option
+     *
+     * @param string $name  The option name
+     * @param mixed  $value The option value
+     */
+    public function addOption($name, $value)
+    {
+        $this->options[$name] = $value;
+    }
+
+    /**
      * Gets the RequireJS configuration options
      *
      * @return array
@@ -108,26 +119,15 @@ class ConfigurationBuilder
             'locale'  => $this->container->get('translator')->getLocale(),
         );
 
-        if (count($this->paths) > 0) {
+        if ($this->paths) {
             $config['paths'] = $this->paths;
         }
 
-        if (count($this->shim)  > 0) {
-            $config['shim']  = $this->shim;
+        if ($this->shim) {
+            $config['shim'] = $this->shim;
         }
 
-        return array_merge($config, $this->additionalConfig);
-    }
-
-    /**
-     * Sets an additional option to output in the config
-     *
-     * @param string $option The option name
-     * @param mixed  $value  The option value
-     */
-    public function setOption($option, $value)
-    {
-        $this->additionalConfig[$option] = $value;
+        return array_merge($config, $this->options);
     }
 
     /**
@@ -149,7 +149,7 @@ class ConfigurationBuilder
 
             $modulePath = $this->mapping->getModulePath($location);
 
-            if ($modulePath !== null) {
+            if ($modulePath) {
                 $modulePath = preg_replace('~\.js$~', '', $modulePath);
                 $location = $this->getBaseUrl() . '/' . $modulePath;
             }
