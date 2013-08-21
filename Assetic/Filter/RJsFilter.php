@@ -260,7 +260,7 @@ class RJsFilter extends BaseNodeFilter
 
         unset($shim);
 
-        $content->shim    = (object) $this->shim;
+        $content->shim    = (object) $this->shim[0];
         $content->exclude = $this->exclude;
 
         foreach ($this->options as $option => $value) {
