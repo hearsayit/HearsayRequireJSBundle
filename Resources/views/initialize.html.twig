@@ -21,22 +21,22 @@
  #}
 {% spaceless %}
 
-{# RequireJS initialization.  Recognized variables:
+{# RequireJS initialization. Recognized variables:
  # config (optional)
- #   The RequireJS config array.
+ #   The RequireJS config array
  # main (optional)
- #   A module to require immediately when RequireJS is loaded.
+ #   A module to require immediately when RequireJS is loaded
  #}
 
 {% if config is defined and config is not empty %}
 {% block configuration %}
-    <script type='text/javascript'>var require={{ config|json_encode|raw }}</script>
+    <script type="text/javascript">var require={{ config|json_encode|raw }}</script>
 {% endblock configuration %}
 {% endif %}
 
 {% block require_js %}
-    {# Applications may override the src block to use a custom URL. #}
-    <script type='text/javascript'{% if main is defined and main is not empty %} data-main='{{ main }}'{% endif %} src='{% block src require_js.src %}'></script>
+    {# Applications may override the src block to use a custom URL #}
+    <script type="text/javascript"{% if main is defined and main is not empty %} data-main="{{ main }}"{% endif %} src="{% block src require_js_src() %}"></script>
 {% endblock require_js %}
 
 {% endspaceless %}

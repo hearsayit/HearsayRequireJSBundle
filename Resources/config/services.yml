@@ -28,7 +28,7 @@ parameters:
 
   hearsay_require_js.configuration_builder.class: Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder
 
-  hearsay_require_js.helper.class: Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper
+  hearsay_require_js.templating_helper.class: Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper
 
   hearsay_require_js.twig_extension.class: Hearsay\RequireJSBundle\Twig\Extension\RequireJSExtension
 
@@ -62,12 +62,13 @@ services:
       - %hearsay_require_js.shim%
     public: false
 
-  hearsay_require_js.helper:
-    class: %hearsay_require_js.helper.class%
+  hearsay_require_js.templating_helper:
+    class: %hearsay_require_js.templating_helper.class%
     arguments:
       - @templating
       - @hearsay_require_js.configuration_builder
       - %hearsay_require_js.initialize_template%
+      - %hearsay_require_js.require_js_src%
     tags:
       - { name: templating.helper }
 
@@ -76,7 +77,6 @@ services:
     arguments:
       - @service_container
       - @hearsay_require_js.configuration_builder
-      - %hearsay_require_js.require_js_src%
     tags:
       - { name: twig.extension }
 

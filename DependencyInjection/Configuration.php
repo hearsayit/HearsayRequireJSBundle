@@ -54,6 +54,7 @@ class Configuration implements ConfigurationInterface
                         ->cannotBeEmpty()
                     ->end()
                     ->scalarNode('require_js_src')
+                        ->info('The template name which will render the RequireJS src or an URL to the RequireJS')
                         ->defaultValue('//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js')
                     ->end()
                     ->scalarNode('initialize_template')
