@@ -30,6 +30,8 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+use Hearsay\RequireJSBundle\Exception\InvalidArgumentException;
+
 /**
  * Bundle setup.
  * @author Kevin Montag <kevin@hearsay.it>
@@ -118,11 +120,10 @@ class HearsayRequireJSExtension extends Extension
 
         if ($path && $container->hasDefinition('hearsay_require_js.optimizer_filter')) {
             $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
-            $filter->addMethodCall('addPath', array($path, $location));
+            $filter->addMethodCall('addPath', array($path, preg_replace('~\.js$~', '', $location)));
         }
 
         if ($generateAssets) {
-            // Create the assetic resource
             $resource = new DefinitionDecorator('hearsay_require_js.filenames_resource');
             $resource->setArguments(array($location));
             $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
@@ -159,10 +160,10 @@ class HearsayRequireJSExtension extends Extension
     {
         // Expand bundle notation (snagged from the Assetic bundle)
         if ($path[0] == '@' && strpos($path, '/') !== false) {
-
             // Extract the bundle name and the directory within the bundle
             $bundle = substr($path, 1);
             $directory = '';
+
             if (($pos = strpos($bundle, '/')) !== false) {
                 $directory = substr($bundle, $pos);
                 $bundle = substr($bundle, 0, $pos);
@@ -176,12 +177,12 @@ class HearsayRequireJSExtension extends Extension
                 $rc = new \ReflectionClass($bundles[$bundle]);
                 $path = dirname($rc->getFileName()) . $directory;
             } else {
-                throw new \InvalidArgumentException(sprintf('Unrecognized bundle: "%s"', $bundle));
+                throw new InvalidArgumentException(sprintf('Unrecognized bundle: "%s"', $bundle));
             }
         }
 
-        if (file_exists($path.'.js')) {
-            $path = $path.'.js';
+        if (is_file($path . '.js')) {
+            $path .= '.js';
         }
 
         return $path;
