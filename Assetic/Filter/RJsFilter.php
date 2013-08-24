@@ -212,9 +212,9 @@ class RJsFilter extends BaseNodeFilter
      *
      * @param array $shim The shim config
      */
-    public function setShim($shim)
+    public function setShim(array $shim)
     {
-        $this->shim[] = $shim;
+        $this->shim = $shim;
     }
 
     /**
