@@ -147,6 +147,10 @@ class RJsFilter extends BaseNodeFilter
                 unlink($output);
             }
 
+            if (file_exists($buildProfile)) {
+                unlink($buildProfile);
+            }
+
             if ($code === 127) {
                 throw new RuntimeException(
                     'Path to node executable could not be resolved.'
@@ -163,6 +167,7 @@ class RJsFilter extends BaseNodeFilter
         $asset->setContent(file_get_contents($output));
 
         unlink($output);
+        unlink($buildProfile);
     }
 
     /**
