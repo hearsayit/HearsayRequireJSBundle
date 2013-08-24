@@ -246,6 +246,10 @@ class RJsFilter extends BaseNodeFilter
         $content->paths->$name = $input;
 
         foreach ($this->paths as $path => $location) {
+            if(preg_match('/(.+)\.js/i', $location)) {
+                $location = substr($location, 0, strlen($location) - 3);
+            }
+            
             $content->paths->$path = $location;
         }
 
@@ -256,7 +260,7 @@ class RJsFilter extends BaseNodeFilter
 
         unset($shim);
 
-        $content->shim    = (object) $this->shim;
+        $content->shim    = (object) $this->shim[0];
         $content->exclude = $this->exclude;
 
         foreach ($this->options as $option => $value) {
