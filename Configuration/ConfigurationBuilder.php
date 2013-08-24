@@ -164,7 +164,7 @@ class ConfigurationBuilder
             $modulePath = $this->mapping->getModulePath($location);
 
             if ($modulePath !== null) {
-                $location = '/' . str_replace('.js', '', $modulePath);
+                $location = '/' . preg_replace('~\.js$~', '', $modulePath);
             }
         }
 
