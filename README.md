@@ -63,11 +63,11 @@ more.
 * [paths](#paths)
 * [shim](#shim)
 * [optimizer](#optimizer)
-    * [path](#optimizer_path)
-    * [hide_unoptimized_assets](#optimizer_unoptimized_assets)
-    * [excludes](#optimizer_excludes)
-    * [options](#optimizer_options)
-    * [timeout](#optimizer_timeout)
+    * [path](#path)
+    * [hide_unoptimized_assets](#unoptimized_assets)
+    * [excludes](#excludes)
+    * [options](#options)
+    * [timeout](#timeout)
 
 #### _base_url_ ####
 
