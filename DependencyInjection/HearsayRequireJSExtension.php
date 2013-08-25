@@ -46,58 +46,66 @@ class HearsayRequireJSExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new Loader\YamlFileLoader(
+            $container,
+            new FileLocator(__DIR__ . '/../Resources/config')
+        );
         $loader->load('services.yml');
 
+        $container->setParameter('hearsay_require_js.require_js_src', $config['require_js_src']);
+        $container->setParameter('hearsay_require_js.initialize_template', $config['initialize_template']);
         $container->setParameter('hearsay_require_js.base_url', $config['base_url']);
         $container->setParameter('hearsay_require_js.base_directory', $this->getRealPath($config['base_directory'], $container));
 
-        $container->setParameter('hearsay_require_js.require_js_src', $config['require_js_src']);
+        // Add the base directory as an empty namespace
+        $config['paths'][''] = array(
+            'location' => $config['base_directory'],
+            'external' => false,
+        );
 
-        $container->setParameter('hearsay_require_js.initialize_template', $config['initialize_template']);
-        $container->setParameter('hearsay_require_js.shim', $config['shim']);
+        $hideUnoptimizedAssets = !isset($config['optimizer']['hide_unoptimized_assets'])
+            ? false
+            : $config['optimizer']['hide_unoptimized_assets'];
 
-        $hide_unoptimized_assets = false;
-        if (isset($config['optimizer'])) {
-            // Check whether the optimizer should suppress unoptimized files
-            $hide_unoptimized_assets = $config['optimizer']['hide_unoptimized_assets'];
-
-            // Set optimizer options
-            $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
-            $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
-
-            if (isset($config['optimizer']['timeout'])) {
-                $filter->addMethodCall('setTimeout', array(intval($config['optimizer']['timeout'])));
-            }
-            foreach ($config['optimizer']['excludes'] as $exclude) {
-                $filter->addMethodCall('addExclude', array($exclude));
-            }
-            foreach ($config['optimizer']['options'] as $name => $settings) {
-                $value = $settings['value'];
-                $filter->addMethodCall('addOption', array($name, $value));
-            }
-
-            $filter->addMethodCall('setShim', array($config['shim']));
-        } else {
-            // If the optimizer config isn't provided, don't provide the filter
-            $container->removeDefinition('hearsay_require_js.optimizer_filter');
-        }
-
-        // Add the configured namespaces
         foreach ($config['paths'] as $path => $settings) {
             $location = $settings['location'];
 
             if ($settings['external']) {
                 $this->addExternalNamespaceMapping($location, $path, $container);
             } else {
-                !is_string($location) && $location = array_shift($location);
+                is_array($location) && $location = array_shift($location);
 
-                $this->addNamespaceMapping($location, $path, $container, !$hide_unoptimized_assets);
+                $this->addNamespaceMapping($location, $path, $container, !$hideUnoptimizedAssets);
             }
         }
 
-        // Add root directory with an empty namespace
-        $this->addNamespaceMapping($config['base_directory'], '', $container, !$hide_unoptimized_assets);
+        $container->setParameter('hearsay_require_js.shim', $config['shim']);
+
+        $configurationBuilder = $container
+            ->getDefinition('hearsay_require_js.configuration_builder');
+
+        foreach ($config['options'] as $option => $value) {
+            $configurationBuilder->addMethodCall('addOption', array($option, $value));
+        }
+
+        if (!isset($config['optimizer'])) {
+            // If the r.js optimizer config isn't provided, don't provide the Assetic filter
+            $container->removeDefinition('hearsay_require_js.optimizer_filter');
+        } else {
+            $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
+
+            $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
+            $filter->addMethodCall('setShim', array($config['shim']));
+            $filter->addMethodCall('setTimeout', array($config['optimizer']['timeout']));
+
+            foreach ($config['optimizer']['excludes'] as $exclude) {
+                $filter->addMethodCall('addExclude', array($exclude));
+            }
+
+            foreach ($config['optimizer']['options'] as $name => $settings) {
+                $filter->addMethodCall('addOption', array($name, $settings['value']));
+            }
+        }
     }
 
     /**

@@ -57,17 +57,33 @@ This bundle configured under the `hearsay_require_js` key in your application
 configuration. This includes settings related to paths, shim, optimization, and
 more.
 
+* [require_js_src](#require_js_src)
+* [initialize_template](#initialize_template)
 * [base_url](#base_url)
 * [base_directory](#base_directory)
-* [require_js_src](#require_js_src)
 * [paths](#paths)
 * [shim](#shim)
+* [options](#options)
 * [optimizer](#optimizer)
     * [path](#path)
     * [hide_unoptimized_assets](#hide_unoptimized_assets)
     * [excludes](#excludes)
     * [options](#options)
     * [timeout](#timeout)
+
+#### _require_js_src_ ####
+
+**type**: string **default**: //cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js
+
+This is a string that represents the template name which will render the
+RequireJS src or an URL to the RequireJS.
+
+#### _initialize_template_ ####
+
+**type**: string **default**: HearsayRequireJSBundle::initialize.html.twig
+
+This is a string that represents the template name which will render the
+`script` tag to load the RequireJS and start script.
 
 #### _base_url_ ####
 
@@ -79,17 +95,10 @@ namespace.
 
 #### _base_directory_ ####
 
-This is a string that represents the base URL for the [r.js][3] optimizer, that
-is generally actually a filesystem path.
-
 **type**: string **default**: null
 
-#### _require_js_src_ ####
-
-**type**: string **default**: //cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js
-
-This is a string that represents the template name which will render the
-RequireJS src or an URL to the RequireJS.
+This is a string that represents the base URL for the [r.js][3] optimizer, that
+is generally actually a filesystem path.
 
 #### _paths_ ####
 
@@ -117,6 +126,12 @@ optimizer;
 This is a prototype that represents an array of shim, corresponds to the
 RequireJS [shim config][6].
 
+#### _options_ ####
+
+**type**: array **default**: null
+
+An array of key-value pairs to pass to the RequireJS.
+
 #### _optimizer_ #####
 
 **type**: array **default**: null
@@ -143,6 +158,8 @@ An array of module names to exclude from the build profile.
 
 ##### _options_ #####
 
+**type**: array **default**: null
+
 An array of key-value pairs to pass to the r.js optimizer.
 
 ##### _timeout_ #####
@@ -157,7 +174,6 @@ This determines the node.js process timeout, in seconds.
 hearsay_require_js:
     base_url:            js
     base_directory:      ~ # Required
-    # The template name which will render the RequireJS src or an URL to the RequireJS
     require_js_src:      //cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js
     initialize_template: HearsayRequireJSBundle::initialize.html.twig
     paths:
@@ -178,7 +194,6 @@ hearsay_require_js:
             # Prototype
             name:
                 value: ~ # Required
-        # The timeout of the node.js process, in seconds
         timeout: 60
 ```
 
@@ -189,14 +204,14 @@ Just output the RequireJS initialization and load files normally:
 ```
 {{ require_js_initialize() }}
 
-<script type="text/javascript">require(['blog/main'])</script>
+<script type="text/javascript">require(['demo/main'])</script>
 ```
 
 Alternately, you can specify a file to be required immediately via the
 `data-main` attribute:
 
 ```
-{{ require_js_initialize({ 'main' : 'blog/main' }) }}
+{{ require_js_initialize({ 'main' : 'demo/main' }) }}
 ```
 
 If you need to do anything fancy with the configuration, you can do so
@@ -242,7 +257,7 @@ production:
 ```
 {% javascripts
     filter='?requirejs'
-    '@AcmeDemoBundle/Resources/scripts/main.js'
+    '@AcmeDemoBundle/Resources/public/js/src/main.js'
 %}
     {{ require_js_initialize({ 'main' : asset_url }) }}
 {% endjavascripts %}
