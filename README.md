@@ -69,7 +69,7 @@ more.
     * [options](#optimizer_options)
     * [timeout](#optimizer_timeout)
 
-<a id="#base_url"></a> **_base_url_**
+#### _base_url_ ####
 
 **type**: string **default**: js **required**
 
@@ -77,21 +77,21 @@ This is a string that represents the base URL where assets are served, relative
 to the website root directory. This URL also will exposed as an empty
 namespace.
 
-<a id="#base_directory"></a> **_base_directory_**
+#### _base_directory_ ####
 
 This is a string that represents the base URL for the [r.js][3] optimizer, that
 is generally actually a filesystem path.
 
 **type**: string **default**: null
 
-<a id="#require_js_src"></a> **_require_js_src_**
+#### _require_js_src_ ####
 
 **type**: string **default**: //cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js
 
 This is a string that represents the template name which will render the
 RequireJS src or an URL to the RequireJS.
 
-<a id="#paths"></a> **_paths_**
+#### _paths_ ####
 
 **type**: array **default**: null
 
@@ -110,42 +110,42 @@ file then MUST NOT ends with the `.js` file extension;
 optimizer;
 * will exposed as a namespace.
 
-<a id="#shim"></a> **_shim_**
+#### _shim_ ####
 
 **type**: array **default**: null
 
 This is a prototype that represents an array of shim, corresponds to the
 RequireJS [shim config][6].
 
-<a id="#optimizer"></a> **_optimizer_**
+#### _optimizer_ #####
 
 **type**: array **default**: null
 
 This block includes the r.js optimizer configuration options.
 
-<a id="#optimizer-path"></a> _path_
+##### _path_ #####
 
 **type**: string **default**: null
 
 This is a string that represents the path to the r.js optimizer.
 
-<a id="#optimizer-hide_unoptimized_assets"></a> _hide_unoptimized_assets_
+##### _hide_unoptimized_assets_ #####
 
 **type**: boolean **default**: false
 
 This determines whether the r.js optimizer should suppress unoptimized files.
 
-<a id="#optimizer-excludes"></a> _excludes_
+##### _excludes_ #####
 
 **type**: array **default**: null
 
 An array of module names to exclude from the build profile.
 
-<a id="#optimizer-options"></a> _options_
+##### _options_ #####
 
 An array of key-value pairs to pass to the r.js optimizer.
 
-<a id="#optimizer-timeout"></a> _timeout_
+##### _timeout_ #####
 
 **type**: integer **default**: 60
 
@@ -255,7 +255,7 @@ production:
 If you wish to prevent unoptimized assets from being served (in e.g. production),
 you can suppress them:
 
-```
+```yaml
 # app/config/config.yml
 hearsay_require_js:
     optimizer:
