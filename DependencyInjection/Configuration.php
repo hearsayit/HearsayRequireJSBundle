@@ -102,8 +102,6 @@ class Configuration implements ConfigurationInterface
                         ->useAttributeAsKey('name')
                         ->prototype('array')
                             ->children()
-                                ->scalarNode('name')
-                                ->end()
                                 ->arrayNode('deps')
                                     ->defaultValue(array())
                                     ->prototype('scalar')
@@ -148,7 +146,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->scalarNode('timeout')
-                                ->info('The timeout, in seconds, of the node process')
+                                ->info('The timeout of the node.js process, in seconds')
                                 ->validate()
                                     ->ifTrue(function ($v) {
                                         return !(is_int($v) || ctype_digit($v));
