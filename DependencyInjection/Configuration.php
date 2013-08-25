@@ -56,7 +56,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('base_url')
                         ->defaultValue('js')
                     ->end()
-                    ->scalarNode('base_directory')
+                    ->scalarNode('base_dir')
                         ->isRequired()
                         ->cannotBeEmpty()
                     ->end()

@@ -60,7 +60,7 @@ more.
 * [require_js_src](#require_js_src)
 * [initialize_template](#initialize_template)
 * [base_url](#base_url)
-* [base_directory](#base_directory)
+* [base_dir](#base_dir)
 * [paths](#paths)
 * [shim](#shim)
 * [options](#options)
@@ -93,7 +93,7 @@ This is a string that represents the base URL where assets are served, relative
 to the website root directory. This URL also will exposed as an empty
 namespace.
 
-#### _base_directory_ ####
+#### _base_dir_ ####
 
 **type**: string **default**: null
 
@@ -173,7 +173,7 @@ This determines the node.js process timeout, in seconds.
 ```yaml
 hearsay_require_js:
     base_url:            js
-    base_directory:      ~ # Required
+    base_dir:            ~ # Required
     require_js_src:      //cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js
     initialize_template: HearsayRequireJSBundle::initialize.html.twig
     paths:
