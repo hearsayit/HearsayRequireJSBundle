@@ -172,10 +172,10 @@ This determines the node.js process timeout, in seconds.
 
 ```yaml
 hearsay_require_js:
-    base_url:            js
-    base_dir:            ~ # Required
     require_js_src:      //cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js
     initialize_template: HearsayRequireJSBundle::initialize.html.twig
+    base_url:            js
+    base_dir:            ~ # Required
     paths:
         # Prototype
         path:
@@ -186,6 +186,10 @@ hearsay_require_js:
         name:
             deps:    []
             exports: ~
+    options:
+        # Prototype
+        name:
+            value: ~ # Required
     optimizer:
         path:                    ~ # Required
         hide_unoptimized_assets: false
