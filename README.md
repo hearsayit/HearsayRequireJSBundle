@@ -64,7 +64,7 @@ more.
 * [shim](#shim)
 * [optimizer](#optimizer)
     * [path](#path)
-    * [hide_unoptimized_assets](#unoptimized_assets)
+    * [hide_unoptimized_assets](#hide_unoptimized_assets)
     * [excludes](#excludes)
     * [options](#options)
     * [timeout](#timeout)
