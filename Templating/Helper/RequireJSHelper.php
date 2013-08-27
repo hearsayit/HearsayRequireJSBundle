@@ -110,12 +110,18 @@ class RequireJSHelper extends Helper
 
         $options = array_merge($defaults, $options);
 
-        return $this->engine->render($this->initializeTemplate, array(
-            'main'   => $options['main'],
-            'config' => $options['configure']
-                ? $this->configurationBuilder->getConfiguration()
-                : null,
-        ));
+        return $this->engine->render(
+            $this->initializeTemplate,
+            array_merge(
+                array(
+                    'main'   => $options['main'],
+                    'config' => $options['configure']
+                        ? $this->configurationBuilder->getConfiguration()
+                        : null,
+                ),
+                array_diff_key($options, $defaults)
+            )
+        );
     }
 
     /**

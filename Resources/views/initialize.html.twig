@@ -29,9 +29,9 @@
  #}
 
 {% if config is defined and config is not empty %}
-{% block configuration %}
-    <script type="text/javascript">var require={{ config|json_encode|raw }}</script>
-{% endblock configuration %}
+    {% block configuration %}
+        <script type="text/javascript">var require={{ config|json_encode|raw }};</script>
+    {% endblock configuration %}
 {% endif %}
 
 {% block require_js %}

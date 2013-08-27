@@ -83,7 +83,8 @@ RequireJS src or an URL to the RequireJS.
 **type**: string **default**: HearsayRequireJSBundle::initialize.html.twig
 
 This is a string that represents the template name which will render the
-`script` tag to load the RequireJS and start script.
+RequireJS initialization output. You can pass into this template any extra
+options.
 
 #### _base_url_ ####
 
@@ -152,7 +153,7 @@ This determines whether the r.js optimizer should suppress unoptimized files.
 
 ##### _excludes_ #####
 
-**type**: array **default**: null
+**type**: array **default**: []
 
 An array of module names to exclude from the build profile.
 
