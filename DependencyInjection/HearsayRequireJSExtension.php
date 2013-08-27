@@ -84,8 +84,8 @@ class HearsayRequireJSExtension extends Extension
         $configurationBuilder = $container
             ->getDefinition('hearsay_require_js.configuration_builder');
 
-        foreach ($config['options'] as $option => $value) {
-            $configurationBuilder->addMethodCall('addOption', array($option, $value));
+        foreach ($config['options'] as $option => $settings) {
+            $configurationBuilder->addMethodCall('addOption', array($option, $settings['value']));
         }
 
         if (!isset($config['optimizer'])) {
