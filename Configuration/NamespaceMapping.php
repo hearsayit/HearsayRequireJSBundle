@@ -57,15 +57,9 @@ class NamespaceMapping implements NamespaceMappingInterface
     }
 
     /**
-     * Registers a directory-to-namespace mapping
-     *
-     * @param string                 $path      The path
-     * @param string                 $namespace The namespace
-     * @param boolean                $isDir     Determines if the path is a
-     *                                          directory
-     * @throws PathNotFoundException            If the path was not found
+     * {@inheritDoc}
      */
-    public function registerNamespace($path, $namespace, $isDir = true)
+    public function registerNamespace($namespace, $path)
     {
         if (is_file($path . '.js')) {
             $path .= '.js';
@@ -73,21 +67,15 @@ class NamespaceMapping implements NamespaceMappingInterface
 
         if (!$realPath = realpath($path)) {
             throw new PathNotFoundException(
-                sprintf(
-                    'The path `%s` was not found.',
-                    $path
-                )
+                sprintf('The path `%s` was not found.', $path)
             );
         }
 
-        $this->namespaces[$realPath] = array(
-            'is_dir'    => $isDir,
-            'namespace' => $namespace,
-        );
+        $this->namespaces[$namespace] = $realPath;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getModulePath($filename)
     {
@@ -99,12 +87,12 @@ class NamespaceMapping implements NamespaceMappingInterface
             return false;
         }
 
-        foreach ($this->namespaces as $path => $settings) {
-            if (strpos($filename, $path) === 0) {
-                $basename   = substr($filename, strlen($path));
-                $modulePath = $this->basePath . '/' . $settings['namespace'];
+        foreach ($this->namespaces as $namespace => $realPath) {
+            if (strpos($filename, $realPath) === 0) {
+                $basename   = substr($filename, strlen($realPath));
+                $modulePath = $this->basePath . '/' . $namespace;
 
-                if ($settings['is_dir'] && $basename) {
+                if (is_dir($realPath) && $basename) {
                     // To allow to use the bundle with `.coffee` scripts
                     $basename = preg_replace('#\.[^.]+$#', '.js', $basename);
 

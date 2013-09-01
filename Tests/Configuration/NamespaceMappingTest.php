@@ -53,7 +53,7 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilesConvertedToModules()
     {
-        $this->mapping->registerNamespace(__DIR__ . '/dir', 'modules');
+        $this->mapping->registerNamespace('modules', __DIR__ . '/dir');
 
         $this->assertEquals(
             'js/modules/file.js',
@@ -69,7 +69,7 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
     public function testExtraSlashesIgnored()
     {
         $mapping = new NamespaceMapping('js//');
-        $mapping->registerNamespace(__DIR__ . '/dir', '/modules/');
+        $mapping->registerNamespace('/modules/', __DIR__ . '/dir');
 
         $this->assertEquals(
             'js/modules/file.js',
@@ -84,7 +84,7 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testRelativePathsReduced()
     {
-        $this->mapping->registerNamespace(__DIR__ . '/dir/../dir', 'modules');
+        $this->mapping->registerNamespace('modules', __DIR__ . '/dir/../dir');
 
         $this->assertEquals(
             'js/modules/file.js',
@@ -124,7 +124,7 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilesRenamedToJs()
     {
-        $this->mapping->registerNamespace(__DIR__ . '/dir', 'modules');
+        $this->mapping->registerNamespace('modules', __DIR__ . '/dir');
 
         $this->assertEquals(
             'js/modules/file2.js',

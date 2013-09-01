@@ -242,8 +242,9 @@ hearsay_require_js:
     initialize_template: ::initialize_require_js.html.twig
 ```
 
-To use this bundle with CoffeeScript, you can specify a __path__ that contains
-`.coffee` scripts. The scripts will renamed to `.js` scripts.
+To use this bundle with CoffeeScript, you can specify a path that contains
+`.coffee` scripts (means a directory). The scripts will renamed to `.js`
+scripts.
 
 >Note that the `r.js` optimizer cannot optimize `.coffee` scripts. However, you
 >can apply the [Assetic][7] filter to this scripts by the file extension.

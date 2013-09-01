@@ -121,7 +121,7 @@ class HearsayRequireJSExtension extends Extension
 
         // Register the namespace with the configuration
         $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
-        $mapping->addMethodCall('registerNamespace', array($location, $path, is_dir($location)));
+        $mapping->addMethodCall('registerNamespace', array($path, $location));
 
         $config = $container->getDefinition('hearsay_require_js.configuration_builder');
         $config->addMethodCall('setPath', array($path, $location));

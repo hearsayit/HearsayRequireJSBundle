@@ -158,17 +158,17 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             'Incorrect number of method calls on namespace mapping'
         );
         $this->assertContains(
-            array('registerNamespace', array($namespace_dir, 'namespace', true)),
+            array('registerNamespace', array('', $base_dir)),
             $methods,
             'Did not find expected method call'
         );
         $this->assertContains(
-            array('registerNamespace', array($base_dir, '', true)),
+            array('registerNamespace', array('namespace', $namespace_dir)),
             $methods,
             'Did not find expected method call'
         );
         $this->assertContains(
-            array('registerNamespace', array($namespace_file, 'namespace_file', false)),
+            array('registerNamespace', array('namespace_file', $namespace_file)),
             $methods,
             'Did not find expected method call'
         );
