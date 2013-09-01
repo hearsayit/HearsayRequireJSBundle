@@ -117,4 +117,19 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
 
         $this->mapping->registerNamespace('dir', 'root');
     }
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::getModulePath
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::registerNamespace
+     */
+    public function testFilesRenamedToJs()
+    {
+        $this->mapping->registerNamespace(__DIR__ . '/dir', 'modules');
+
+        $this->assertEquals(
+            'js/modules/file2.js',
+            $this->mapping->getModulePath(__DIR__ . '/dir/file2.coffee'),
+            'Incorrect file-to-module conversion'
+        );
+    }
 }

@@ -105,6 +105,9 @@ class NamespaceMapping implements NamespaceMappingInterface
                 $modulePath = $this->basePath . '/' . $settings['namespace'];
 
                 if ($settings['is_dir'] && $basename) {
+                    // To allow to use the bundle with `.coffee` scripts
+                    $basename = preg_replace('#\.[^.]+$#', '.js', $basename);
+
                     $modulePath .= '/' . $basename;
                 }
 
