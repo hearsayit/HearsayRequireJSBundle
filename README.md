@@ -242,9 +242,15 @@ hearsay_require_js:
     initialize_template: ::initialize_require_js.html.twig
 ```
 
+To use this bundle with CoffeeScript, you can specify a *path* that contains
+`.coffee` scripts. The scripts will renamed to `.js` scripts.
+
+>Note that the `r.js` optimizer cannot optimize `.coffee` scripts. However, you
+>can apply the [Assetic][7] filter to this scripts by the file extension.
+
 ### Optimization ###
 
-This bundle provides the [Assetic][7] filter to create minified Javascript files
+This bundle provides the Assetic filter to create minified Javascript files
 using by r.js optimizer. This also inlines any module definitions required by
 the file being optimized. You need to provide a path to the r.js optimizer in
 your configuration to use the filter:
