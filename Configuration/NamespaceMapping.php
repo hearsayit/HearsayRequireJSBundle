@@ -101,8 +101,8 @@ class NamespaceMapping implements NamespaceMappingInterface
      *
      * @param  string         $path The path
      * @return boolean|string       Returns false on failure, e.g. if the file
-     *                              does not exist or a string that represents
-     *                              the the canonicalized absolute pathname
+     *                              does not exist, or a string that represents
+     *                              the canonicalized absolute pathname
      */
     protected function getRealPath($path)
     {
