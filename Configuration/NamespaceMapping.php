@@ -61,11 +61,7 @@ class NamespaceMapping implements NamespaceMappingInterface
      */
     public function registerNamespace($namespace, $path)
     {
-        if (is_file($path . '.js')) {
-            $path .= '.js';
-        }
-
-        if (!$realPath = realpath($path)) {
+        if (!$realPath = $this->getRealPath($path)) {
             throw new PathNotFoundException(
                 sprintf('The path `%s` was not found.', $path)
             );
@@ -79,13 +75,7 @@ class NamespaceMapping implements NamespaceMappingInterface
      */
     public function getModulePath($filename)
     {
-        if (is_file($filename . '.js')) {
-            $filename .= '.js';
-        }
-
-        if (!$filename = realpath($filename)) {
-            return false;
-        }
+        $filename = $this->getRealPath($filename);
 
         foreach ($this->namespaces as $namespace => $realPath) {
             if (strpos($filename, $realPath) === 0) {
@@ -104,5 +94,26 @@ class NamespaceMapping implements NamespaceMappingInterface
         }
 
         return false;
+    }
+
+    /**
+     * Gets canonicalized absolute pathname
+     *
+     * @param  string         $path The path
+     * @return boolean|string       Returns false on failure, e.g. if the file
+     *                              does not exist or a string that represents
+     *                              the the canonicalized absolute pathname
+     */
+    protected function getRealPath($path)
+    {
+        if (is_file($path . '.js')) {
+            $path .= '.js';
+        }
+
+        if (!$realPath = realpath($path)) {
+            return false;
+        }
+
+        return $realPath;
     }
 }
