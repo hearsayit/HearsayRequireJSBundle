@@ -42,7 +42,7 @@ interface NamespaceMappingInterface
     public function registerNamespace($namespace, $path);
 
     /**
-     * Gets the module path, e.g. `namespace/modules/js` corresponding to a
+     * Gets the module path, e.g. `namespace/modules.js` corresponding to a
      * filesystem path
      *
      * @param  string         $filename The filename

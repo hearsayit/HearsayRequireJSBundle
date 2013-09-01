@@ -98,7 +98,7 @@ class HearsayRequireJSExtension extends Extension
             $filter->addMethodCall('setShim', array($config['shim']));
             $filter->addMethodCall('setTimeout', array($config['optimizer']['timeout']));
 
-            foreach ($config['optimizer']['excludes'] as $exclude) {
+            foreach ($config['optimizer']['exclude'] as $exclude) {
                 $filter->addMethodCall('addExclude', array($exclude));
             }
 

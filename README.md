@@ -67,7 +67,7 @@ more.
 * [optimizer](#optimizer)
     * [path](#path)
     * [hide_unoptimized_assets](#hide_unoptimized_assets)
-    * [excludes](#excludes)
+    * [exclude](#exclude)
     * [options](#options)
     * [timeout](#timeout)
 
@@ -151,7 +151,7 @@ This is a string that represents the path to the r.js optimizer.
 
 This determines whether the r.js optimizer should suppress unoptimized files.
 
-##### _excludes_ #####
+##### _exclude_ #####
 
 **type**: array **default**: []
 
@@ -194,7 +194,7 @@ hearsay_require_js:
     optimizer:
         path:                    ~ # Required
         hide_unoptimized_assets: false
-        excludes:                []
+        exclude:                 []
         options:
             # Prototype
             name:

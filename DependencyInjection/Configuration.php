@@ -47,6 +47,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
                 ->children()
                     ->scalarNode('require_js_src')
+                        ->cannotBeEmpty()
                         ->defaultValue('//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js')
                     ->end()
                     ->scalarNode('initialize_template')
@@ -73,6 +74,7 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->variableNode('location')
                                     ->isRequired()
+                                    ->cannotBeEmpty()
                                     ->validate()
                                         ->always(function ($v) {
                                             if (!is_string($v) && !is_array($v)) {
@@ -91,6 +93,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                                 ->booleanNode('external')
+                                    ->cannotBeEmpty()
                                     ->defaultFalse()
                                 ->end()
                             ->end()
@@ -137,9 +140,10 @@ class Configuration implements ConfigurationInterface
                                 ->cannotBeEmpty()
                             ->end()
                             ->booleanNode('hide_unoptimized_assets')
+                                ->cannotBeEmpty()
                                 ->defaultFalse()
                             ->end()
-                            ->arrayNode('excludes')
+                            ->arrayNode('exclude')
                                 ->defaultValue(array())
                                 ->prototype('scalar')
                                 ->end()
@@ -164,6 +168,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->scalarNode('timeout')
+                                ->cannotBeEmpty()
                                 ->validate()
                                     ->ifTrue(function ($v) {
                                         return !(is_int($v) || ctype_digit($v));
