@@ -84,7 +84,7 @@ class NamespaceMapping implements NamespaceMappingInterface
 
                 if (is_dir($realPath) && $basename) {
                     // To allow to use the bundle with `.coffee` scripts
-                    $basename = preg_replace('#\.[^.]+$#', '.js', $basename);
+                    $basename = preg_replace('#\.coffee$#', '.js', $basename);
 
                     $modulePath .= '/' . $basename;
                 }
