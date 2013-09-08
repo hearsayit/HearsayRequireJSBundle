@@ -119,15 +119,12 @@ class Configuration implements ConfigurationInterface
                         ->useAttributeAsKey('name')
                         ->prototype('array')
                             ->beforeNormalization()
-                                ->ifTrue(function ($v) {
-                                    return !is_array($v);
-                                })
-                                ->then(function ($v) {
+                                ->always(function ($v) {
                                     return array('value' => $v);
                                 })
                             ->end()
                             ->children()
-                                ->scalarNode('value')
+                                ->variableNode('value')
                                     ->isRequired()
                                 ->end()
                             ->end()
@@ -153,15 +150,12 @@ class Configuration implements ConfigurationInterface
                                 ->useAttributeAsKey('name')
                                 ->prototype('array')
                                     ->beforeNormalization()
-                                        ->ifTrue(function ($v) {
-                                            return !is_array($v);
-                                        })
-                                        ->then(function ($v) {
+                                        ->always(function ($v) {
                                             return array('value' => $v);
                                         })
-                                    ->end()
-                                    ->children()
-                                        ->scalarNode('value')
+                                        ->end()
+                                        ->children()
+                                            ->variableNode('value')
                                             ->isRequired()
                                         ->end()
                                     ->end()

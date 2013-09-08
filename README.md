@@ -131,7 +131,8 @@ RequireJS [shim config][6].
 
 **type**: array **default**: null
 
-An array of key-value pairs to pass to the RequireJS.
+An array of key-value pairs to pass to the RequireJS. The value can have
+variable type.
 
 #### _optimizer_ #####
 
@@ -161,7 +162,8 @@ An array of module names to exclude from the build profile.
 
 **type**: array **default**: null
 
-An array of key-value pairs to pass to the r.js optimizer.
+An array of key-value pairs to pass to the r.js optimizer. The value can have
+variable type.
 
 ##### _timeout_ #####
 
