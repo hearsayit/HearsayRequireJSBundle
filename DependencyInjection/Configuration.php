@@ -137,7 +137,6 @@ class Configuration implements ConfigurationInterface
                                 ->cannotBeEmpty()
                             ->end()
                             ->booleanNode('hide_unoptimized_assets')
-                                ->cannotBeEmpty()
                                 ->defaultFalse()
                             ->end()
                             ->arrayNode('exclude')
