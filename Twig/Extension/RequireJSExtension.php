@@ -65,6 +65,19 @@ class RequireJSExtension extends \Twig_Extension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getGlobals()
+    {
+        return array(
+            'require_js' => array(
+                'config' => $this->getHelper()->config(),
+                'src' => $this->getHelper()->src(),
+            ),
+        );
+    }
+
+    /**
      * {@inheritDoc}
      * @codeCoverageIgnore
      */
