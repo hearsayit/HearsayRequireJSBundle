@@ -22,6 +22,9 @@
         "kriswallsmith/assetic": ">= 1.0",
         "symfony/framework-bundle": ">=2.0.9"
     },
+    "require-dev": {
+        "twig/extensions": "v1.0.0"
+    },
     "autoload": {
         "psr-0": {
             "Hearsay\\RequireJSBundle": ""

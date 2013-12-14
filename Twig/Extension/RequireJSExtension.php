@@ -26,6 +26,7 @@ namespace Hearsay\RequireJSBundle\Twig\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder;
 use Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper;
 
 /**
@@ -35,6 +36,11 @@ use Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper;
 class RequireJSExtension extends \Twig_Extension
 {
     /**
+     * @var ConfigurationBuilder
+     */
+    protected $configurationBuilder;
+
+    /**
      * @var ContainerInterface
      */
     protected $container;
@@ -43,10 +49,14 @@ class RequireJSExtension extends \Twig_Extension
      * The constructor method
      *
      * @param ContainerInterface   $container
+     * @param ConfigurationBuilder $configurationBuilder
      */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        ContainerInterface $container,
+        ConfigurationBuilder $configurationBuilder
+    ) {
+        $this->container            = $container;
+        $this->configurationBuilder = $configurationBuilder;
     }
 
     /**
@@ -61,6 +71,22 @@ class RequireJSExtension extends \Twig_Extension
                 array('is_safe' => array('html'))
             ),
             'require_js_src'        => new \Twig_Function_Method($this, 'src'),
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getGlobals()
+    {
+        if (!$this->container->isScopeActive('request')) {
+            return array();
+        }
+        
+        return array(
+            'require_js' => array(
+                'config' => $this->configurationBuilder->getConfiguration(),
+            ),
         );
     }
 

@@ -76,6 +76,7 @@ services:
     class: %hearsay_require_js.twig_extension.class%
     arguments:
       - @service_container
+      - @hearsay_require_js.configuration_builder
     tags:
       - { name: twig.extension }
 
