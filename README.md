@@ -78,7 +78,7 @@ more.
 This is a string that represents the template name which will render the
 RequireJS src or an URL to the RequireJS.
 
-#### _initialize_template_ ####
+#### _initialize\_template_ ####
 
 **type**: string **default**: HearsayRequireJSBundle::initialize.html.twig
 
@@ -86,17 +86,17 @@ This is a string that represents the template name which will render the
 RequireJS initialization output. You can pass into this template any extra
 options.
 
-#### _base_url_ ####
+#### _base\_url_ ####
 
-**type**: string **default**: js **required**
+**type**: string **default**: js
 
 This is a string that represents the base URL where assets are served, relative
 to the website root directory. This URL also will exposed as an empty
 namespace.
 
-#### _base_dir_ ####
+#### _base\_dir_ ####
 
-**type**: string **default**: null
+**type**: string **default**: null **required**
 
 This is a string that represents the base URL for the [r.js][3] optimizer, that
 is generally actually a filesystem path.
@@ -146,7 +146,7 @@ This block includes the r.js optimizer configuration options.
 
 This is a string that represents the path to the r.js optimizer.
 
-##### _hide_unoptimized_assets_ #####
+##### _hide\_unoptimized\_assets_ #####
 
 **type**: boolean **default**: false
 
