@@ -71,14 +71,14 @@ more.
     * [options](#options)
     * [timeout](#timeout)
 
-#### _require\\_js\\_src_ ####
+#### *require_js_src* ####
 
 **type**: string **default**: //cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js
 
 This is a string that represents the template name which will render the
 RequireJS src or an URL to the RequireJS.
 
-#### _initialize\\_template_ ####
+#### *initialize_template* ####
 
 **type**: string **default**: HearsayRequireJSBundle::initialize.html.twig
 
@@ -86,7 +86,7 @@ This is a string that represents the template name which will render the
 RequireJS initialization output. You can pass into this template any extra
 options.
 
-#### _base\\_url_ ####
+#### *base_url* ####
 
 **type**: string **default**: js
 
@@ -94,14 +94,14 @@ This is a string that represents the base URL where assets are served, relative
 to the website root directory. This URL also will exposed as an empty
 namespace.
 
-#### _base\\_dir_ ####
+#### *base_dir* ####
 
 **type**: string **default**: null **required**
 
 This is a string that represents the base URL for the [r.js][3] optimizer, that
 is generally actually a filesystem path.
 
-#### _paths_ ####
+#### *paths* ####
 
 **type**: array **default**: null
 
@@ -120,52 +120,52 @@ file then MUST NOT ends with the `.js` file extension;
 optimizer;
 * will exposed as a namespace.
 
-#### _shim_ ####
+#### *shim* ####
 
 **type**: array **default**: null
 
 This is a prototype that represents an array of shim, corresponds to the
 RequireJS [shim config][6].
 
-#### _options_ ####
+#### *options* ####
 
 **type**: array **default**: null
 
 An array of key-value pairs to pass to the RequireJS. The value can have
 variable type.
 
-#### _optimizer_ #####
+#### *optimizer* #####
 
 **type**: array **default**: null
 
 This block includes the r.js optimizer configuration options.
 
-##### _path_ #####
+##### *path* #####
 
 **type**: string **default**: null
 
 This is a string that represents the path to the r.js optimizer.
 
-##### _hide\\_unoptimized\\_assets_ #####
+##### *hide_unoptimized_assets* #####
 
 **type**: boolean **default**: false
 
 This determines whether the r.js optimizer should suppress unoptimized files.
 
-##### _exclude_ #####
+##### *exclude* #####
 
 **type**: array **default**: []
 
 An array of module names to exclude from the build profile.
 
-##### _options_ #####
+##### *options* #####
 
 **type**: array **default**: null
 
 An array of key-value pairs to pass to the r.js optimizer. The value can have
 variable type.
 
-##### _timeout_ #####
+##### *timeout* #####
 
 **type**: integer **default**: 60
 
