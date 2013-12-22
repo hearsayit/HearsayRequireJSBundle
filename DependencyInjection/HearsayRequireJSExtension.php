@@ -85,8 +85,8 @@ class HearsayRequireJSExtension extends Extension
             ->getDefinition('hearsay_require_js.configuration_builder');
 
         if ($container->getParameter('kernel.debug')) {
-            $args = isset($config['options']['urlArgs']) ? $config['options']['urlArgs'] : '';
-            $config['options']['urlArgs'] = trim($args.'&v='.time(), '&');
+            $args = isset($config['options']['urlArgs']) ? $config['options']['urlArgs']['value'] : '';
+            $config['options']['urlArgs'] = array('value' => trim($args.'&v='.time(), '&'));
         }
 
         foreach ($config['options'] as $option => $settings) {
