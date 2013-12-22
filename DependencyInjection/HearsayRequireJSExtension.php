@@ -84,6 +84,11 @@ class HearsayRequireJSExtension extends Extension
         $configurationBuilder = $container
             ->getDefinition('hearsay_require_js.configuration_builder');
 
+        if ($container->getParameter('kernel.debug')) {
+            $args = isset($options['urlArgs']) ? $options['urlArgs'] : '';
+            $options['urlArgs'] = trim($args.'&v='.time(), '&');
+        }
+
         foreach ($config['options'] as $option => $settings) {
             $configurationBuilder->addMethodCall('addOption', array($option, $settings['value']));
         }
