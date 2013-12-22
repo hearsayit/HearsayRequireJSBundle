@@ -71,14 +71,14 @@ more.
     * [options](#options)
     * [timeout](#timeout)
 
-#### _require_js_src_ ####
+#### _require\\_js\\_src_ ####
 
 **type**: string **default**: //cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js
 
 This is a string that represents the template name which will render the
 RequireJS src or an URL to the RequireJS.
 
-#### _initialize\_template_ ####
+#### _initialize\\_template_ ####
 
 **type**: string **default**: HearsayRequireJSBundle::initialize.html.twig
 
@@ -86,7 +86,7 @@ This is a string that represents the template name which will render the
 RequireJS initialization output. You can pass into this template any extra
 options.
 
-#### _base\_url_ ####
+#### _base\\_url_ ####
 
 **type**: string **default**: js
 
@@ -94,7 +94,7 @@ This is a string that represents the base URL where assets are served, relative
 to the website root directory. This URL also will exposed as an empty
 namespace.
 
-#### _base\_dir_ ####
+#### _base\\_dir_ ####
 
 **type**: string **default**: null **required**
 
@@ -146,7 +146,7 @@ This block includes the r.js optimizer configuration options.
 
 This is a string that represents the path to the r.js optimizer.
 
-##### _hide\_unoptimized\_assets_ #####
+##### _hide\\_unoptimized\\_assets_ #####
 
 **type**: boolean **default**: false
 
