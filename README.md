@@ -298,6 +298,21 @@ if you are, then you're explicitly including those modules via optimizer
 options), otherwise you may see certain assets available in development, but
 not in production.
 
+## Testing
+
+```sh
+$ phpunit
+```
+
+## Contributing
+
+Please see [CONTRIBUTING][8] for details.
+
+## Credits
+
+- [Kevin Montag][9]
+- [All Contributors][10]
+
 ## License ##
 
 This bundle is released under the MIT license. See the complete license in the
@@ -312,3 +327,7 @@ bundle:
 [5]: http://requirejs.org/docs/optimization.html#empty
 [6]: http://requirejs.org/docs/api.html#config-shim
 [7]: https://github.com/kriswallsmith/assetic
+[8]: https://github.com/hearsayit/HearsayRequireJSBundle/blob/master/CONTRIBUTING.md
+[9]: https://github.com/kmontag
+[10]: https://github.com/hearsayit/HearsayRequireJSBundle/graphs/contributors)
+
