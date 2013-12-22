@@ -329,5 +329,5 @@ bundle:
 [7]: https://github.com/kriswallsmith/assetic
 [8]: https://github.com/hearsayit/HearsayRequireJSBundle/blob/master/CONTRIBUTING.md
 [9]: https://github.com/kmontag
-[10]: https://github.com/hearsayit/HearsayRequireJSBundle/graphs/contributors)
+[10]: https://github.com/hearsayit/HearsayRequireJSBundle/graphs/contributors
 
