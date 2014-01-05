@@ -151,7 +151,7 @@ class ConfigurationBuilder
 
             if ($modulePath) {
                 $modulePath = preg_replace('~\.js$~', '', $modulePath);
-                $location = $this->getBaseUrl() . '/' . $modulePath;
+                $location = $this->getUrl($modulePath);
             }
         }
 
@@ -169,11 +169,13 @@ class ConfigurationBuilder
      *
      * @return string
      */
-    protected function getBaseUrl()
+    protected function getUrl($path = null)
     {
         if ($this->container->getParameter('assetic.use_controller')
             && $this->container->isScopeActive('request')) {
-            return $this->container->get('request')->getBaseUrl();
+            $request = $this->container->get('request');
+            if ($path && file_exists($path)) return $request->getBasePath() . '/' . $path;
+            return $request->getBaseUrl() . '/' . $path;
         }
 
         $baseUrl = $this->container->isScopeActive('templating.helper.assets')
@@ -185,7 +187,7 @@ class ConfigurationBuilder
             $baseUrl = substr($baseUrl, 0, $pos);
         }
 
-        return $baseUrl;
+        return $baseUrl . '/' . $path;
     }
 
     /**
@@ -195,6 +197,6 @@ class ConfigurationBuilder
      */
     protected function getScriptUrl()
     {
-        return $this->getBaseUrl() . '/' . $this->baseUrl;
+        return $this->getUrl($this->baseUrl);
     }
 }
