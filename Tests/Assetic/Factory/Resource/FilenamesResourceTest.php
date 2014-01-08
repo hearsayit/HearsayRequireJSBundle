@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-namespace Hearsay\RequireJSBundle\Tests\Factory\Resource;
+namespace Hearsay\RequireJSBundle\Tests\Assetic\Factory\Resource;
 
-use Hearsay\RequireJSBundle\Factory\Resource\FilenamesResource;
+use Hearsay\RequireJSBundle\Assetic\Factory\Resource\FilenamesResource;
 
 /**
  * Unit tests for the filename resource.
@@ -41,7 +41,7 @@ class FilenamesResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, count($filenames), 'Incorrect number of files pulled');
         $this->assertContains(strtr(__DIR__, '\\', '/') . '/FilenamesResourceTest.php', $filenames, 'Did not find expected filename');
         $this->assertContains(strtr(__DIR__, '\\', '/') . '/dir/file', $filenames, 'Did not find expected filename');
-        $this->assertContains(strtr(__DIR__, '\\', '/') . '/dir/subdir/file', $filenames, 'Did not find expected filename');
+        $this->assertContains(strtr(__DIR__, '\\', '/') . '/dir/sub_dir/file', $filenames, 'Did not find expected filename');
     }
     
     public function testSingleFilenameRetrieved()

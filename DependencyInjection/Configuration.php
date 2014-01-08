@@ -27,6 +27,9 @@ namespace Hearsay\RequireJSBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Hearsay\RequireJSBundle\Exception\InvalidPathException;
+use Hearsay\RequireJSBundle\Exception\InvalidTypeException;
+
 /**
  * Bundle configuration definitions.
  * @author Kevin Montag <kevin@hearsay.it>
@@ -39,35 +42,90 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('hearsay_require_js');
+        $rootNode    = $treeBuilder->root('hearsay_require_js');
 
         $rootNode
                 ->children()
-                    ->scalarNode('base_url')
-                        ->defaultValue('js')
-                    ->end()
-                    ->scalarNode('base_directory')
-                        ->cannotBeEmpty()
-                        ->isRequired()
-                    ->end()
                     ->scalarNode('require_js_src')
-                        ->defaultValue('//cdnjs.cloudflare.com/ajax/libs/require.js/1.0.5/require.min.js')
+                        ->cannotBeEmpty()
+                        ->defaultValue('//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js')
                     ->end()
                     ->scalarNode('initialize_template')
                         ->cannotBeEmpty()
                         ->defaultValue('HearsayRequireJSBundle::initialize.html.twig')
                     ->end()
+                    ->scalarNode('base_url')
+                        ->defaultValue('js')
+                    ->end()
+                    ->scalarNode('base_dir')
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                    ->end()
                     ->arrayNode('paths')
                         ->defaultValue(array())
                         ->useAttributeAsKey('path')
                         ->prototype('array')
-                            ->beforeNormalization()->ifString()->then(function($v) { return array('location' => $v); })->end()
+                            ->beforeNormalization()
+                                ->ifString()
+                                ->then(function ($v) {
+                                    return array('location' => $v);
+                                })
+                            ->end()
                             ->children()
-                                ->scalarNode('location')
+                                ->variableNode('location')
                                     ->isRequired()
+                                    ->cannotBeEmpty()
+                                    ->validate()
+                                        ->always(function ($v) {
+                                            if (!is_string($v) && !is_array($v)) {
+                                                throw new InvalidTypeException();
+                                            }
+
+                                            $vs = !is_array($v) ? (array) $v : $v;
+                                            $er = preg_grep('~\.js$~', $vs);
+
+                                            if ($er) {
+                                                throw new InvalidPathException();
+                                            }
+
+                                            return $v;
+                                        })
+                                    ->end()
                                 ->end()
                                 ->booleanNode('external')
+                                    ->cannotBeEmpty()
                                     ->defaultFalse()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->arrayNode('shim')
+                        ->defaultValue(array())
+                        ->useAttributeAsKey('name')
+                        ->prototype('array')
+                            ->children()
+                                ->arrayNode('deps')
+                                    ->defaultValue(array())
+                                    ->prototype('scalar')
+                                    ->end()
+                                ->end()
+                                ->scalarNode('exports')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->arrayNode('options')
+                        ->defaultValue(array())
+                        ->useAttributeAsKey('name')
+                        ->prototype('array')
+                            ->beforeNormalization()
+                                ->always(function ($v) {
+                                    return array('value' => $v);
+                                })
+                            ->end()
+                            ->children()
+                                ->variableNode('value')
+                                    ->isRequired()
                                 ->end()
                             ->end()
                         ->end()
@@ -75,35 +133,46 @@ class Configuration implements ConfigurationInterface
                     ->arrayNode('optimizer')
                         ->children()
                             ->scalarNode('path')
-                                ->cannotBeEmpty()
                                 ->isRequired()
-                            ->end()
-                            ->scalarNode('build_profile')
-                                ->defaultNull()
+                                ->cannotBeEmpty()
                             ->end()
                             ->booleanNode('hide_unoptimized_assets')
                                 ->defaultFalse()
                             ->end()
-                            ->arrayNode('excludes')
+                            ->arrayNode('exclude')
                                 ->defaultValue(array())
-                                ->prototype('scalar')->end()
+                                ->prototype('scalar')
+                                ->end()
                             ->end()
                             ->arrayNode('options')
                                 ->defaultValue(array())
                                 ->useAttributeAsKey('name')
                                 ->prototype('array')
-                                    ->beforeNormalization()->ifTrue(function($v) { return !is_array($v); })->then(function($v) { return array('value' => $v); })->end()
-                                    ->children()
-                                        ->scalarNode('value')
+                                    ->beforeNormalization()
+                                        ->always(function ($v) {
+                                            return array('value' => $v);
+                                        })
+                                        ->end()
+                                        ->children()
+                                            ->variableNode('value')
                                             ->isRequired()
                                         ->end()
                                     ->end()
                                 ->end()
                             ->end()
+                            ->scalarNode('timeout')
+                                ->cannotBeEmpty()
+                                ->validate()
+                                    ->ifTrue(function ($v) {
+                                        return !(is_int($v) || ctype_digit($v));
+                                    })
+                                    ->thenInvalid('Invalid number of seconds "%s"')
+                                ->end()
+                                ->defaultValue(60)
+                            ->end()
                         ->end()
                     ->end()
-                ->end()
-        ;
+                ->end();
 
         return $treeBuilder;
     }

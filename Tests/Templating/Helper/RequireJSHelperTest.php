@@ -32,53 +32,58 @@ use Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper;
  */
 class RequireJSHelperTest extends \PHPUnit_Framework_TestCase
 {
-
+    /**
+     * @covers Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper::initialize
+     */
     public function testDefaultInitialization()
     {
-        $engine = $this->getMock('Symfony\Component\Templating\EngineInterface');
+        $engine = $this->getEngineMock(array('option' => 'value'));
+
         $config = $this->getMockBuilder('Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder')
-                ->disableOriginalConstructor()
-                ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
         $config->expects($this->once())
-                ->method('getConfiguration')
-                ->will($this->returnValue(array('option' => 'value')));
+            ->method('getConfiguration')
+            ->will($this->returnValue(array('option' => 'value')));
 
-        $engine->expects($this->once())
-                ->method('render')
-                ->with('template', array(
-                    'config' => array('option' => 'value'),
-                    'main' => null,
-                ))
-                ->will($this->returnValue('initialized'));
+        $helper = new RequireJSHelper($engine, $config, 'template', '');
 
-        $helper = new RequireJSHelper($engine, $config, 'template');
-        $this->assertEquals('initialized', $helper->initialize(), 'Incorrect initialization rendered');
+        $this->assertEquals(
+            'initialized',
+            $helper->initialize(),
+            'Incorrect initialization rendered'
+        );
     }
-    
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper::initialize
+     */
     public function testConfigurationSuppressed()
     {
-        $engine = $this->getMock('Symfony\Component\Templating\EngineInterface');
+        $engine = $this->getEngineMock(null, null);
+
         $config = $this->getMockBuilder('Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder')
                 ->disableOriginalConstructor()
                 ->getMock();
         $config->expects($this->never())
                 ->method('getConfiguration');
 
-        $engine->expects($this->once())
-                ->method('render')
-                ->with('template', array(
-                    'config' => null,
-                    'main' => null,
-                ))
-                ->will($this->returnValue('initialized'));
+        $helper = new RequireJSHelper($engine, $config, 'template', '');
 
-        $helper = new RequireJSHelper($engine, $config, 'template');
-        $this->assertEquals('initialized', $helper->initialize(array('configure' => false)), 'Incorrect initialization rendered');
+        $this->assertEquals(
+            'initialized',
+            $helper->initialize(array('configure' => false)),
+            'Incorrect initialization rendered'
+        );
     }
-    
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper::initialize
+     */
     public function testMainScriptIncluded()
     {
-        $engine = $this->getMock('Symfony\Component\Templating\EngineInterface');
+        $engine = $this->getEngineMock(array('option' => 'value'), 'module');
+
         $config = $this->getMockBuilder('Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder')
                 ->disableOriginalConstructor()
                 ->getMock();
@@ -86,16 +91,31 @@ class RequireJSHelperTest extends \PHPUnit_Framework_TestCase
                 ->method('getConfiguration')
                 ->will($this->returnValue(array('option' => 'value')));
 
-        $engine->expects($this->once())
-                ->method('render')
-                ->with('template', array(
-                    'config' => array('option' => 'value'),
-                    'main' => 'module',
-                ))
-                ->will($this->returnValue('initialized'));
+        $helper = new RequireJSHelper($engine, $config, 'template', '');
 
-        $helper = new RequireJSHelper($engine, $config, 'template');
-        $this->assertEquals('initialized', $helper->initialize(array('main' => 'module')), 'Incorrect initialization rendered');
+        $this->assertEquals(
+            'initialized',
+            $helper->initialize(array('main' => 'module')),
+            'Incorrect initialization rendered'
+        );
     }
 
+    /**
+     * @param  null|array  $config
+     * @param  null|string $main
+     * @return mixed
+     */
+    private function getEngineMock($config = null, $main = null)
+    {
+        $engine = $this->getMock('Symfony\Component\Templating\EngineInterface');
+        $engine->expects($this->once())
+            ->method('render')
+            ->with('template', array(
+                'config' => $config,
+                'main'   => $main,
+            ))
+            ->will($this->returnValue('initialized'));
+
+        return $engine;
+    }
 }

@@ -22,11 +22,12 @@
  * SOFTWARE.
  */
 
-namespace Hearsay\RequireJSBundle\Factory\Loader;
+namespace Hearsay\RequireJSBundle\Assetic\Factory\Loader;
 
-use Assetic\Factory\AssetFactory;
 use Assetic\Factory\Loader\FormulaLoaderInterface;
 use Assetic\Factory\Resource\ResourceInterface;
+use Assetic\Factory\AssetFactory;
+
 use Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface;
 
 /**
@@ -38,12 +39,12 @@ class ModuleFormulaLoader implements FormulaLoaderInterface
     /**
      * @var AssetFactory
      */
-    protected $factory = null;
+    protected $factory;
     
     /**
      * @var NamespaceMappingInterface
      */
-    protected $mapping = null;
+    protected $mapping;
     
     public function __construct(AssetFactory $factory, NamespaceMappingInterface $mapping)
     {
@@ -52,18 +53,25 @@ class ModuleFormulaLoader implements FormulaLoaderInterface
     }
     
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(ResourceInterface $resource)
     {
-        $formulae = array();
-        $tokens = preg_split("/\n+/", $resource->getContent());
-        foreach ($tokens as $token) {
-            if (is_file($token)) {
-                $name = $this->factory->generateAssetName($token, array());
-                $output = $this->mapping->getModulePath($token);
+        $formulae  = array();
+        $filenames = preg_split("/\n+/", $resource->getContent());
+
+        foreach ($filenames as $filename) {
+            if (is_file($filename)) {
+                $name   = $this->factory->generateAssetName($filename, array());
+                $output = $this->mapping->getModulePath($filename);
+
                 if ($output) {
-                    $formulae[$name] = array($token, array(), array('output' => $output));
+                    // @see \Assetic\Factory\AssetFactory::createAsset()
+                    $formulae[$name] = array(
+                        $filename,
+                        array(),
+                        array('output' => $output)
+                    );
                 }
             }
         }

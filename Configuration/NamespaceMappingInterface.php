@@ -24,6 +24,8 @@
 
 namespace Hearsay\RequireJSBundle\Configuration;
 
+use Hearsay\RequireJSBundle\Exception\PathNotFoundException;
+
 /**
  * Mapping of base file paths to Javascript module namespaces.
  * @author Kevin Montag <kevin@hearsay.it>
@@ -31,11 +33,22 @@ namespace Hearsay\RequireJSBundle\Configuration;
 interface NamespaceMappingInterface
 {
     /**
-     * Get the module path (e.g. 'namespace/module.js') corresponding to a
-     * filesystem path.
-     * @param string $filename The filesystem path.
-     * @return string|boolean The module path, or false if it cannot be
-     * determined.
+     * Registers a namespace to a filesystem path mapping
+     *
+     * @param string                 $namespace The namespace
+     * @param string                 $path      The path
+     * @throws PathNotFoundException            If the path was not found
+     */
+    public function registerNamespace($namespace, $path);
+
+    /**
+     * Gets the module path, e.g. `namespace/modules.js` corresponding to a
+     * filesystem path
+     *
+     * @param  string         $filename The filename
+     * @return boolean|string           Returns false on failure, e.g. if the
+     *                                  file does not exist or a string that
+     *                                  represents the module path
      */
     public function getModulePath($filename);
 }

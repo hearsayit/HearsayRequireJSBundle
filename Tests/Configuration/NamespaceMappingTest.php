@@ -32,36 +32,104 @@ use Hearsay\RequireJSBundle\Configuration\NamespaceMapping;
  */
 class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var NamespaceMapping
+     */
+    private $mapping;
 
-    public function testFilesConvertedToModules()
+    /**
+     * {@inheritDoc}
+     */
+    public function setUp()
     {
-        $mapping = new NamespaceMapping('js');
-        $mapping->registerNamespace(__DIR__ . '/dir', 'modules');
+        parent::setUp();
 
-        $this->assertEquals('js/modules/file.js', $mapping->getModulePath(__DIR__ . '/dir/file.js'), 'Incorrect file-to-module conversion');
+        $this->mapping = new NamespaceMapping('js');
     }
 
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::getModulePath
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::registerNamespace
+     */
+    public function testFilesConvertedToModules()
+    {
+        $this->mapping->registerNamespace('modules', __DIR__ . '/dir');
+
+        $this->assertEquals(
+            'js/modules/file.js',
+            $this->mapping->getModulePath(__DIR__ . '/dir/file.js'),
+            'Incorrect file-to-module conversion'
+        );
+    }
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::getModulePath
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::registerNamespace
+     */
     public function testExtraSlashesIgnored()
     {
         $mapping = new NamespaceMapping('js//');
-        $mapping->registerNamespace(__DIR__ . '/dir', '/modules/');
+        $mapping->registerNamespace('/modules/', __DIR__ . '/dir');
 
-        $this->assertEquals('js/modules/file.js', $mapping->getModulePath(__DIR__ . '/dir/file.js'), 'Incorrect file-to-module conversion');
+        $this->assertEquals(
+            'js/modules/file.js',
+            $mapping->getModulePath(__DIR__ . '/dir/file.js'),
+            'Incorrect file-to-module conversion'
+        );
     }
-    
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::getModulePath
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::registerNamespace
+     */
     public function testRelativePathsReduced()
     {
-        $mapping = new NamespaceMapping('js');
-        $mapping->registerNamespace(__DIR__ . '/dir/../dir', 'modules');
+        $this->mapping->registerNamespace('modules', __DIR__ . '/dir/../dir');
 
-        $this->assertEquals('js/modules/file.js', $mapping->getModulePath(__DIR__ . '/../Configuration/dir/file.js'), 'Incorrect file-to-module conversion');
+        $this->assertEquals(
+            'js/modules/file.js',
+            $this->mapping->getModulePath(__DIR__ . '/../Configuration/dir/file.js'),
+            'Incorrect file-to-module conversion'
+        );
     }
-    
-    public function testNonexistentNamespaceReturnsFalse()
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::getModulePath
+     */
+    public function testNonExistentNamespaceReturnsFalse()
     {
-        $mapping = new NamespaceMapping('js');
-
-        $this->assertFalse($mapping->getModulePath(__DIR__ . '/dir/file.js'), 'Non-existent module expected not to be converted');
+        $this->assertFalse(
+            $this->mapping->getModulePath(__DIR__ . '/dir/file.js'),
+            'Non-existent module expected not to be converted'
+        );
     }
 
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::getModulePath
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::registerNamespace
+     */
+    public function testNonExistentModulePathThrowsException()
+    {
+        $this->setExpectedException(
+            'Hearsay\RequireJSBundle\Exception\PathNotFoundException',
+            ''
+        );
+
+        $this->mapping->registerNamespace('dir', 'root');
+    }
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::getModulePath
+     * @covers Hearsay\RequireJSBundle\Configuration\NamespaceMapping::registerNamespace
+     */
+    public function testFilesRenamedToJs()
+    {
+        $this->mapping->registerNamespace('modules', __DIR__ . '/dir');
+
+        $this->assertEquals(
+            'js/modules/file2.js',
+            $this->mapping->getModulePath(__DIR__ . '/dir/file2.coffee'),
+            'Incorrect file-to-module conversion'
+        );
+    }
 }

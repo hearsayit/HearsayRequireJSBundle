@@ -24,11 +24,13 @@
 
 namespace Hearsay\RequireJSBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+
+use Hearsay\RequireJSBundle\Exception\InvalidArgumentException;
 
 /**
  * Bundle setup.
@@ -36,7 +38,6 @@ use Symfony\Component\DependencyInjection\Loader;
  */
 class HearsayRequireJSExtension extends Extension
 {
-
     /**
      * {@inheritDoc}
      */
@@ -45,52 +46,66 @@ class HearsayRequireJSExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new Loader\YamlFileLoader(
+            $container,
+            new FileLocator(__DIR__ . '/../Resources/config')
+        );
         $loader->load('services.yml');
 
-        $container->setParameter('hearsay_require_js.base_url', $config['base_url']);
-        $container->setParameter('hearsay_require_js.base_directory', $this->getRealPath($config['base_directory'], $container));
-
         $container->setParameter('hearsay_require_js.require_js_src', $config['require_js_src']);
-
         $container->setParameter('hearsay_require_js.initialize_template', $config['initialize_template']);
+        $container->setParameter('hearsay_require_js.base_url', $config['base_url']);
+        $container->setParameter('hearsay_require_js.base_dir', $this->getRealPath($config['base_dir'], $container));
 
-        $hide_unoptimized_assets = false;
-        if (isset($config['optimizer'])) {
-            // Check whether the optimizer should suppress unoptimized files
-            $hide_unoptimized_assets = $config['optimizer']['hide_unoptimized_assets'];
+        // Add the base directory as an empty namespace
+        $config['paths'][''] = array(
+            'location' => $config['base_dir'],
+            'external' => false,
+        );
 
-            // Set optimizer options
-            $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
-            $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
+        $hideUnoptimizedAssets = !isset($config['optimizer']['hide_unoptimized_assets'])
+            ? false
+            : $config['optimizer']['hide_unoptimized_assets'];
 
-            if (isset($config['optimizer']['build_profile'])) {
-                $buildProfile = $this->getRealPath($config['optimizer']['build_profile'], $container);
-                $filter->addMethodCall('setBuildProfile', array($buildProfile));
+        foreach ($config['paths'] as $path => $settings) {
+            $location = $settings['location'];
+
+            if ($settings['external']) {
+                $this->addExternalNamespaceMapping($location, $path, $container);
+            } else {
+                is_array($location) && $location = array_shift($location);
+
+                $this->addNamespaceMapping($location, $path, $container, !$hideUnoptimizedAssets);
             }
-            foreach ($config['optimizer']['excludes'] as $exclude) {
+        }
+
+        $container->setParameter('hearsay_require_js.shim', $config['shim']);
+
+        $configurationBuilder = $container
+            ->getDefinition('hearsay_require_js.configuration_builder');
+
+        foreach ($config['options'] as $option => $settings) {
+            $configurationBuilder->addMethodCall('addOption', array($option, $settings['value']));
+        }
+
+        if (!isset($config['optimizer'])) {
+            // If the r.js optimizer config isn't provided, don't provide the Assetic filter
+            $container->removeDefinition('hearsay_require_js.optimizer_filter');
+        } else {
+            $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
+
+            $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
+            $filter->addMethodCall('setShim', array($config['shim']));
+            $filter->addMethodCall('setTimeout', array($config['optimizer']['timeout']));
+
+            foreach ($config['optimizer']['exclude'] as $exclude) {
                 $filter->addMethodCall('addExclude', array($exclude));
             }
+
             foreach ($config['optimizer']['options'] as $name => $settings) {
-                $value = $settings['value'];
-                $filter->addMethodCall('setOption', array($name, $value));
-            }
-        } else {
-            // If the optimizer config isn't provided, don't provide the filter
-            $container->removeDefinition('hearsay_require_js.optimizer_filter');
-        }
-
-        // Add the configured namespaces
-        foreach ($config['paths'] as $path => $settings) {
-            if ($settings['external']) {
-                $this->addExternalNamespaceMapping($settings['location'], $path, $container);
-            } else {
-                $this->addNamespaceMapping($settings['location'], $path, $container, !$hide_unoptimized_assets);
+                $filter->addMethodCall('addOption', array($name, $settings['value']));
             }
         }
-
-        // Add root directory with an empty namespace
-        $this->addNamespaceMapping($config['base_directory'], '', $container, !$hide_unoptimized_assets);
     }
 
     /**
@@ -106,15 +121,17 @@ class HearsayRequireJSExtension extends Extension
 
         // Register the namespace with the configuration
         $mapping = $container->getDefinition('hearsay_require_js.namespace_mapping');
-        $mapping->addMethodCall('registerNamespace', array($location, $path, is_dir($location)));
+        $mapping->addMethodCall('registerNamespace', array($path, $location));
 
-        // And with the optimizer filter
+        $config = $container->getDefinition('hearsay_require_js.configuration_builder');
+        $config->addMethodCall('setPath', array($path, $location));
+
         if ($path && $container->hasDefinition('hearsay_require_js.optimizer_filter')) {
-            $container->getDefinition('hearsay_require_js.optimizer_filter')->addMethodCall('setOption', array('paths.' . $path, $location));
+            $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
+            $filter->addMethodCall('addPath', array($path, preg_replace('~\.js$~', '', $location)));
         }
 
         if ($generateAssets) {
-            // Create the assetic resource
             $resource = new DefinitionDecorator('hearsay_require_js.filenames_resource');
             $resource->setArguments(array($location));
             $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
@@ -151,10 +168,10 @@ class HearsayRequireJSExtension extends Extension
     {
         // Expand bundle notation (snagged from the Assetic bundle)
         if ($path[0] == '@' && strpos($path, '/') !== false) {
-
             // Extract the bundle name and the directory within the bundle
             $bundle = substr($path, 1);
             $directory = '';
+
             if (($pos = strpos($bundle, '/')) !== false) {
                 $directory = substr($bundle, $pos);
                 $bundle = substr($bundle, 0, $pos);
@@ -168,11 +185,14 @@ class HearsayRequireJSExtension extends Extension
                 $rc = new \ReflectionClass($bundles[$bundle]);
                 $path = dirname($rc->getFileName()) . $directory;
             } else {
-                throw new \InvalidArgumentException(sprintf('Unrecognized bundle: "%s"', $bundle));
+                throw new InvalidArgumentException(sprintf('Unrecognized bundle: "%s"', $bundle));
             }
+        }
+
+        if (is_file($path . '.js')) {
+            $path .= '.js';
         }
 
         return $path;
     }
-
 }

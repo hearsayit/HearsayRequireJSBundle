@@ -24,8 +24,10 @@
 
 namespace Hearsay\RequireJSBundle\Twig\Extension;
 
-use Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder;
+use Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper;
 
 /**
  * Twig extension providing RequireJS functionality.
@@ -33,81 +35,63 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class RequireJSExtension extends \Twig_Extension
 {
+    /**
+     * @var ConfigurationBuilder
+     */
+    protected $configurationBuilder;
 
     /**
      * @var ContainerInterface
      */
-    protected $container = null;
-    /**
-     * @var ConfigurationBuilder
-     */
-    protected $configurationBuilder = null;
-    /**
-     * @var string
-     */
-    protected $requireJsSrc = null;
+    protected $container;
 
     /**
-     * Standard constructor.
-     * @param ContainerInterface $container Container to get the templating
-     * helper.
-     * @param ConfigurationBuilder $configurationBuilder For generating the
-     * initial Javascript config array.
-     * @param string $requireJsSrc Default URL to use for loading RequireJS.
+     * The constructor method
+     *
+     * @param ContainerInterface   $container
+     * @param ConfigurationBuilder $configurationBuilder
      */
-    public function __construct(ContainerInterface $container, ConfigurationBuilder $configurationBuilder, $requireJsSrc)
-    {
-        $this->container = $container;
+    public function __construct(
+        ContainerInterface $container,
+        ConfigurationBuilder $configurationBuilder
+    ) {
+        $this->container            = $container;
         $this->configurationBuilder = $configurationBuilder;
-        $this->requireJsSrc = $requireJsSrc;
     }
 
     /**
-     * Get the templating helper to delegate actual work.
-     * @return RequireJSHelper
-     */
-    protected function getHelper()
-    {
-        return $this->container->get('hearsay_require_js.helper');
-    }
-
-    /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getFunctions()
     {
         return array(
-            'require_js_initialize' => new \Twig_Function_Method($this, 'renderInitialize', array('is_safe' => array('html'))),
+            'require_js_initialize' => new \Twig_Function_Method(
+                $this,
+                'initialize',
+                array('is_safe' => array('html'))
+            ),
+            'require_js_src'        => new \Twig_Function_Method($this, 'src'),
         );
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getGlobals()
     {
+        if (!$this->container->isScopeActive('request')) {
+            return array();
+        }
+        
         return array(
             'require_js' => array(
                 'config' => $this->configurationBuilder->getConfiguration(),
-                'src' => $this->requireJsSrc,
             ),
         );
     }
 
     /**
-     * Render the RequireJS initialization markup.  Options are as specified in
-     * the helper documentation.
-     * @see Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper
-     * @param array $options Initialization options.
-     * @return string
-     */
-    public function renderInitialize(array $options = array())
-    {
-        return $this->getHelper()->initialize($options);
-    }
-
-    /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @codeCoverageIgnore
      */
     public function getName()
@@ -115,4 +99,27 @@ class RequireJSExtension extends \Twig_Extension
         return 'require_js';
     }
 
+    /**
+     * @see Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper::initialize()
+     */
+    public function initialize(array $options = array())
+    {
+        return $this->getHelper()->initialize($options);
+    }
+
+    /**
+     * @see Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper::src()
+     */
+    public function src()
+    {
+        return $this->getHelper()->src();
+    }
+
+    /**
+     * @return RequireJSHelper
+     */
+    protected function getHelper()
+    {
+        return $this->container->get('hearsay_require_js.templating_helper');
+    }
 }
