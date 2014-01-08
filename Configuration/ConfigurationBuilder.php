@@ -178,7 +178,7 @@ class ConfigurationBuilder
             $baseUrl = $this->container->get('request')->getBaseUrl();
         }
 
-        if ($assetHelper = $this->container->get('templating.helper.assets')) {
+        if ($assetHelper = $this->container->get('templating.helper.assets', ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
             $baseUrl = $assetHelper->getUrl('');
 
             // Remove ?version from the end of the base URL
