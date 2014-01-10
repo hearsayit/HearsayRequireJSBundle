@@ -71,9 +71,6 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->container->addScope($requestScope);
         $this->container->enterScope('request');
 
-        // Assets Twig function only available in request scope, so mock it out
-        $this->setAssetsHelperMock('base');
-
         $request = $this
             ->getMock('Symfony\Component\HttpFoundation\Request');
         $request
@@ -107,6 +104,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getBaseUrl
      */
     public function testBaseUrlSlashesTrimmed()
     {
@@ -142,6 +140,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getBaseUrl
      */
     public function testRootUrlIgnoredIfAppropriate()
     {
@@ -149,9 +148,6 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->container->addScope($requestScope);
         $this->container->enterScope('request');
-
-        // Assets Twig function only available in request scope, so mock it out
-        $this->setAssetsHelperMock('/js');
 
         $request = $this
             ->getMock('Symfony\Component\HttpFoundation\Request');
@@ -202,6 +198,45 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             $expected,
             $config['paths'],
             'Did not find expected paths configuration'
+        );
+    }
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getBaseUrl
+     */
+    public function testAssetsBaseUrlUsed()
+    {
+        $requestScope = new Scope('request');
+
+        $this->container->addScope($requestScope);
+        $this->container->enterScope('request');
+
+        // Assets Twig function only available in request scope, so mock it out
+        $this->setAssetsHelperMock('/assets/?1234');
+
+        $request = $this
+            ->getMock('Symfony\Component\HttpFoundation\Request');
+        $request
+            ->expects($this->any())
+            ->method('getBaseUrl')
+            ->will($this->returnValue('/base'));
+
+        $this->container->set('request', $request);
+
+        $mapping = $this
+            ->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
+
+        $this->container->setParameter('assetic.use_controller', false);
+
+        $builder = new ConfigurationBuilder($this->container, $mapping, '/js');
+        $config  = $builder->getConfiguration();
+
+        $this->assertEquals(
+            '/assets/js',
+            $config['baseUrl'],
+            'Assets base URL not used correctly'
         );
     }
 
