@@ -178,21 +178,18 @@ class ConfigurationBuilder
             $baseUrl = $this->container->get('request')->getBaseUrl();
         }
 
-        if ($assetHelper = $this->container->get('templating.helper.assets', ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+        $assetHelper = $this->container->get('templating.helper.assets', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        if ($assetHelper) {
             $baseUrl = $assetHelper->getUrl('');
 
             // Remove ?version from the end of the base URL
-            if (($pos = strpos($baseUrl, '?')) !== false) {
-                $baseUrl = substr($baseUrl, 0, $pos);
+            if (($pos = \strpos($baseUrl, '?')) !== false) {
+                $baseUrl = \substr($baseUrl, 0, $pos);
             }
         }
 
         // Remove trailing slash, if there is one
-        if (substr($baseUrl, -1, 1) === '/') {
-            $baseUrl = substr($baseUrl, 0, -1);
-        }
-
-        return $baseUrl;
+        return \rtrim($baseUrl, '/');
     }
 
     /**
