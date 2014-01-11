@@ -50,7 +50,7 @@ class RJsFilterTest extends \PHPUnit_Framework_TestCase
 
         $nodePath = $this->getNodePath();
 
-        $this->filter = new RJsFilter($nodePath, __DIR__ . '/r.js', __DIR__);
+        $this->filter = new RJsFilter($nodePath, __DIR__ . '/../../../r.js', __DIR__);
         $this->filter->addNodePath($nodePath);
     }
 

@@ -301,7 +301,8 @@ not in production.
 ## Testing
 
 ```sh
-$ phpunit
+$ wget https://raw.github.com/jrburke/r.js/2.1.8/dist/r.js
+$ phpunit --coverage-text
 ```
 
 ## Contributing
