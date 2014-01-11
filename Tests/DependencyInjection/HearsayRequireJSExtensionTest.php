@@ -254,8 +254,8 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             '/home/user/path',
         );
 
-            $this->assertTrue($container->hasDefinition('hearsay_require_js.filenames_resource.' . md5($path)));
         foreach ($paths as $path) {
+            $this->assertTrue($container->hasDefinition('hearsay_require_js.filenames_resource.' . md5($path)));
         }
     }
 
