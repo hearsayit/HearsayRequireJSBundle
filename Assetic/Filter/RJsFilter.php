@@ -122,7 +122,8 @@ class RJsFilter extends BaseNodeFilter
      */
     public function filterDump(AssetInterface $asset)
     {
-        $pb = $this->createProcessBuilder($this->nodePath
+        $pb = $this->createProcessBuilder(
+            $this->nodePath
             ? array($this->nodePath, $this->rPath)
             : array($this->rPath)
         );
