@@ -92,7 +92,7 @@ class ConfigurationBuilder
     ) {
         $this->container = $container;
         $this->mapping   = $mapping;
-        $this->baseUrl   = \ltrim($baseUrl, '/');
+        $this->baseUrl   = ltrim($baseUrl, '/');
         $this->shim      = $shim;
     }
 
@@ -173,22 +173,16 @@ class ConfigurationBuilder
     {
         $baseUrl = '';
 
-        if ($this->container->getParameter('assetic.use_controller')
-            && $this->container->isScopeActive('request')) {
-            $baseUrl = $this->container->get('request')->getBaseUrl();
-        }
+        if ($this->container->isScopeActive('request')) {
+            if ($this->container->getParameter('assetic.use_controller')) {
+                $baseUrl = $this->container->get('request')->getBaseUrl();
+            } else {
+                $baseUrl = $this->container->get('templating.helper.assets')->getUrl('');
 
-        $assetHelper = $this->container->get(
-            'templating.helper.assets',
-            ContainerInterface::NULL_ON_INVALID_REFERENCE
-        );
-
-        if ($assetHelper) {
-            $baseUrl = $assetHelper->getUrl('');
-
-            // Remove ?version from the end of the base URL
-            if (($pos = strpos($baseUrl, '?')) !== false) {
-                $baseUrl = substr($baseUrl, 0, $pos);
+                // Remove ?version from the end of the base URL
+                if (($pos = strpos($baseUrl, '?')) !== false) {
+                    $baseUrl = substr($baseUrl, 0, $pos);
+                }
             }
         }
 

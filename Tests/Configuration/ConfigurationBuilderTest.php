@@ -75,7 +75,6 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->container->setParameter('assetic.use_controller', true);
 
         $builder = new ConfigurationBuilder($this->container, $mapping, 'js');
-
         $builder->addOption('option', 'value');
 
         $expected = array(
@@ -93,8 +92,8 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
-     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getBaseUrl
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
      */
     public function testBaseUrlSlashesTrimmed()
     {
@@ -116,14 +115,15 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
-     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getBaseUrl
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
      */
-    public function testRootUrlIgnoredIfAppropriate()
+    public function testBaseUrlIgnoredIfAppropriate()
     {
         $mapping = $this
             ->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
 
+        $this->setAssetsHelperMock(null);
         $this->container->setParameter('assetic.use_controller', false);
 
         $builder = new ConfigurationBuilder($this->container, $mapping, '/js');
@@ -148,11 +148,9 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->container->leaveScope('request');
         $this->container->setParameter('assetic.use_controller', false);
-        $this->setAssetsHelperMock('base');
 
         $builder = new ConfigurationBuilder($this->container, $mapping, 'js');
         $builder->setPath('namespace', '/path/to/namespace');
-
         $config = $builder->getConfiguration();
 
         $expected = array(
@@ -168,16 +166,16 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
-     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getBaseUrl
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
      */
     public function testAssetsBaseUrlUsed()
     {
-        $this->setRequestMock('/base');
-        $this->setAssetsHelperMock('/assets/?1234');
         $mapping = $this
             ->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
 
+        $this->setRequestMock('/base');
+        $this->setAssetsHelperMock('/assets/?123');
         $this->container->setParameter('assetic.use_controller', false);
 
         $builder = new ConfigurationBuilder($this->container, $mapping, '/js');
@@ -202,9 +200,10 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $assetsHelper
             ->expects($this->any())
             ->method('getUrl')
+            ->with($this->equalTo(''))
             ->will($this->returnValue($filename));
 
-        $this->container->set('templating.helper.assets', $assetsHelper);
+        $this->container->set('templating.helper.assets', $assetsHelper, 'request');
     }
 
     /**
