@@ -105,6 +105,12 @@ class HearsayRequireJSExtension extends Extension
             foreach ($config['optimizer']['options'] as $name => $settings) {
                 $filter->addMethodCall('addOption', array($name, $settings['value']));
             }
+
+            // almond
+            if (isset($config['optimizer']['almond_path'])) {
+                $filter->addMethodCall('setAlmondPath', array($config['optimizer']['almond_path']));
+                $configurationBuilder->addMethodCall('useAlmond', array(true));
+            }
         }
     }
 

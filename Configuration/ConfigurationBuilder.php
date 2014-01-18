@@ -75,6 +75,11 @@ class ConfigurationBuilder
     protected $shim  = array();
 
     /**
+     * @var boolean
+     */
+    protected $useAlmond = false;
+
+    /**
      * The constructor method
      *
      * @param ContainerInterface        $container
@@ -118,6 +123,13 @@ class ConfigurationBuilder
             'baseUrl' => $this->getScriptUrl(),
             'locale'  => $this->container->get('translator')->getLocale(),
         );
+
+        // almond
+        if (!$this->container->getParameter('kernel.debug')
+            && $this->useAlmond) {
+
+            $config['almond'] = true;
+        }
 
         if ($this->paths) {
             $config['paths'] = $this->paths;
@@ -198,5 +210,10 @@ class ConfigurationBuilder
     protected function getScriptUrl()
     {
         return $this->getBaseUrl() . '/' . $this->baseUrl;
+    }
+
+    public function useAlmond($bool)
+    {
+        $this->useAlmond = (bool) $bool;
     }
 }

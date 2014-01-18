@@ -144,6 +144,10 @@ class Configuration implements ConfigurationInterface
                                 ->prototype('scalar')
                                 ->end()
                             ->end()
+                            // almond
+                            ->scalarNode('almond_path')
+                                ->defaultNull()
+                            ->end()
                             ->arrayNode('options')
                                 ->defaultValue(array())
                                 ->useAttributeAsKey('name')

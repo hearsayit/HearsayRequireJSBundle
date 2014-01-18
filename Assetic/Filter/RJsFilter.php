@@ -96,6 +96,11 @@ class RJsFilter extends BaseNodeFilter
     protected $shim = array();
 
     /**
+     * The relative path to almond.js
+     */
+    protected $almondPath;
+
+    /**
      * The constructor method
      *
      * @param string $nodePath The absolute path to the node.js
@@ -244,6 +249,20 @@ class RJsFilter extends BaseNodeFilter
             'out'     => $output,
         );
 
+        // The almond build profile
+        if ($this->almondPath) {
+            $realAlmondPath = $this->baseUrl . '/' . ltrim($this->almondPath, '/') . '.js';
+
+            if (!file_exists($realAlmondPath)) {
+                throw new RuntimeException('Path to almond could not be resolved.');
+            }
+
+            $content->name          = $this->almondPath;
+            $content->include       = array($name);
+            $content->insertRequire = array($name);
+            $content->wrap          = true;
+        }
+
         // @link http://requirejs.org/docs/optimization.html#empty
         foreach ($this->external as $external) {
             $content->paths->$external = 'empty:';
@@ -277,5 +296,10 @@ class RJsFilter extends BaseNodeFilter
         file_put_contents($buildProfile, '(' . json_encode($content) . ')');
 
         return $buildProfile;
+    }
+
+    public function setAlmondPath($almondPath)
+    {
+        $this->almondPath = $almondPath;
     }
 }
