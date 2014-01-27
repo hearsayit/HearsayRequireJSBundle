@@ -77,6 +77,13 @@ class RJsFilter extends BaseNodeFilter
     protected $rPath;
 
     /**
+     * The relative path to almond.js
+     *
+     * @var string
+     */
+    protected $almondPath;
+
+    /**
      * The shim config
      *
      * @var array
@@ -164,6 +171,16 @@ class RJsFilter extends BaseNodeFilter
 
         unlink($output);
         unlink($buildProfile);
+    }
+
+    /**
+     * Sets the almod relative path
+     *
+     * @param string $almondPath The almod relative path
+     */
+    public function setAlmondPath($almondPath)
+    {
+        $this->almondPath = $almondPath;
     }
 
     /**
@@ -290,6 +307,15 @@ class RJsFilter extends BaseNodeFilter
             }
 
             $content->$option = $value;
+        }
+
+        // Override the built profile content for almond optimization
+        if ($this->almondPath) {
+            $content->name          = $this->almondPath;
+            $content->include       = $name;
+            // @link http://requirejs.org/docs/api.html
+            // That serves the same purpose of the initial require() call that data-main does
+            $content->insertRequire = array($name);
         }
 
         file_put_contents($buildProfile, '(' . json_encode($content) . ')');

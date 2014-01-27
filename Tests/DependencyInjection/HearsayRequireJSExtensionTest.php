@@ -335,6 +335,53 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(array($config), $container);
     }
 
+    public function testOptimizerWithNoAlmondPath()
+    {
+        $config = array(
+            'base_dir'  => '/home/user/base',
+            'optimizer' => array(
+                'path' => '/path/to/r.js',
+            ),
+        );
+
+        $container = $this->getContainerBuilder();
+
+        $this->extension->load(array($config), $container);
+
+        $filter  = $container->getDefinition('hearsay_require_js.optimizer_filter');
+        $methods = $filter->getMethodCalls();
+
+        $this->assertNotContains(
+            array('setAlmondPath', array()),
+            $methods,
+            'Did find expected method call'
+        );
+    }
+
+    public function testOptimizerWithAlmondPath()
+    {
+        $config = array(
+            'base_dir'    => '/home/user/base',
+            'almond_path' => '/path/to/almond.js',
+            'optimizer' => array(
+                'path' => '/path/to/r.js',
+            ),
+        );
+
+        $container = $this->getContainerBuilder();
+
+        $this->extension->load(array($config), $container);
+
+        $filter  = $container->getDefinition('hearsay_require_js.optimizer_filter');
+        $methods = $filter->getMethodCalls();
+
+        $this->assertContains(
+            array('setAlmondPath', array('../../path/to/almond')),
+            $methods,
+            'Did not find expected method call'
+        );
+    }
+
     /**
      * @return ContainerBuilder
      */
