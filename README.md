@@ -166,7 +166,7 @@ An array of module names to exclude from the build profile.
 This is a prototype that represents an array of modules options for r.js optimizer.
 Each array must contain name of the module and could contain include and exclude options
 that explicitly includes / excludes defined dependencies
-See [multipage module cofig][7] for more details.
+See [multipage module config][7] for more details.
 
 ##### *options* #####
 
@@ -343,7 +343,7 @@ bundle:
 [4]: http://requirejs.org/docs/api.html#pathsfallbacks
 [5]: http://requirejs.org/docs/optimization.html#empty
 [6]: http://requirejs.org/docs/api.html#config-shim
-[7]: http://http://requirejs.org/docs/optimization.html#wholemultipage
+[7]: http://requirejs.org/docs/optimization.html#wholemultipage
 [8]: https://github.com/kriswallsmith/assetic
 [9]: https://github.com/hearsayit/HearsayRequireJSBundle/blob/master/CONTRIBUTING.md
 [10]: https://github.com/kmontag
