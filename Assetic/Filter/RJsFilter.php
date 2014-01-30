@@ -28,6 +28,7 @@ use Assetic\Asset\AssetInterface;
 use Assetic\Exception\FilterException;
 use Assetic\Filter\BaseNodeFilter;
 
+use Hearsay\RequireJSBundle\Exception\InvalidArgumentException;
 use Hearsay\RequireJSBundle\Exception\RuntimeException;
 
 /**
@@ -96,6 +97,13 @@ class RJsFilter extends BaseNodeFilter
     protected $shim = array();
 
     /**
+     * Modules to load
+     *
+     * @var array
+     */
+    protected $modules = array();
+
+    /**
      * The constructor method
      *
      * @param string $nodePath The absolute path to the node.js
@@ -134,7 +142,7 @@ class RJsFilter extends BaseNodeFilter
 
         file_put_contents($input . '.js', $asset->getContent());
 
-        $buildProfile = $this->makeBuildProfile($input, $output);
+        $buildProfile = $this->makeBuildProfile($input, $output, $this->getModuleName($asset));
 
         $pb->add('-o')->add($buildProfile);
 
@@ -214,6 +222,24 @@ class RJsFilter extends BaseNodeFilter
     }
 
     /**
+     * Adds a module information
+     *
+     * @param string $name module name
+     * @param array $module Module information
+     *
+     * @throws InvalidArgumentException in case of attempt to add module info twice
+     *
+     * @return void
+     */
+    public function addModule($name, array $module)
+    {
+        if (array_key_exists($name, $this->modules)) {
+            throw new InvalidArgumentException("Cannot handle $name module twice");
+        }
+        $this->modules[$name] = $module;
+    }
+
+    /**
      * Sets the shim config
      *
      * @param array $shim The shim config
@@ -226,11 +252,13 @@ class RJsFilter extends BaseNodeFilter
     /**
      * Makes the build profile's file
      *
-     * @param  string $input  The input file
+     * @param  string $input The input file
      * @param  string $output The output file
-     * @return string         Returns the build profile's file name
+     * @param  string $module current r.js module
+     *
+     * @return string Returns the build profile's file name
      */
-    protected function makeBuildProfile($input, $output)
+    protected function makeBuildProfile($input, $output, $module)
     {
         $buildProfile = tempnam(sys_get_temp_dir(), 'build_profile') . '.js';
 
@@ -262,8 +290,15 @@ class RJsFilter extends BaseNodeFilter
 
         unset($shim);
 
-        $content->shim    = (object) $this->shim;
-        $content->exclude = $this->exclude;
+        $content->shim = (object) $this->shim;
+
+        $includes     = $this->getModuleIncludes($module);
+        $excludedDeps = $this->getExcludedDependencies($module);
+        // merge optimizer excludes with global ones
+        $exclude = array_merge($this->exclude, $excludedDeps);
+
+        $content->exclude = $exclude;
+        $content->include = $includes;
 
         foreach ($this->options as $option => $value) {
             // @link https://github.com/jrburke/requirejs/wiki/Upgrading-to-RequireJS-2.0#wiki-delayed
@@ -277,5 +312,61 @@ class RJsFilter extends BaseNodeFilter
         file_put_contents($buildProfile, '(' . json_encode($content) . ')');
 
         return $buildProfile;
+    }
+
+    /**
+     * Get the list of the dependencies of any excluded modules for a given one.
+     *
+     * @param string $module current module name
+     *
+     * @return array modules to exclude
+     */
+    private function getExcludedDependencies($module)
+    {
+        // Find excluded modules
+        $excludedModules = array();
+        if (isset($this->modules[$module]) && isset($this->modules[$module]["exclude"])) {
+            $excludedModules = $this->modules[$module]["exclude"];
+        }
+
+        // Find dependencies of excluded modules
+        $excludedDebs = array();
+        foreach ($excludedModules as $exclude) {
+            if (isset($this->modules[$exclude]) && isset($this->modules[$exclude]['include'])) {
+                $excludedDebs = array_merge($excludedDebs, $this->modules[$exclude]['include']);
+            }
+        }
+
+        return array_merge($excludedModules, $excludedDebs);
+    }
+
+    /**
+     * Get the list of included modules for a given one.
+     *
+     * @param string $module module name
+     *
+     * @return array Included modules
+     */
+    private function getModuleIncludes($module)
+    {
+        $includes = array();
+        if (isset($this->modules[$module]) && isset($this->modules[$module]["include"])) {
+            $includes = $this->modules[$module]["include"];
+        }
+        return $includes;
+    }
+
+    /**
+     * Returns r.js module name for current asset
+     *
+     * @param AssetInterface $asset current asset
+     *
+     * @return string
+     */
+    private function getModuleName(AssetInterface $asset)
+    {
+        $full_path = $asset->getSourceRoot() .'/'. $asset->getSourcePath();
+        $rel_path  = str_replace($this->baseUrl.'/', '', $full_path);
+        return substr_replace($rel_path, '', strpos($rel_path, '.js'), 3);
     }
 }

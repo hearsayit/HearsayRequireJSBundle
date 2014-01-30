@@ -68,6 +68,7 @@ more.
     * [path](#path)
     * [hide_unoptimized_assets](#hide_unoptimized_assets)
     * [exclude](#exclude)
+    * [modules](#modules)
     * [options](#options)
     * [timeout](#timeout)
 
@@ -158,6 +159,15 @@ This determines whether the r.js optimizer should suppress unoptimized files.
 
 An array of module names to exclude from the build profile.
 
+#### *modules* ####
+
+**type**: array **default**: null
+
+This is a prototype that represents an array of modules options for r.js optimizer.
+Each array must contain name of the module and could contain include and exclude options
+that explicitly includes / excludes defined dependencies
+See [multipage module cofig][7] for more details.
+
 ##### *options* #####
 
 **type**: array **default**: null
@@ -197,6 +207,11 @@ hearsay_require_js:
         path:                    ~ # Required
         hide_unoptimized_assets: false
         exclude:                 []
+        modules:
+            # Prototype
+            name:
+                include: ~
+                exclude: ~
         options:
             # Prototype
             name:
@@ -249,7 +264,7 @@ To use this bundle with CoffeeScript, you can specify a path that contains
 scripts.
 
 >Note that the `r.js` optimizer cannot optimize `.coffee` scripts. However, you
->can apply the [Assetic][7] filter to this scripts by the file extension.
+>can apply the [Assetic][8] filter to this scripts by the file extension.
 
 ### Optimization ###
 
@@ -308,12 +323,12 @@ $ php vendor/bin/phpunit --coverage-text
 
 ## Contributing
 
-Please see [CONTRIBUTING][8] for details.
+Please see [CONTRIBUTING][9] for details.
 
 ## Credits
 
-- [Kevin Montag][9]
-- [All Contributors][10]
+- [Kevin Montag][10]
+- [All Contributors][11]
 
 ## License ##
 
@@ -328,8 +343,9 @@ bundle:
 [4]: http://requirejs.org/docs/api.html#pathsfallbacks
 [5]: http://requirejs.org/docs/optimization.html#empty
 [6]: http://requirejs.org/docs/api.html#config-shim
-[7]: https://github.com/kriswallsmith/assetic
-[8]: https://github.com/hearsayit/HearsayRequireJSBundle/blob/master/CONTRIBUTING.md
-[9]: https://github.com/kmontag
-[10]: https://github.com/hearsayit/HearsayRequireJSBundle/graphs/contributors
+[7]: http://http://requirejs.org/docs/optimization.html#wholemultipage
+[8]: https://github.com/kriswallsmith/assetic
+[9]: https://github.com/hearsayit/HearsayRequireJSBundle/blob/master/CONTRIBUTING.md
+[10]: https://github.com/kmontag
+[11]: https://github.com/hearsayit/HearsayRequireJSBundle/graphs/contributors
 
