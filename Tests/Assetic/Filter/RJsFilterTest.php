@@ -24,6 +24,7 @@
 
 namespace Hearsay\RequireJSBundle\Tests\Filter;
 
+use Assetic\Asset\FileAsset;
 use Symfony\Component\Process\ExecutableFinder;
 
 use Assetic\Asset\StringAsset;
@@ -173,6 +174,59 @@ JS;
             '",function(){});',
             substr($content, 112),
             'Unexpected output for external dependencies'
+        );
+    }
+
+    /**
+     * Tests that optimizer correctly handles module includes
+     *
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::filterDump
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addModule
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addOption
+     */
+    public function testOptimizerInclusionsIncluded()
+    {
+        $this->filter->addOption('preserveLicenseComments', false);
+        $this->filter->addOption('skipModuleInsertion', true);
+
+        // registering optimizer modules config
+        $this->filter->addModule("modules/module2", array("include" => array("modules/module")));
+
+        $asset = new FileAsset(__DIR__ . '/modules/module2.js');
+        $asset->ensureFilter($this->filter);
+
+        // expecting result contains both module and module2 although module 2 doesn't depend on module
+        $this->assertRegExp(
+            '/^define\(".{32}",\{js:"got it twice"\}\),define\("modules\/module",\{js:"got it"\}\);$/',
+            $asset->dump(),
+            'Defined exclusions excluded incorrectly'
+        );
+    }
+
+    /**
+     * Tests that optimizer correctly excludes exclude-modules (configured in optimizer options for current module)
+     * and their includes
+     *
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::filterDump
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addModule
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addOption
+     */
+    public function testOptimizerExclusionsDepsExcluded()
+    {
+        $this->filter->addOption('preserveLicenseComments', false);
+
+        // registering optimizer modules config
+        $this->filter->addModule("modules/module2", array("include" => array("modules/module")));
+        $this->filter->addModule("modules/module3", array("exclude" => array("modules/module2")));
+
+        $asset = new FileAsset(__DIR__ . '/modules/module3.js');
+        $asset->ensureFilter($this->filter);
+
+        // expecting result contains only content of module3 although module3 depends on module2 and module
+        $this->assertRegExp(
+            '/^require\(\["modules\/module2","modules\/module"\],function\(e,t\)\{return console\.log\(e,t\)\}\),define\(".{32}",function\(\)\{\}\);$/',
+            $asset->dump(),
+            'Defined exclusions excluded incorrectly'
         );
     }
 
