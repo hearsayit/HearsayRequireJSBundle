@@ -165,7 +165,7 @@ An array of module names to exclude from the build profile.
 
 This is a prototype that represents an array of modules options for r.js optimizer.
 Each array must contain name of the module and could contain include and exclude options
-that explicitly includes / excludes defined dependencies
+that explicitly includes/excludes defined dependencies.
 See [multipage module config][7] for more details.
 
 ##### *options* #####

@@ -228,8 +228,6 @@ class RJsFilter extends BaseNodeFilter
      * @param array $module Module information
      *
      * @throws InvalidArgumentException in case of attempt to add module info twice
-     *
-     * @return void
      */
     public function addModule($name, array $module)
     {
@@ -254,11 +252,11 @@ class RJsFilter extends BaseNodeFilter
      *
      * @param  string $input The input file
      * @param  string $output The output file
-     * @param  string $module current r.js module
+     * @param  string $moduleName current r.js module name
      *
      * @return string Returns the build profile's file name
      */
-    protected function makeBuildProfile($input, $output, $module)
+    protected function makeBuildProfile($input, $output, $moduleName)
     {
         $buildProfile = tempnam(sys_get_temp_dir(), 'build_profile') . '.js';
 
@@ -292,13 +290,11 @@ class RJsFilter extends BaseNodeFilter
 
         $content->shim = (object) $this->shim;
 
-        $includes     = $this->getModuleIncludes($module);
-        $excludedDeps = $this->getExcludedDependencies($module);
+        $excludedDeps = $this->getExcludedDependencies($moduleName);
         // merge optimizer excludes with global ones
-        $exclude = array_merge($this->exclude, $excludedDeps);
+        $content->exclude = array_merge($this->exclude, $excludedDeps);
 
-        $content->exclude = $exclude;
-        $content->include = $includes;
+        $content->include = $this->getModuleIncludes($moduleName);
 
         foreach ($this->options as $option => $value) {
             // @link https://github.com/jrburke/requirejs/wiki/Upgrading-to-RequireJS-2.0#wiki-delayed
@@ -315,6 +311,21 @@ class RJsFilter extends BaseNodeFilter
     }
 
     /**
+     * Returns r.js module name for current asset
+     *
+     * @param AssetInterface $asset current asset
+     *
+     * @return string
+     */
+    protected function getModuleName(AssetInterface $asset)
+    {
+        $fullPath = $asset->getSourceRoot() . '/' . $asset->getSourcePath();
+        $relPath  = str_replace($this->baseUrl . '/', '', $fullPath);
+
+        return substr_replace($relPath, '', strpos($relPath, '.js'), 3);
+    }
+
+    /**
      * Get the list of the dependencies of any excluded modules for a given one.
      *
      * @param string $module current module name
@@ -325,14 +336,14 @@ class RJsFilter extends BaseNodeFilter
     {
         // Find excluded modules
         $excludedModules = array();
-        if (isset($this->modules[$module]) && isset($this->modules[$module]["exclude"])) {
-            $excludedModules = $this->modules[$module]["exclude"];
+        if (isset($this->modules[$module]['exclude'])) {
+            $excludedModules = $this->modules[$module]['exclude'];
         }
 
         // Find dependencies of excluded modules
         $excludedDebs = array();
         foreach ($excludedModules as $exclude) {
-            if (isset($this->modules[$exclude]) && isset($this->modules[$exclude]['include'])) {
+            if (isset($this->modules[$exclude]['include'])) {
                 $excludedDebs = array_merge($excludedDebs, $this->modules[$exclude]['include']);
             }
         }
@@ -349,24 +360,6 @@ class RJsFilter extends BaseNodeFilter
      */
     private function getModuleIncludes($module)
     {
-        $includes = array();
-        if (isset($this->modules[$module]) && isset($this->modules[$module]["include"])) {
-            $includes = $this->modules[$module]["include"];
-        }
-        return $includes;
-    }
-
-    /**
-     * Returns r.js module name for current asset
-     *
-     * @param AssetInterface $asset current asset
-     *
-     * @return string
-     */
-    private function getModuleName(AssetInterface $asset)
-    {
-        $full_path = $asset->getSourceRoot() .'/'. $asset->getSourcePath();
-        $rel_path  = str_replace($this->baseUrl.'/', '', $full_path);
-        return substr_replace($rel_path, '', strpos($rel_path, '.js'), 3);
+        return !isset($this->modules[$module]['include']) ? array() : $this->modules[$module]['include'];
     }
 }

@@ -102,12 +102,12 @@ class HearsayRequireJSExtension extends Extension
                 $filter->addMethodCall('addExclude', array($exclude));
             }
 
-            foreach ($config['optimizer']['options'] as $name => $settings) {
-                $filter->addMethodCall('addOption', array($name, $settings['value']));
-            }
-
             foreach ($config['optimizer']['modules'] as $name => $module) {
                 $filter->addMethodCall('addModule', array($name, $module));
+            }
+
+            foreach ($config['optimizer']['options'] as $name => $settings) {
+                $filter->addMethodCall('addOption', array($name, $settings['value']));
             }
         }
     }
