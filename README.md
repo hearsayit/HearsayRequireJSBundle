@@ -159,14 +159,14 @@ This determines whether the r.js optimizer should suppress unoptimized files.
 
 An array of module names to exclude from the build profile.
 
-#### *modules* ####
+##### *modules* #####
 
 **type**: array **default**: null
 
-This is a prototype that represents an array of modules options for r.js optimizer.
-Each array must contain name of the module and could contain include and exclude options
-that explicitly includes/excludes defined dependencies.
-See [multipage module config][7] for more details.
+This is a prototype that represents an array of modules options for r.js
+optimizer. Each array must contain name of the module and could contain include
+and exclude options that explicitly includes/excludes defined dependencies. See
+[multipage module config][7] for more details.
 
 ##### *options* #####
 
@@ -315,9 +315,7 @@ not in production.
 ## Testing
 
 ```sh
-$ php vendor/bin/phpcs --standard=PSR2 --ignore=vendor/ --extensions=php . -n -p
-$ wget https://raw.github.com/jrburke/r.js/2.1.8/dist/r.js
-$ php vendor/bin/phpunit --coverage-text
+$ make test
 ```
 
 ## Contributing
@@ -347,4 +345,3 @@ bundle:
 [9]: https://github.com/hearsayit/HearsayRequireJSBundle/blob/master/CONTRIBUTING.md
 [10]: https://github.com/kmontag
 [11]: https://github.com/hearsayit/HearsayRequireJSBundle/graphs/contributors
-
