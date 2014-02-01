@@ -75,19 +75,12 @@ class NamespaceMapping implements NamespaceMappingInterface
      */
     public function getModulePath($filename)
     {
-        $filename = $this->getRealPath($filename);
+        $filePath = $this->getRealPath($filename);
 
         foreach ($this->namespaces as $namespace => $realPath) {
-            if (strpos($filename, $realPath) === 0) {
-                $basename   = substr($filename, strlen($realPath));
-                $modulePath = $this->basePath . '/' . $namespace;
-
-                if (is_dir($realPath) && $basename) {
-                    // To allow to use the bundle with `.coffee` scripts
-                    $basename = preg_replace('#\.coffee$#', '.js', $basename);
-
-                    $modulePath .= '/' . $basename;
-                }
+            if (strpos($filePath, $realPath) === 0) {
+                $basename   = $this->getBaseName($filePath, $realPath);
+                $modulePath = $this->basePath . '/' . $namespace . '/' . $basename;
 
                 return preg_replace('~[/\\\\]+~', '/', $modulePath);
             }
@@ -97,12 +90,31 @@ class NamespaceMapping implements NamespaceMappingInterface
     }
 
     /**
-     * Gets canonicalized absolute pathname
+     * Gets the base name of the given file path
+     *
+     * @param  string $filePath The file path
+     * @param  string $realPath The real path of the namespace
+     * @return string           Returns the base name of the given file path
+     */
+    protected function getBaseName($filePath, $realPath)
+    {
+        $basename = substr($filePath, strlen($realPath));
+
+        if (!$basename) {
+            $basename = basename($filePath);
+        }
+
+        // To allow to use the bundle with `.coffee` scripts
+        return preg_replace('~\.coffee$~', '.js', $basename);
+    }
+
+    /**
+     * Gets the real path of the given path
      *
      * @param  string         $path The path
      * @return boolean|string       Returns false on failure, e.g. if the file
      *                              does not exist, or a string that represents
-     *                              the canonicalized absolute pathname
+     *                              the real path of the given path
      */
     protected function getRealPath($path)
     {

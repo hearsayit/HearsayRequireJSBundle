@@ -260,8 +260,7 @@ hearsay_require_js:
 ```
 
 To use this bundle with CoffeeScript, you can specify a path that contains
-`.coffee` scripts (means a directory). The scripts will renamed to `.js`
-scripts.
+`.coffee` scripts. The scripts will renamed to `.js` scripts.
 
 >Note that the `r.js` optimizer cannot optimize `.coffee` scripts. However, you
 >can apply the [Assetic][8] filter to this scripts by the file extension.
