@@ -79,10 +79,10 @@ class ConfigurationBuilder
      *
      * @param ContainerInterface        $container
      * @param NamespaceMappingInterface $mapping
-     * @param string                    $baseUrl    The base URL where assets
-     *                                              are served, relative to the
-     *                                              website root directory
-     * @param array                     $shim       The shim config
+     * @param string                    $baseUrl   The base URL where assets
+     *                                             are served, relative to the
+     *                                             website root directory
+     * @param array                     $shim      The shim config
      */
     public function __construct(
         ContainerInterface $container,
