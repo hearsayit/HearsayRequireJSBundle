@@ -1,25 +1,12 @@
 <?php
 
-/**
- * Copyright (c) 2011 Hearsay News Products, Inc.
+/*
+ * This file is part of the HearsayRequireJSBundle package.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy 
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights 
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is 
- * furnished to do so, subject to the following conditions:
+ * (c) Hearsay News Products, Inc.
  *
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
- * SOFTWARE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Hearsay\RequireJSBundle\Tests\Assetic\Factory\Loader;
@@ -36,7 +23,7 @@ class ModuleFormulaLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $file1 = __DIR__ . '/dir/file';
         $file2 = __DIR__ . '/dir/other_file';
-                
+
         $factory = $this->getMockBuilder('Assetic\Factory\AssetFactory')
                 ->disableOriginalConstructor()
                 ->getMock();
@@ -48,7 +35,7 @@ class ModuleFormulaLoaderTest extends \PHPUnit_Framework_TestCase
                 ->method('generateAssetName')
                 ->with($file2, array())
                 ->will($this->returnValue('other_file'));
-        
+
         $mapping = $this->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
         $mapping->expects($this->at(0))
                 ->method('getModulePath')
@@ -58,15 +45,15 @@ class ModuleFormulaLoaderTest extends \PHPUnit_Framework_TestCase
                 ->method('getModulePath')
                 ->with($file2)
                 ->will($this->returnValue('second/module'));
-        
+
         $resource = $this->getMock('Assetic\Factory\Resource\ResourceInterface');
         $resource->expects($this->any())
                 ->method('getContent')
                 ->will($this->returnValue($file1 . "\nsome other\ntext\n" . $file2));
-        
+
         $loader = new ModuleFormulaLoader($factory, $mapping);
         $formulae = $loader->load($resource);
-        
+
         $this->assertEquals(array(
             'file' => array($file1, array(), array('output' => 'first/module')),
             'other_file' => array($file2, array(), array('output' => 'second/module'))
