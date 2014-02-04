@@ -69,8 +69,7 @@ class NamespaceMapping implements NamespaceMappingInterface
                 $modulePath = $this->basePath . '/' . $namespace;
 
                 if (is_file($filePath)) {
-                    $basename   = $this->getBaseName($filePath, $realPath);
-                    $modulePath .= '/' . $basename;
+                    $modulePath .= '/' . $this->getBaseName($filePath, $realPath);
                 }
 
                 return preg_replace('~[/\\\\]+~', '/', $modulePath);
