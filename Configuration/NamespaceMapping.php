@@ -68,7 +68,7 @@ class NamespaceMapping implements NamespaceMappingInterface
             if (strpos($filePath, $realPath) === 0) {
                 $modulePath = $this->basePath . '/' . $namespace;
 
-                if (!is_dir($filePath)) {
+                if (is_file($filePath)) {
                     $basename   = $this->getBaseName($filePath, $realPath);
                     $modulePath .= '/' . $basename;
                 }
