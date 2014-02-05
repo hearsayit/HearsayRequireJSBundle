@@ -66,8 +66,11 @@ class NamespaceMapping implements NamespaceMappingInterface
 
         foreach ($this->namespaces as $namespace => $realPath) {
             if (strpos($filePath, $realPath) === 0) {
-                $basename   = $this->getBaseName($filePath, $realPath);
-                $modulePath = $this->basePath . '/' . $namespace . '/' . $basename;
+                $modulePath = $this->basePath . '/' . $namespace;
+
+                if (is_file($filePath)) {
+                    $modulePath .= '/' . $this->getBaseName($filePath, $realPath);
+                }
 
                 return preg_replace('~[/\\\\]+~', '/', $modulePath);
             }
