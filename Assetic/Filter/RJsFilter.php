@@ -313,12 +313,14 @@ class RJsFilter extends BaseNodeFilter
         } else {
             $suitablePath = '';
             $suitablePathName = '';
+            
             foreach ($this->paths as $path => $location) {
-                if (strpos($fullPath, $location) === 0 && strlen($location) > strlen($suitablePath)) {
+                if (strpos($fullPath, $location) === 0 && $location > $suitablePath) {
                     $suitablePath = $location;
                     $suitablePathName = $path;
                 }
             }
+            
             $relPath = str_replace($suitablePath, $suitablePathName, $fullPath);
         }
 
