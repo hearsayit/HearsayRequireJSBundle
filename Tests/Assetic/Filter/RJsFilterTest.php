@@ -197,7 +197,6 @@ JS;
      * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::filterDump
      * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addModule
      * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addOption
-     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addPath
      */
     public function testOptimizerExclusionsDepsExcluded()
     {
@@ -210,24 +209,71 @@ JS;
         $asset = new FileAsset(__DIR__ . '/modules/base/module/file3.js');
         $asset->ensureFilter($this->filter);
 
-        // expecting result contains only content of module3 although module3 depends on module2 and module
+        // expecting result contains only content of file3 although file3 depends on file2 and file
         $this->assertRegExp(
             '/^require\(\["module\/file2","module\/file"\],function\(e,t\)\{return console\.log\(e,t\)\}\),define\(".{32}",function\(\)\{\}\);$/',
             $asset->dump(),
             'Defined exclusions excluded incorrectly'
         );
+    }
+
+    /**
+     * Tests that optimizer correctly excludes exclude-modules (configured in optimizer options for current module)
+     * and their includes when first part of a module name is specified in paths
+     *
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::filterDump
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addModule
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addOption
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addPath
+     */
+    public function testFindModuleNameAmongPaths()
+    {
+        $this->filter->addOption('preserveLicenseComments', false);
 
         $this->filter->addPath("module2", __DIR__ . '/modules/module2');
+
+        // registering optimizer modules config
+        $this->filter->addModule("module/file3", array("include" => array("module/file", "module/file2")));
         $this->filter->addModule("module2/file4", array("exclude" => array("module/file3")));
 
         $asset = new FileAsset(__DIR__ . '/modules/module2/file4.js');
         $asset->ensureFilter($this->filter);
 
-        // expecting result contains only content of module4 although module4 depends on module3 and module3 depends on module 2 and module
+        // expecting result contains only content of file4 although file4 depends on file3 and file3 depends on file 2 and file
         $this->assertRegExp(
             '/^require\(\["module\/file3"\],function\(e\)\{return console\.log\(e\)\}\),define\(".{32}",function\(\)\{\}\);$/',
             $asset->dump(),
-            'Defined exclusions for additionalModules excluded incorrectly'
+            'Defined exclusions for module2/file4 excluded incorrectly'
+        );
+    }
+
+    /**
+     * When first part of a module name is not specified in paths and not equals baseUrl, we can't find module
+     * so this module exclusions will not be excluded
+     *
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::filterDump
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addModule
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addOption
+     */
+    public function testNotFindModuleNameAmongPaths()
+    {
+        $this->filter->addOption('preserveLicenseComments', false);
+
+        // registering optimizer modules config
+        $this->filter->addModule("module/file3", array("include" => array("module/file", "module/file2")));
+        $this->filter->addModule("module2/file4", array("exclude" => array("module/file3")));
+
+        $asset = new FileAsset(__DIR__ . '/modules/module2/file4.js');
+        $asset->ensureFilter($this->filter);
+
+        // expecting result contains only content of file4 although file4 depends on file3 and file3 depends on file 2 and file
+        $this->assertRegExp(
+            '/^define\("module\/file2",\{js:"got it twice"\}\),define\("module\/file",\{js:"got it"\}\),' .
+            'require\(\["module\/file2","module\/file"\],function\(e,t\)\{return console.log\(e,t\)\}\),' .
+            'define\("module\/file3",function\(\)\{\}\),require\(\["module\/file3"\],function\(e\)\{return console.log\(e\)\}\),' .
+            'define\(".{32}",function\(\)\{\}\);$/',
+            $asset->dump(),
+            'Defined exclusions for modules/module2/file4.js excluded incorrectly'
         );
     }
 
