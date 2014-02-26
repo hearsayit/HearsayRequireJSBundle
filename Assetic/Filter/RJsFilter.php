@@ -307,7 +307,22 @@ class RJsFilter extends BaseNodeFilter
     protected function getModuleName(AssetInterface $asset)
     {
         $fullPath = $asset->getSourceRoot() . '/' . $asset->getSourcePath();
-        $relPath  = str_replace($this->baseUrl . '/', '', $fullPath);
+
+        if (strpos($fullPath, $this->baseUrl) === 0) {
+            $relPath = str_replace($this->baseUrl . '/', '', $fullPath);
+        } else {
+            $suitablePath = '';
+            $suitablePathName = '';
+
+            foreach ($this->paths as $path => $location) {
+                if (strpos($fullPath, $location) === 0 && $location > $suitablePath) {
+                    $suitablePath = $location;
+                    $suitablePathName = $path;
+                }
+            }
+
+            $relPath = str_replace($suitablePath, $suitablePathName, $fullPath);
+        }
 
         return substr_replace($relPath, '', strpos($relPath, '.js'), 3);
     }
