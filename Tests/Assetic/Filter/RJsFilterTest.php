@@ -38,7 +38,7 @@ class RJsFilterTest extends \PHPUnit_Framework_TestCase
 
         $nodePath = $this->getNodePath();
 
-        $this->filter = new RJsFilter($nodePath, __DIR__ . '/../../../r.js', __DIR__ . '/baseModules');
+        $this->filter = new RJsFilter($nodePath, __DIR__ . '/../../../r.js', __DIR__ . '/modules/base');
         $this->filter->addNodePath($nodePath);
     }
 
@@ -68,7 +68,7 @@ JS;
         $this->filter->addOption('preserveLicenseComments', false);
 
         $javascript = <<<JS
-define(['modules/module'], function(module) {
+define(['module/file'], function(module) {
     console.log('Hello');
 
     return console.log(module);
@@ -78,13 +78,13 @@ JS;
         $content = $this->getStringAsset($javascript)->dump();
 
         $this->assertEquals(
-            'define("modules/module",{js:"got it"}),define("',
-            substr($content, 0, 47),
+            'define("module/file",{js:"got it"}),define("',
+            substr($content, 0, 44),
             'Unexpected optimized content'
         );
         $this->assertEquals(
-            '",["modules/module"],function(e){return console.log("Hello"),console.log(e)});',
-            substr($content, 79),
+            '",["module/file"],function(e){return console.log("Hello"),console.log(e)});',
+            substr($content, 76),
             'Unexpected optimized content'
         );
     }
@@ -112,11 +112,11 @@ JS;
      */
     public function testExclusionsExcluded()
     {
-        $this->filter->addExclude('modules/module');
+        $this->filter->addExclude('module/file');
         $this->filter->addOption('preserveLicenseComments', false);
 
         $javascript = <<<JS
-require(['modules/module'], function(module) {
+require(['module/file'], function(module) {
     return console.log(module);
 });
 JS;
@@ -124,14 +124,14 @@ JS;
         $content = $this->getStringAsset($javascript)->dump();
 
         $this->assertEquals(
-            'require(["modules/module"],function(e){return console.log(e)}),define("',
-            substr($content, 0, 71),
-            'Did not expect modules/module to be included in the build'
+            'require(["module/file"],function(e){return console.log(e)}),define("',
+            substr($content, 0, 68),
+            'Did not expect module/file to be included in the build'
         );
         $this->assertEquals(
             '",function(){});',
-            substr($content, 103),
-            'Did not expect modules/module to be included in the build'
+            substr($content, 100),
+            'Did not expect module/file to be included in the build'
         );
     }
 
@@ -177,14 +177,14 @@ JS;
         $this->filter->addOption('skipModuleInsertion', true);
 
         // registering optimizer modules config
-        $this->filter->addModule("modules/module2", array("include" => array("modules/module")));
+        $this->filter->addModule("module/file2", array("include" => array("module/file")));
 
-        $asset = new FileAsset(__DIR__ . '/baseModules/modules/module2.js');
+        $asset = new FileAsset(__DIR__ . '/modules/base/module/file2.js');
         $asset->ensureFilter($this->filter);
 
         // expecting result contains both module and module2 although module 2 doesn't depend on module
         $this->assertRegExp(
-            '/^define\(".{32}",\{js:"got it twice"\}\),define\("modules\/module",\{js:"got it"\}\);$/',
+            '/^define\(".{32}",\{js:"got it twice"\}\),define\("module\/file",\{js:"got it"\}\);$/',
             $asset->dump(),
             'Defined inclusions included incorrectly'
         );
@@ -204,28 +204,28 @@ JS;
         $this->filter->addOption('preserveLicenseComments', false);
 
         // registering optimizer modules config
-        $this->filter->addModule("modules/module2", array("include" => array("modules/module")));
-        $this->filter->addModule("modules/module3", array("exclude" => array("modules/module2")));
+        $this->filter->addModule("module/file2", array("include" => array("module/file")));
+        $this->filter->addModule("module/file3", array("exclude" => array("module/file2")));
 
-        $asset = new FileAsset(__DIR__ . '/baseModules/modules/module3.js');
+        $asset = new FileAsset(__DIR__ . '/modules/base/module/file3.js');
         $asset->ensureFilter($this->filter);
 
         // expecting result contains only content of module3 although module3 depends on module2 and module
         $this->assertRegExp(
-            '/^require\(\["modules\/module2","modules\/module"\],function\(e,t\)\{return console\.log\(e,t\)\}\),define\(".{32}",function\(\)\{\}\);$/',
+            '/^require\(\["module\/file2","module\/file"\],function\(e,t\)\{return console\.log\(e,t\)\}\),define\(".{32}",function\(\)\{\}\);$/',
             $asset->dump(),
             'Defined exclusions excluded incorrectly'
         );
 
-        $this->filter->addPath("additionalModules", __DIR__ . '/additionalModules');
-        $this->filter->addModule("additionalModules/module4", array("exclude" => array("modules/module3")));
+        $this->filter->addPath("module2", __DIR__ . '/modules/module2');
+        $this->filter->addModule("module2/file4", array("exclude" => array("module/file3")));
 
-        $asset = new FileAsset(__DIR__ . '/additionalModules/module4.js');
+        $asset = new FileAsset(__DIR__ . '/modules/module2/file4.js');
         $asset->ensureFilter($this->filter);
 
         // expecting result contains only content of module4 although module4 depends on module3 and module3 depends on module 2 and module
         $this->assertRegExp(
-            '/^require\(\["modules\/module3"\],function\(e\)\{return console\.log\(e\)\}\),define\(".{32}",function\(\)\{\}\);$/',
+            '/^require\(\["module\/file3"\],function\(e\)\{return console\.log\(e\)\}\),define\(".{32}",function\(\)\{\}\);$/',
             $asset->dump(),
             'Defined exclusions for additionalModules excluded incorrectly'
         );
@@ -238,18 +238,18 @@ JS;
      */
     public function testOptionsPassed()
     {
-        $this->filter->addPath('modules', __DIR__ . '/baseModules/modules');
+        $this->filter->addPath('modules', __DIR__ . '/modules/base/module');
         $this->filter->addOption('preserveLicenseComments', false);
         $this->filter->addOption('skipModuleInsertion', true);
 
         $javascript = <<<JS
-require(['modules/module'], function(module) {
+require(['module/file'], function(module) {
     return console.log(module);
 });
 JS;
 
         $this->assertEquals(
-            'define("modules/module",{js:"got it"}),require(["modules/module"],function(e){return console.log(e)});',
+            'define("module/file",{js:"got it"}),require(["module/file"],function(e){return console.log(e)});',
             $this->getStringAsset($javascript)->dump(),
             'Unexpected optimized content'
         );
