@@ -7,6 +7,6 @@
  * file that was distributed with this source code.
  */
 
-require(['modules/module2', "modules/module"], function(module2,module) {
-    return console.log(module2, module);
+require(['module/file3'], function(module3) {
+    return console.log(module3);
 });
