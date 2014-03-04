@@ -28,9 +28,9 @@
  #   A module to require immediately when RequireJS is loaded
  #}
 
-{% set almond = config.almond is defined ? config.almond : false %}
-
 {% if config is defined and config is not empty %}
+    {% set almond = config.almond is defined ? config.almond : false %}
+
     {% block configuration %}
 		{% if false == almond %}
         	<script type="text/javascript">var require={{ config|json_encode|raw }};</script>
@@ -39,6 +39,8 @@
 {% endif %}
 
 {% block require_js %}
+    {% set almond = config.almond is defined ? config.almond : false %}
+
 	{% if false == almond %}
 		{# Applications may override the src block to use a custom URL #}
 	    <script type="text/javascript"{% if main is defined and main is not empty %} data-main="{{ main }}"{% endif %} src="{% block src require_js_src() %}"></script>

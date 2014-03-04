@@ -335,7 +335,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(array($config), $container);
     }
 
-    public function testOptimizerWithNoAlmondPath()
+    public function testOptimizerWithoutAlmondPath()
     {
         $config = array(
             'base_dir'  => '/home/user/base',
@@ -361,9 +361,9 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
     public function testOptimizerWithAlmondPath()
     {
         $config = array(
-            'base_dir'    => '/home/user/base',
-            'almond_path' => '/path/to/almond.js',
+            'base_dir'  => '/home/user/base',
             'optimizer' => array(
+                'almond_path' => '/path/to/almond.js',
                 'path' => '/path/to/r.js',
             ),
         );

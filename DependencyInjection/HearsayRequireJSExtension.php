@@ -85,11 +85,11 @@ class HearsayRequireJSExtension extends Extension
 
             $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
 
-            if ($config['almond_path']) {
+            if ($config['optimizer']['almond_path']) {
                 // Makes almond path relative to base directory for r.js optimization
                 $almondPath = UrlGenerator::getRelativePath(
                     $container->getParameter('hearsay_require_js.base_dir'),
-                    $this->getRealPath($config['almond_path'], $container)
+                    $this->getRealPath($config['optimizer']['almond_path'], $container)
                 );
 
                 // Removes file extension if it exists
@@ -97,7 +97,7 @@ class HearsayRequireJSExtension extends Extension
 
                 $filter->addMethodCall('setAlmondPath', array($almondPath));
 
-                $configurationBuilder->addMethodCall('useAlmond', array(true));
+                $configurationBuilder->addMethodCall('setUseAlmond', array(true));
             }
 
             $filter->addMethodCall('setShim', array($config['shim']));

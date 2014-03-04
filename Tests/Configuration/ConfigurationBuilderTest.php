@@ -191,7 +191,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->container->setParameter('kernel.debug', true);
 
         $builder = new ConfigurationBuilder($this->container, $mapping);
-        $builder->useAlmond(true);
+        $builder->setUseAlmond(true);
 
         $config = $builder->getConfiguration();
 
@@ -214,7 +214,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->container->setParameter('kernel.debug', false);
 
         $builder = new ConfigurationBuilder($this->container, $mapping);
-        $builder->useAlmond(true);
+        $builder->setUseAlmond(true);
 
         $config = $builder->getConfiguration();
 

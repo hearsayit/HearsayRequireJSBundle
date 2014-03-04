@@ -124,7 +124,6 @@ class ConfigurationBuilder
         if ($this->container->hasParameter('kernel.debug')
             && !$this->container->getParameter('kernel.debug')
             && $this->useAlmond) {
-
             $config['almond'] = true;
         }
 
@@ -166,6 +165,18 @@ class ConfigurationBuilder
     }
 
     /**
+     * Sets if almond.js is used or not
+     *
+     * @param boolean $useAlmond The almond.js used value
+     *
+     * @return boolean
+     */
+    public function setUseAlmond($useAlmond)
+    {
+        $this->useAlmond = (bool) $useAlmond;
+    }
+
+    /**
      * Gets the base URL
      *
      * @return string
@@ -199,17 +210,5 @@ class ConfigurationBuilder
     protected function getScriptUrl()
     {
         return $this->getBaseUrl() . '/' . $this->baseUrl;
-    }
-
-    /**
-     * Sets if almond is used or not
-     *
-     * @param boolean $bool The almond used value
-     *
-     * @return boolean
-     */
-    public function useAlmond($bool)
-    {
-        $this->useAlmond = (bool) $bool;
     }
 }
