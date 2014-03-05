@@ -178,7 +178,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getBaseUrl
-     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::useAlmond
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::setUseAlmond
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
      */
     public function testUseAlmondDevEnvironment()
@@ -201,7 +201,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getBaseUrl
-     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::useAlmond
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::setUseAlmond
      * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
      */
     public function testUseAlmondProdEnvironment()
