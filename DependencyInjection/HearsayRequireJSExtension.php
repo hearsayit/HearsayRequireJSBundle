@@ -54,6 +54,13 @@ class HearsayRequireJSExtension extends Extension
             ? false
             : $config['optimizer']['hide_unoptimized_assets'];
 
+        // By using this flag as true, defines will be declared as their module names
+        $declareModuleName = !isset($config['optimizer']['declare_module_name'])
+            ? false
+            : $config['optimizer']['declare_module_name'];
+
+        $container->setParameter('hearsay_require_js.declare_module_name', $declareModuleName);
+
         foreach ($config['paths'] as $path => $settings) {
             $location = $settings['location'];
 

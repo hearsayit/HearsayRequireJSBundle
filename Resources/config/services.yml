@@ -65,6 +65,7 @@ services:
       - %assetic.node.bin%
       - %hearsay_require_js.r.path%
       - %hearsay_require_js.base_dir%
+      - %hearsay_require_js.declare_module_name%
     calls:
       - [ addNodePath, [%assetic.node.bin%] ]
     tags:

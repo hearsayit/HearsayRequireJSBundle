@@ -91,17 +91,26 @@ class RJsFilter extends BaseNodeFilter
     protected $modules = array();
 
     /**
+     * Flag that controls if defines will be declared as their module names
+     *
+     * @var boolean
+     */
+    protected $declareModuleName;
+
+    /**
      * The constructor method
      *
-     * @param string $nodePath The absolute path to the node.js
-     * @param string $rPath    The absolute path to the r.js
-     * @param string $baseUrl  The base URL
+     * @param string  $nodePath          The absolute path to the node.js
+     * @param string  $rPath             The absolute path to the r.js
+     * @param string  $baseUrl           The base URL
+     * @param boolean $declareModuleName Flag that allows defines to be declared as their module names
      */
-    public function __construct($nodePath, $rPath, $baseUrl)
+    public function __construct($nodePath, $rPath, $baseUrl, $declareModuleName)
     {
-        $this->nodePath = $nodePath;
-        $this->rPath    = $rPath;
-        $this->baseUrl  = $baseUrl;
+        $this->nodePath          = $nodePath;
+        $this->rPath             = $rPath;
+        $this->baseUrl           = $baseUrl;
+        $this->declareModuleName = $declareModuleName;
     }
 
     /**
@@ -247,7 +256,7 @@ class RJsFilter extends BaseNodeFilter
     {
         $buildProfile = tempnam(sys_get_temp_dir(), 'build_profile') . '.js';
 
-        $name = md5($input);
+        $name = $this->declareModuleName ? $moduleName : md5($input);
 
         // The basic build profile
         $content = (object) array(
