@@ -25,6 +25,11 @@ use Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter;
 class RJsFilterTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var string
+     */
+    private $nodePath;
+
+    /**
      * @var RJsFilter
      */
     private $filter;
@@ -36,10 +41,15 @@ class RJsFilterTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $nodePath = $this->getNodePath();
+        $this->nodePath = $this->getNodePath();
+        $this->filter   = new RJsFilter(
+            $this->nodePath,
+            __DIR__ . '/../../../r.js',
+            __DIR__ . '/modules/base',
+            false
+        );
 
-        $this->filter = new RJsFilter($nodePath, __DIR__ . '/../../../r.js', __DIR__ . '/modules/base');
-        $this->filter->addNodePath($nodePath);
+        $this->filter->addNodePath($this->nodePath);
     }
 
     /**
@@ -185,6 +195,41 @@ JS;
         // expecting result contains both module and module2 although module 2 doesn't depend on module
         $this->assertRegExp(
             '/^define\(".{32}",\{js:"got it twice"\}\),define\("module\/file",\{js:"got it"\}\);$/',
+            $asset->dump(),
+            'Defined inclusions included incorrectly'
+        );
+    }
+
+    /**
+     * Tests that optimizer correctly handles module includes
+     *
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::filterDump
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addModule
+     * @covers Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter::addOption
+     */
+    public function testOptimizerInclusionsIncludedWithModuleName()
+    {
+        $this->filter   = new RJsFilter(
+            $this->nodePath,
+            __DIR__ . '/../../../r.js',
+            __DIR__ . '/modules/base',
+            true
+        );
+
+        $this->filter->addNodePath($this->nodePath);
+
+        $this->filter->addOption('preserveLicenseComments', false);
+        $this->filter->addOption('skipModuleInsertion', true);
+
+        // registering optimizer modules config
+        $this->filter->addModule("module/file2", array("include" => array("module/file")));
+
+        $asset = new FileAsset(__DIR__ . '/modules/base/module/file2.js');
+        $asset->ensureFilter($this->filter);
+
+        // expecting result contains both module and module2 although module 2 doesn't depend on module
+        $this->assertRegExp(
+            '/^define\("module\/file2",\{js:"got it twice"\}\),define\("module\/file",\{js:"got it"\}\);$/',
             $asset->dump(),
             'Defined inclusions included incorrectly'
         );
