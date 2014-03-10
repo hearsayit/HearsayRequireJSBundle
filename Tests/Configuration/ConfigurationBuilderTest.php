@@ -176,6 +176,53 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getBaseUrl
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::setUseAlmond
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
+     */
+    public function testUseAlmondDevEnvironment()
+    {
+        $mapping = $this
+            ->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
+
+        $this->setRequestMock('/base');
+        $this->container->setParameter('assetic.use_controller', true);
+        $this->container->setParameter('kernel.debug', true);
+
+        $builder = new ConfigurationBuilder($this->container, $mapping);
+        $builder->setUseAlmond(true);
+
+        $config = $builder->getConfiguration();
+
+        $this->assertArrayNotHasKey('almond', $config, 'Almond key should not exists');
+    }
+
+    /**
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::__construct
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getBaseUrl
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::setUseAlmond
+     * @covers Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder::getConfiguration
+     */
+    public function testUseAlmondProdEnvironment()
+    {
+        $mapping = $this
+            ->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
+
+        $this->setRequestMock('/base');
+        $this->container->setParameter('assetic.use_controller', true);
+        $this->container->setParameter('kernel.debug', false);
+
+        $builder = new ConfigurationBuilder($this->container, $mapping);
+        $builder->setUseAlmond(true);
+
+        $config = $builder->getConfiguration();
+
+        $this->assertArrayHasKey('almond', $config, 'Almond key should exists');
+        $this->assertTrue($config['almond'], 'Almond value should be true');
+    }
+
+    /**
      * @param string $filename
      */
     private function setAssetsHelperMock($filename)

@@ -16,7 +16,9 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 
+use Hearsay\RequireJSBundle\Exception\PathNotFoundException;
 use Hearsay\RequireJSBundle\Exception\InvalidArgumentException;
 
 /**
@@ -82,6 +84,22 @@ class HearsayRequireJSExtension extends Extension
             $container->setParameter('hearsay_require_js.r.path', $this->getRealPath($config['optimizer']['path'], $container));
 
             $filter = $container->getDefinition('hearsay_require_js.optimizer_filter');
+
+            if ($config['optimizer']['almond_path']) {
+                // Makes almond path relative to base directory for r.js optimization
+                $almondPath = UrlGenerator::getRelativePath(
+                    $container->getParameter('hearsay_require_js.base_dir'),
+                    $this->getRealPath($config['optimizer']['almond_path'], $container)
+                );
+
+                // Removes file extension if it exists
+                $almondPath = preg_replace('/\.js$/', '', $almondPath);
+
+                $filter->addMethodCall('setAlmondPath', array($almondPath));
+
+                $configurationBuilder->addMethodCall('setUseAlmond', array(true));
+            }
+
             $filter->addMethodCall('setShim', array($config['shim']));
             $filter->addMethodCall('setTimeout', array($config['optimizer']['timeout']));
 

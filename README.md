@@ -71,6 +71,8 @@ more.
     * [modules](#modules)
     * [options](#options)
     * [timeout](#timeout)
+    * [almond_path](#almond_path)
+
 
 #### *require_js_src* ####
 
@@ -181,6 +183,12 @@ variable type.
 
 This determines the node.js process timeout, in seconds.
 
+##### *almond_path* #####
+
+**type**: string **default**: false
+
+This is a string that represents the path to almond.js.
+
 ### Full Default Configuration ###
 
 ```yaml
@@ -206,6 +214,7 @@ hearsay_require_js:
     optimizer:
         path:                    ~ # Required
         hide_unoptimized_assets: false
+        almond_path:             ~
         exclude:                 []
         modules:
             # Prototype

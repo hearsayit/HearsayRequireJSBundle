@@ -91,6 +91,13 @@ class RJsFilter extends BaseNodeFilter
     protected $modules = array();
 
     /**
+     * The relative path to almond.js
+     *
+     * @var string
+     */
+    protected $almondPath;
+
+    /**
      * The constructor method
      *
      * @param string $nodePath The absolute path to the node.js
@@ -235,6 +242,16 @@ class RJsFilter extends BaseNodeFilter
     }
 
     /**
+     * Sets the almond.js relative path
+     *
+     * @param string $almondPath The almond.js relative path
+     */
+    public function setAlmondPath($almondPath)
+    {
+        $this->almondPath = $almondPath;
+    }
+
+    /**
      * Makes the build profile's file
      *
      * @param  string $input The input file
@@ -290,6 +307,14 @@ class RJsFilter extends BaseNodeFilter
             }
 
             $content->$option = $value;
+        }
+
+        // Override the built profile content for almond optimization
+        if ($this->almondPath) {
+            $content->name          = $this->almondPath;
+            $content->include       = $name;
+            // That serves the same purpose of the initial require() call that data-main does
+            $content->insertRequire = array($name);
         }
 
         file_put_contents($buildProfile, '(' . json_encode($content) . ')');

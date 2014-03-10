@@ -62,6 +62,13 @@ class ConfigurationBuilder
     protected $shim  = array();
 
     /**
+     * Flag to control if almond is used or not.
+     *
+     * @var boolean
+     */
+    protected $useAlmond = false;
+
+    /**
      * The constructor method
      *
      * @param ContainerInterface        $container
@@ -114,6 +121,12 @@ class ConfigurationBuilder
             $config['shim'] = $this->shim;
         }
 
+        if ($this->container->hasParameter('kernel.debug')
+            && !$this->container->getParameter('kernel.debug')
+            && $this->useAlmond) {
+            $config['almond'] = true;
+        }
+
         return array_merge($config, $this->options);
     }
 
@@ -149,6 +162,18 @@ class ConfigurationBuilder
         }
 
         $this->paths[$path] = $locations;
+    }
+
+    /**
+     * Sets if almond.js is used or not
+     *
+     * @param boolean $useAlmond The almond.js used value
+     *
+     * @return boolean
+     */
+    public function setUseAlmond($useAlmond)
+    {
+        $this->useAlmond = (bool) $useAlmond;
     }
 
     /**

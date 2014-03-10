@@ -178,6 +178,9 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->defaultValue(60)
                             ->end()
+                            ->scalarNode('almond_path')
+                                ->defaultFalse()
+                            ->end()
                         ->end()
                     ->end()
                 ->end();
