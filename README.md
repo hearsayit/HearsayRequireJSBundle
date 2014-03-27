@@ -72,7 +72,7 @@ more.
     * [options](#options)
     * [timeout](#timeout)
     * [almond_path](#almond_path)
-
+    * [declare_module_name](#declare_module_name)
 
 #### *require_js_src* ####
 
@@ -188,6 +188,12 @@ This determines the node.js process timeout, in seconds.
 **type**: string **default**: false
 
 This is a string that represents the path to almond.js.
+
+##### *declare_module_name* #####
+
+**type**: boolean **default**: false
+
+This is a boolean that configures module declarations as their actual module name or if it will be an md5 representation.
 
 ### Full Default Configuration ###
 
