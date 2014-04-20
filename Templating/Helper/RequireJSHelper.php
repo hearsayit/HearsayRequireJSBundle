@@ -118,8 +118,8 @@ class RequireJSHelper extends Helper
      */
     public function src()
     {
-        if ($this->engine->exists($this->requireJsSrc)
-            && $this->engine->supports($this->requireJsSrc)) {
+        if ($this->engine->supports($this->requireJsSrc)
+            && $this->engine->exists($this->requireJsSrc)) {
             return $this->engine->render($this->requireJsSrc);
         }
 
