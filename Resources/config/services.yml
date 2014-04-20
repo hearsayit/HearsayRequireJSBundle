@@ -49,7 +49,7 @@ services:
       - %hearsay_require_js.initialize_template%
       - %hearsay_require_js.require_js_src%
     tags:
-      - { name: templating.helper }
+      - { name: templating.helper, alias: require_js }
 
   hearsay_require_js.twig_extension:
     class: %hearsay_require_js.twig_extension.class%
