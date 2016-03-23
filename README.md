@@ -60,7 +60,7 @@ more.
 * [require_js_src](#require_js_src)
 * [initialize_template](#initialize_template)
 * [base_url](#base_url)
-* [base_dir](#base_dir)
+* [base_directory](#base_directory)
 * [paths](#paths)
 * [shim](#shim)
 * [options](#options)
@@ -97,7 +97,7 @@ This is a string that represents the base URL where assets are served, relative
 to the website root directory. This URL also will exposed as an empty
 namespace.
 
-#### *base_dir* ####
+#### *base_directory* ####
 
 **type**: string **default**: null **required**
 
@@ -202,7 +202,7 @@ hearsay_require_js:
     require_js_src:      //cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js
     initialize_template: HearsayRequireJSBundle::initialize.html.twig
     base_url:            js
-    base_dir:            ~ # Required
+    base_directory:      ~ # Required
     paths:
         # Prototype
         path:
