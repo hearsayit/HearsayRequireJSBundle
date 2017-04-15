@@ -125,4 +125,14 @@ class RequireJSHelper extends Helper
 
         return $this->requireJsSrc;
     }
+
+    /**
+     * Gets the RequireJS configuration
+     *
+     * @return string Returns a string that represents the RequireJS configuration
+     */
+    public function config()
+    {
+        return $this->configurationBuilder->getConfiguration();
+    }
 }
