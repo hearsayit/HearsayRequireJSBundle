@@ -12,12 +12,13 @@
 namespace Hearsay\RequireJSBundle\Tests\Assetic\Factory\Loader;
 
 use Hearsay\RequireJSBundle\Assetic\Factory\Loader\ModuleFormulaLoader;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for the module formula loader.
  * @author Kevin Montag <kevin@hearsay.it>
  */
-class ModuleFormulaLoaderTest extends \PHPUnit_Framework_TestCase
+class ModuleFormulaLoaderTest extends TestCase
 {
     public function testFormulaeLoaded()
     {
@@ -36,7 +37,7 @@ class ModuleFormulaLoaderTest extends \PHPUnit_Framework_TestCase
                 ->with($file2, array())
                 ->will($this->returnValue('other_file'));
 
-        $mapping = $this->getMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
+        $mapping = $this->createMock('Hearsay\RequireJSBundle\Configuration\NamespaceMappingInterface');
         $mapping->expects($this->at(0))
                 ->method('getModulePath')
                 ->with($file1)
@@ -46,7 +47,7 @@ class ModuleFormulaLoaderTest extends \PHPUnit_Framework_TestCase
                 ->with($file2)
                 ->will($this->returnValue('second/module'));
 
-        $resource = $this->getMock('Assetic\Factory\Resource\ResourceInterface');
+        $resource = $this->createMock('Assetic\Factory\Resource\ResourceInterface');
         $resource->expects($this->any())
                 ->method('getContent')
                 ->will($this->returnValue($file1 . "\nsome other\ntext\n" . $file2));

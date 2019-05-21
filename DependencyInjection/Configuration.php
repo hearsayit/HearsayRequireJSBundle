@@ -81,7 +81,6 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                                 ->booleanNode('external')
-                                    ->cannotBeEmpty()
                                     ->defaultFalse()
                                 ->end()
                             ->end()

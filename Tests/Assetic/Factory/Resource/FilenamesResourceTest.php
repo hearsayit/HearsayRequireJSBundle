@@ -12,12 +12,13 @@
 namespace Hearsay\RequireJSBundle\Tests\Assetic\Factory\Resource;
 
 use Hearsay\RequireJSBundle\Assetic\Factory\Resource\FilenamesResource;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for the filename resource.
  * @author Kevin Montag <kevin@hearsay.it>
  */
-class FilenamesResourceTest extends \PHPUnit_Framework_TestCase
+class FilenamesResourceTest extends TestCase
 {
     public function testFilenamesRetrieved()
     {

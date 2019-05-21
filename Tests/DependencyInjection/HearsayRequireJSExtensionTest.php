@@ -11,6 +11,7 @@
 
 namespace Hearsay\RequireJSBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Hearsay\RequireJSBundle\DependencyInjection\HearsayRequireJSExtension;
@@ -19,7 +20,7 @@ use Hearsay\RequireJSBundle\DependencyInjection\HearsayRequireJSExtension;
  * Unit tests for the bundle loader.
  * @author Kevin Montag <kevin@hearsay.it>
  */
-class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
+class HearsayRequireJSExtensionTest extends TestCase
 {
     /**
      * @var HearsayRequireJSExtension
@@ -56,9 +57,8 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         foreach ($paths as $path) {
             $config['paths'][0] = $path;
 
-            $this->setExpectedException(
-                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                ''
+            $this->expectException(
+                'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException'
             );
 
             $this->extension->load(array($config), $container);
@@ -85,9 +85,8 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
         $container = $this->getContainerBuilder();
 
-        $this->setExpectedException(
-            'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-            'The path should NOT include the ".js" file extension.'
+        $this->expectException(
+            'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException'
         );
 
         $this->extension->load(array($config), $container);
@@ -189,12 +188,12 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         // Check the Assetic resources
         foreach ($paths as $path) {
             /**
-             * @var $resource \Symfony\Component\DependencyInjection\DefinitionDecorator
+             * @var $resource \Symfony\Component\DependencyInjection\ChildDefinition
              */
             $resource = $container->getDefinition('hearsay_require_js.filenames_resource.' . md5($path));
 
             $this->assertInstanceOf(
-                'Symfony\Component\DependencyInjection\DefinitionDecorator',
+                'Symfony\Component\DependencyInjection\ChildDefinition',
                 $resource
             );
             $this->assertEquals(
@@ -330,7 +329,7 @@ class HearsayRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
         $container = $this->getContainerBuilder();
 
-        $this->setExpectedException('InvalidArgumentException', 'Unrecognized bundle: "UnknownBundle"');
+        $this->expectException('InvalidArgumentException');
 
         $this->extension->load(array($config), $container);
     }

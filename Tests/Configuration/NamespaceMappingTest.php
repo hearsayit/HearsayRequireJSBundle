@@ -12,12 +12,13 @@
 namespace Hearsay\RequireJSBundle\Tests\Configuration;
 
 use Hearsay\RequireJSBundle\Configuration\NamespaceMapping;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for the namespace mapping container.
  * @author Kevin Montag <kevin@hearsay.it>
  */
-class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
+class NamespaceMappingTest extends TestCase
 {
     /**
      * @var NamespaceMapping
@@ -39,10 +40,7 @@ class NamespaceMappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testNonExistentModulePathThrowsException()
     {
-        $this->setExpectedException(
-            'Hearsay\RequireJSBundle\Exception\PathNotFoundException',
-            ''
-        );
+        $this->expectException('Hearsay\RequireJSBundle\Exception\PathNotFoundException');
 
         $this->mapping->registerNamespace('dir', 'root');
     }

@@ -11,15 +11,16 @@
 
 namespace Hearsay\RequireJSBundle\Tests\Twig\Extension;
 
+use Hearsay\RequireJSBundle\Configuration\ConfigurationBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Scope;
 
 use Hearsay\RequireJSBundle\Twig\Extension\RequireJSExtension;
 
 /**
  * @author Igor Timoshenko <igor.timoshenko@i.ua>
  */
-class RequireJSExtensionTest extends \PHPUnit_Framework_TestCase
+class RequireJSExtensionTest extends TestCase
 {
     /**
      * @var Container
@@ -69,8 +70,18 @@ class RequireJSExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetGlobalsInActiveRequestScope()
     {
-        $this->container->addScope(new Scope('request'));
-        $this->container->enterScope('request');
+        $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+
+        $requestStack = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
+            ->getMock();
+
+        $requestStack
+            ->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+
+        $this->container->set('request_stack', $requestStack);
 
         $this->assertEquals(
             array('require_js' => array('config' => array())),
