@@ -52,12 +52,15 @@ class RequireJSExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'require_js_initialize' => new \Twig_Function_Method(
-                $this,
-                'initialize',
+            new \Twig_SimpleFunction(
+                'require_js_initialize',
+                array($this, 'initialize'),
                 array('is_safe' => array('html'))
             ),
-            'require_js_src'        => new \Twig_Function_Method($this, 'src'),
+            new \Twig_SimpleFunction(
+                'require_js_src',
+                array($this, 'src')
+            ),
         );
     }
 
@@ -66,7 +69,8 @@ class RequireJSExtension extends \Twig_Extension
      */
     public function getGlobals()
     {
-        if (!$this->container->isScopeActive('request')) {
+        if (!$this->container->has('request_stack') ||
+            !$this->container->get('request_stack')->getCurrentRequest()) {
             return array();
         }
 

@@ -5,5 +5,5 @@ help:
 
 test:
 	php vendor/bin/phpcs --standard=PSR2 --ignore=vendor/ --extensions=php . -n -p
-	wget https://raw.github.com/jrburke/r.js/2.1.8/dist/r.js -nc
+	curl -LO https://raw.github.com/jrburke/r.js/2.1.8/dist/r.js
 	php vendor/bin/phpunit --coverage-text

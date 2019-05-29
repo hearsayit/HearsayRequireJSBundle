@@ -15,58 +15,58 @@ parameters:
 
 services:
   hearsay_require_js.module_formula_loader:
-    class: %hearsay_require_js.module_formula_loader.class%
+    class: '%hearsay_require_js.module_formula_loader.class%'
     arguments:
-      - @assetic.asset_factory
-      - @hearsay_require_js.namespace_mapping
+      - '@assetic.asset_factory'
+      - '@hearsay_require_js.namespace_mapping'
     tags:
       - { name: assetic.formula_loader, alias: require_js }
 
   hearsay_require_js.filenames_resource:
-    class: %hearsay_require_js.filenames_resource.class%
+    class: '%hearsay_require_js.filenames_resource.class%'
     abstract: true
 
   hearsay_require_js.namespace_mapping:
-    class: %hearsay_require_js.namespace_mapping.class%
+    class: '%hearsay_require_js.namespace_mapping.class%'
     arguments:
-      - %hearsay_require_js.base_url%
+      - '%hearsay_require_js.base_url%'
     public: false
 
   hearsay_require_js.configuration_builder:
-    class: %hearsay_require_js.configuration_builder.class%
+    class: '%hearsay_require_js.configuration_builder.class%'
     arguments:
-      - @service_container
-      - @hearsay_require_js.namespace_mapping
-      - %hearsay_require_js.base_url%
-      - %hearsay_require_js.shim%
+      - '@service_container'
+      - '@hearsay_require_js.namespace_mapping'
+      - '%hearsay_require_js.base_url%'
+      - '%hearsay_require_js.shim%'
     public: false
 
   hearsay_require_js.templating_helper:
-    class: %hearsay_require_js.templating_helper.class%
+    class: '%hearsay_require_js.templating_helper.class%'
     arguments:
-      - @templating
-      - @hearsay_require_js.configuration_builder
-      - %hearsay_require_js.initialize_template%
-      - %hearsay_require_js.require_js_src%
+      - '@templating'
+      - '@hearsay_require_js.configuration_builder'
+      - '%hearsay_require_js.initialize_template%'
+      - '%hearsay_require_js.require_js_src%'
     tags:
       - { name: templating.helper }
 
   hearsay_require_js.twig_extension:
-    class: %hearsay_require_js.twig_extension.class%
+    class: '%hearsay_require_js.twig_extension.class%'
     arguments:
-      - @service_container
-      - @hearsay_require_js.configuration_builder
+      - '@service_container'
+      - '@hearsay_require_js.configuration_builder'
     tags:
       - { name: twig.extension }
 
   hearsay_require_js.optimizer_filter:
-    class: %hearsay_require_js.optimizer_filter.class%
+    class: '%hearsay_require_js.optimizer_filter.class%'
     arguments:
-      - %assetic.node.bin%
-      - %hearsay_require_js.r.path%
-      - %hearsay_require_js.base_dir%
-      - %hearsay_require_js.declare_module_name%
+      - '%assetic.node.bin%'
+      - '%hearsay_require_js.r.path%'
+      - '%hearsay_require_js.base_dir%'
+      - '%hearsay_require_js.declare_module_name%'
     calls:
-      - [ addNodePath, [%assetic.node.bin%] ]
+      - [ addNodePath, ['%assetic.node.bin%'] ]
     tags:
       - { name: assetic.filter, alias: requirejs }

@@ -12,12 +12,13 @@
 namespace Hearsay\RequireJSBundle\Tests\Templating\Helper;
 
 use Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for the templating helper.
  * @author Kevin Montag <kevin@hearsay.it>
  */
-class RequireJSHelperTest extends \PHPUnit_Framework_TestCase
+class RequireJSHelperTest extends TestCase
 {
     /**
      * @covers Hearsay\RequireJSBundle\Templating\Helper\RequireJSHelper::initialize
@@ -94,7 +95,7 @@ class RequireJSHelperTest extends \PHPUnit_Framework_TestCase
      */
     private function getEngineMock($config = null, $main = null)
     {
-        $engine = $this->getMock('Symfony\Component\Templating\EngineInterface');
+        $engine = $this->createMock('Symfony\Component\Templating\EngineInterface');
         $engine->expects($this->once())
             ->method('render')
             ->with('template', array(

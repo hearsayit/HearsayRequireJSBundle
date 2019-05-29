@@ -12,6 +12,7 @@
 namespace Hearsay\RequireJSBundle\Tests\Filter;
 
 use Assetic\Asset\FileAsset;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\ExecutableFinder;
 
 use Assetic\Asset\StringAsset;
@@ -22,7 +23,7 @@ use Hearsay\RequireJSBundle\Assetic\Filter\RJsFilter;
  * @author Kevin Montag <kevin@hearsay.it>
  * @author Igor Timoshenko <igor.timoshenko@i.ua>
  */
-class RJsFilterTest extends \PHPUnit_Framework_TestCase
+class RJsFilterTest extends TestCase
 {
     /**
      * @var string
@@ -110,7 +111,7 @@ require(['unknown/module'], function(module) {
 });
 JS;
 
-        $this->setExpectedException('Assetic\Exception\FilterException');
+        $this->expectException('Assetic\Exception\FilterException');
 
         $this->getStringAsset($javascript)->dump();
     }

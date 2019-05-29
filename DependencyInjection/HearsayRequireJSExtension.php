@@ -12,7 +12,7 @@
 namespace Hearsay\RequireJSBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -148,7 +148,7 @@ class HearsayRequireJSExtension extends Extension
         }
 
         if ($generateAssets) {
-            $resource = new DefinitionDecorator('hearsay_require_js.filenames_resource');
+            $resource = new ChildDefinition('hearsay_require_js.filenames_resource');
             $resource->setArguments(array($location));
             $resource->addTag('assetic.formula_resource', array('loader' => 'require_js'));
             $container->addDefinitions(array(
